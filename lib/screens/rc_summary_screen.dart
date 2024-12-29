@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/models/item_summary.dart';
 import 'package:gsr/models/item_summary_customer_wise.dart';
-import 'package:gsr/modules/select_previous_invoice/select_previous_invoice_screen.dart';
+import 'package:gsr/screens/select_previous_invoice_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/data_provider.dart';
@@ -66,7 +66,7 @@ class _RCSummaryScreenState extends State<RCSummaryScreen> {
                       Padding(
                         padding: const EdgeInsets.all(5.0),
                         child: Text(
-                          dataProvider.currentRouteCard!.date!.toString(),
+                          dataProvider.currentRouteCard!.date!,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 18.0,
@@ -90,7 +90,7 @@ class _RCSummaryScreenState extends State<RCSummaryScreen> {
                       Padding(
                         padding: const EdgeInsets.all(5.0),
                         child: Text(
-                          dataProvider.currentRouteCard?.route?.routeName ?? '',
+                          dataProvider.currentRouteCard?.route.routeName ?? '',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 18.0,

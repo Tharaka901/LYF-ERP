@@ -1,69 +1,64 @@
 import 'package:flutter/widgets.dart';
 import 'package:gsr/models/added_item.dart';
-import 'package:gsr/models/cheque/cheque.dart';
-import 'package:gsr/models/customer/customer_model.dart';
+import 'package:gsr/models/cheque.dart';
+import 'package:gsr/models/customer.dart';
 import 'package:gsr/models/customer_deposite.dart';
-import 'package:gsr/models/employee/employee_model.dart';
+import 'package:gsr/models/employee.dart';
 import 'package:gsr/models/invoice.dart';
-import 'package:gsr/models/issued_invoice_paid_model/issued_invoice_paid.dart';
+import 'package:gsr/models/issued_invoice.dart';
+import 'package:gsr/models/issued_invoice_paid.dart';
 import 'package:gsr/models/paid_balance.dart';
-import 'package:gsr/models/route_card/route_card_model.dart';
-import 'package:gsr/models/route_card_item/route_card_item_model.dart';
+import 'package:gsr/models/route_card.dart';
+import 'package:gsr/models/routecard_item.dart';
 import 'package:gsr/models/voucher.dart';
 
 import '../models/cylinder.dart';
-import '../models/invoice/invoice_model.dart';
 import '../services/database.dart';
 
 class DataProvider extends ChangeNotifier {
-  EmployeeModel? _currentEmployee;
-  RouteCardModel? _currentRouteCard;
-  CustomerModel? _selectedCustomer;
-  InvoiceModel? _selectedInvoice;
+  Employee? _currentEmployee;
+  RouteCard? _currentRouteCard;
+  Customer? _selectedCustomer;
+  IssuedInvoice? _selectedInvoice;
   final _itemList = <AddedItem>[];
-  final _chequeList = <ChequeModel>[];
-  final _rcItemList = <RouteCardItemModel>[];
+  final _chequeList = <Cheque>[];
+  final _rcItemList = <RoutecardItem>[];
   final _paidBalanceList = <PaidBalance>[];
-  final _issuedInvoicePaidList = <IssuedInvoicePaidModel>[];
-  List<IssuedDepositePaidModel> issuedDepositePaidList =
-      <IssuedDepositePaidModel>[];
+  final _issuedInvoicePaidList = <IssuedInvoicePaid>[];
+  List<IssuedDepositePaid> issuedDepositePaidList = <IssuedDepositePaid>[];
   Invoice? _currentInvoice;
   CustomerDeposite? selectedDeposite;
-  VoucherModel? _selectedVoucher;
+  Voucher? _selectedVoucher;
   List<Cylinder> cylinderList = [];
   List<Cylinder> selectedCylinderList = [];
   List<int> selectedCylinderItemIds = [];
   bool isManualReceipt = false;
 
-  EmployeeModel? get currentEmployee => _currentEmployee;
-  RouteCardModel? get currentRouteCard => _currentRouteCard;
-  CustomerModel? get selectedCustomer => _selectedCustomer;
+  Employee? get currentEmployee => _currentEmployee;
+  RouteCard? get currentRouteCard => _currentRouteCard;
+  Customer? get selectedCustomer => _selectedCustomer;
   Invoice? get currentInvoice => _currentInvoice;
-  VoucherModel? get selectedVoucher => _selectedVoucher;
-  InvoiceModel? get selectedInvoice => _selectedInvoice;
+  Voucher? get selectedVoucher => _selectedVoucher;
+  IssuedInvoice? get selectedInvoice => _selectedInvoice;
   List<AddedItem> get itemList => _itemList;
-  List<ChequeModel> get chequeList => _chequeList;
-  List<RouteCardItemModel> get rcItemList => _rcItemList;
+  List<Cheque> get chequeList => _chequeList;
+  List<RoutecardItem> get rcItemList => _rcItemList;
   List<PaidBalance> get paidBalanceList => _paidBalanceList;
-  List<IssuedInvoicePaidModel> get issuedInvoicePaidList =>
-      _issuedInvoicePaidList;
-  double get nonVatItemTotal => itemList.isEmpty
-      ? 0
-      : itemList
-          .map((e) => e.item.nonVatAmount! * e.quantity)
-          .reduce((value, element) => value + element);
+  List<IssuedInvoicePaid> get issuedInvoicePaidList => _issuedInvoicePaidList;
+  double get nonVatItemTotal => itemList.isEmpty ? 0: itemList
+      .map((e) => e.item.nonVatAmount! * e.quantity)
+      .reduce((value, element) => value + element);
 
   double get vat =>
       double.parse(((getTotalAmount() / 100) * 18).toStringAsFixed(2));
-  double get grandTotal => double.parse(
-      (getTotalAmount() + vat + nonVatItemTotal).toStringAsFixed(2));
+  double get grandTotal => double.parse((getTotalAmount() + vat + nonVatItemTotal).toStringAsFixed(2));
 
-  setCurrentEmployee(EmployeeModel currentEmployee) {
+  setCurrentEmployee(Employee currentEmployee) {
     _currentEmployee = currentEmployee;
     notifyListeners();
   }
 
-  setCurrentRouteCard(RouteCardModel currentRouteCard) {
+  setCurrentRouteCard(RouteCard currentRouteCard) {
     _currentRouteCard = currentRouteCard;
     notifyListeners();
   }
@@ -72,22 +67,22 @@ class DataProvider extends ChangeNotifier {
     _currentInvoice = currentInvoice;
   }
 
-  setSelectedCustomer(CustomerModel? selectedCustomer) {
+  setSelectedCustomer(Customer? selectedCustomer) {
     _selectedCustomer = selectedCustomer;
     notifyListeners();
   }
 
-  setSelectedInvoice(InvoiceModel? selectedInvoice) {
+  setSelectedInvoice(IssuedInvoice? selectedInvoice) {
     _selectedInvoice = selectedInvoice;
     //notifyListeners();
   }
 
   setSelectedDeposite(CustomerDeposite? selectedDeposite1) {
     selectedDeposite = selectedDeposite1;
-    //notifyListeners();
+    notifyListeners();
   }
 
-  setSelectedVoucher(VoucherModel? selectedVoucher) {
+  setSelectedVoucher(Voucher? selectedVoucher) {
     _selectedVoucher = selectedVoucher;
   }
 
@@ -106,12 +101,12 @@ class DataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  addPaidDeposite(IssuedDepositePaidModel issuedDepositePaid) {
+  addPaidDeposite(IssuedDepositePaid issuedDepositePaid) {
     issuedDepositePaidList.add(issuedDepositePaid);
     notifyListeners();
   }
 
-  addPaidIssuedInvoice(IssuedInvoicePaidModel issuedInvoicePaid) {
+  addPaidIssuedInvoice(IssuedInvoicePaid issuedInvoicePaid) {
     _issuedInvoicePaidList.add(issuedInvoicePaid);
     notifyListeners();
   }
@@ -121,7 +116,7 @@ class DataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  addRCItem(RouteCardItemModel rcItem) {
+  addRCItem(RoutecardItem rcItem) {
     _rcItemList.add(rcItem);
   }
 
@@ -134,7 +129,7 @@ class DataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  addCheque(ChequeModel cheque) {
+  addCheque(Cheque cheque) {
     _chequeList.add(cheque);
     notifyListeners();
   }
@@ -143,13 +138,13 @@ class DataProvider extends ChangeNotifier {
     _chequeList.clear();
   }
 
-  removeCheque(ChequeModel cheque) {
+  removeCheque(Cheque cheque) {
     _chequeList
         .removeWhere((element) => element.chequeNumber == cheque.chequeNumber);
     notifyListeners();
   }
 
-  removePaidIssuedInvoice(IssuedInvoicePaidModel issuedInvoicePaid) {
+  removePaidIssuedInvoice(IssuedInvoicePaid issuedInvoicePaid) {
     _issuedInvoicePaidList.removeWhere(
       (element) =>
           element.issuedInvoice.invoiceId ==
@@ -158,7 +153,7 @@ class DataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  removePaidDepositeInvoice(IssuedDepositePaidModel issuedDepositePaid) {
+  removePaidDepositeInvoice(IssuedDepositePaid issuedDepositePaid) {
     issuedDepositePaidList.removeWhere(
       (element) =>
           element.issuedDeposite.paymentInvoiceId ==

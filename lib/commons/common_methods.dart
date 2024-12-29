@@ -196,7 +196,7 @@ popValue(BuildContext context, {required dynamic value}) {
   Navigator.of(context).pop(value);
 }
 
-price(double price) {
+String price(double price) {
   final bool negative = price < 0;
   return MoneyFormatter(
     amount: negative ? -price : price,

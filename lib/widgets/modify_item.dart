@@ -26,7 +26,7 @@ class _ModifyItemState extends State<ModifyItem> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(widget.addedItem.item.itemName ),
+            Text(widget.addedItem.item.itemName),
             const SizedBox(
               height: 10.0,
             ),

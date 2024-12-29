@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
-
-import '../models/invoice/invoice_model.dart';
+import 'package:gsr/models/issued_invoice.dart';
+import 'package:pattern_formatter/pattern_formatter.dart';
 
 class PreviousInvoiceForm extends StatefulWidget {
-  final InvoiceModel issuedInvoice;
+  final IssuedInvoice issuedInvoice;
   final TextEditingController amountController;
   final GlobalKey<FormState> formKey;
   const PreviousInvoiceForm({
@@ -28,7 +28,7 @@ class _PreviousInvoiceFormState extends State<PreviousInvoiceForm> {
         child: Column(
           children: [
             Text(
-              price(widget.issuedInvoice.creditValue!),
+              price(widget.issuedInvoice.creditValue),
               style: const TextStyle(fontSize: 20.0),
             ),
             const SizedBox(
@@ -53,7 +53,7 @@ class _PreviousInvoiceFormState extends State<PreviousInvoiceForm> {
                   } else if (double.parse(chequeAmount) <= 0) {
                     return 'Invalid payment amount!';
                   } else if (double.parse(chequeAmount) >
-                      widget.issuedInvoice.creditValue!) {
+                      widget.issuedInvoice.creditValue) {
                     return 'Maximam payment amount is ${widget.issuedInvoice.creditValue}';
                   } else {
                     return null;

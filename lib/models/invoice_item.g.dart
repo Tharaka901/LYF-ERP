@@ -7,7 +7,7 @@ part of 'invoice_item.dart';
 // **************************************************************************
 
 InvoiceItem _$InvoiceItemFromJson(Map<String, dynamic> json) => InvoiceItem(
-      item: ItemModel.fromJson(json['item'] as Map<String, dynamic>),
+      item: Item.fromJson(json['item'] as Map<String, dynamic>),
       itemPrice: (json['itemPrice'] as num).toDouble(),
       itemQty: (json['itemQty'] as num).toDouble(),
       status: json['status'] as int,

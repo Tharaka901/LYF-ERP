@@ -18,6 +18,7 @@ class PrintReceiptView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Print Receipt'),
+        automaticallyImplyLeading: false,
       ),
       body: PdfPreview(
         onPrinted: (context) async {},

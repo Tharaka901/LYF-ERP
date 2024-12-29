@@ -1,18 +1,16 @@
-import 'package:gsr/models/route_card/route_card_model.dart';
-
 import '../commons/common_methods.dart';
+import '../models/cash_settle/cash_settle.dart';
 
 class RouteCardService {
-  Future<List<RouteCardModel>> getPendingAndAcceptedRouteCards(int uid) async {
+  Future<void> cashSettle(CashSettlementModel cashSettlement) async {
     try {
-      final response = await respo(
-        'route-card/get-by-uid/$uid?status=10',
+      print(cashSettlement.toJson());
+      final t = await respo(
+        'route-card/cash-save',
+        method: Method.post,
+        data: cashSettlement.toJson(),
       );
-      List<dynamic> list = response.data;
-      return list
-          .map((element) => RouteCardModel.fromJson(element))
-          .where((rc) => (rc.status == 0 || rc.status == 1))
-          .toList();
+      print(t.error);
     } catch (e) {
       print(e);
       rethrow;

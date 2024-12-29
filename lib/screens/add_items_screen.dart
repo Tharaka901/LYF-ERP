@@ -3,7 +3,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/added_item.dart';
-import 'package:gsr/models/item/item_model.dart';
+import 'package:gsr/models/item.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/providers/items_provider.dart';
 import 'package:gsr/screens/leak_note_screen.dart';
@@ -11,6 +11,7 @@ import 'package:gsr/screens/loan_note_screen.dart';
 import 'package:gsr/screens/return_note_screen.dart';
 import 'package:gsr/modules/invoice/invoice_view.dart';
 import 'package:gsr/widgets/add_items.dart';
+import 'package:gsr/widgets/buttons/basic_switch.dart';
 import 'package:gsr/widgets/cards/add_item_card.dart';
 import 'package:gsr/widgets/modify_item.dart';
 import 'package:gsr/widgets/option_card.dart';
@@ -31,10 +32,10 @@ class AddItemsScreen extends StatefulWidget {
 class _AddItemsScreenState extends State<AddItemsScreen> {
   @override
   void initState() {
-   
-    super.initState();
-     final itemsProvider = Provider.of<ItemsProvider>(context, listen: false);
+    final itemsProvider = Provider.of<ItemsProvider>(context, listen: false);
+    itemsProvider.isLoadingItems = true;
     itemsProvider.getBasicItems(context);
+    super.initState();
   }
 
   @override
@@ -103,9 +104,9 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                 final cylindserNumberController = TextEditingController();
                 final referenceNumberController = TextEditingController();
                 final formKey = GlobalKey<FormState>();
-                ItemModel? item;
+                Item? item;
                 double? maxQuantity;
-                callBack({required ItemModel selectedItem, required double maxQty}) {
+                callBack({required Item selectedItem, required double maxQty}) {
                   item = selectedItem;
                   if (selectedItem.hasSpecialPrice != null) {
                     item?.salePrice = selectedItem.hasSpecialPrice!.itemPrice;
@@ -145,7 +146,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                                     leakTypeController.text == 'Leak Recive'
                                         ? 2
                                         : 3,
-                                item: ItemModel(
+                                item: Item(
                                     id: item!.id,
                                     itemRegNo: item!.itemRegNo,
                                     itemName: item!.itemName,
@@ -194,7 +195,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                             leakType: leakTypeController.text == 'Leak Recive'
                                 ? 2
                                 : 3,
-                            item: ItemModel(
+                            item: Item(
                                 id: item!.id,
                                 itemRegNo: item!.itemRegNo,
                                 itemName: item!.itemName,

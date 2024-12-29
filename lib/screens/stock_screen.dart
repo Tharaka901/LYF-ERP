@@ -44,7 +44,7 @@ class StockScreen extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(5.0),
                         child: Text(
-                          dataProvider.currentRouteCard!.date!.toString(),
+                          dataProvider.currentRouteCard!.date!,
                           //date(dataProvider.currentRouteCard!.date as DateTime, format: 'dd.MM.yyyy'),
                           textAlign: TextAlign.center,
                           style: const TextStyle(
@@ -69,7 +69,7 @@ class StockScreen extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(5.0),
                         child: Text(
-                          dataProvider.currentRouteCard?.route?.routeName ?? '',
+                          dataProvider.currentRouteCard?.route.routeName ?? '',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 18.0,

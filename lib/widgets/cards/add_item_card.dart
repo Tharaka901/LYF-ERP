@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:gsr/models/route_card_item/route_card_item_model.dart';
 
+import '../../models/routecard_item.dart';
 import '../counter.dart';
 
 class AddItemCard extends StatelessWidget {
-  final RouteCardItemModel routecardItem;
+  final RoutecardItem routecardItem;
   const AddItemCard(this.routecardItem);
 
   @override

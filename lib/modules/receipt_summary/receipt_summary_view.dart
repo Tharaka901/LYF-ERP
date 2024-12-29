@@ -3,7 +3,7 @@ import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/credit_payment.dart';
 import 'package:gsr/models/credit_payment/credit_payment_model.dart';
 import 'package:gsr/modules/receipt_summary/receipt_summary_provider.dart';
-import 'package:gsr/modules/select_previous_invoice/select_previous_invoice_screen.dart';
+import 'package:gsr/screens/select_previous_invoice_screen.dart';
 import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
 

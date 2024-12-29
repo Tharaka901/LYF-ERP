@@ -1,10 +1,10 @@
 class CustomerModel {
   final int? customerId;
-  final String registrationId;
+  final String? registrationId;
   final DateTime? regDate;
   final String? customerVat;
   final String? dealerCode;
-  final String businessName;
+  final String? businessName;
   final String? parentCompany;
   final String? ownerName;
   final String? address;
@@ -16,16 +16,16 @@ class CustomerModel {
   final int? priceLevelId;
   final int? routeId;
   final int? employeeId;
-  final double depositBalance;
+  final double? depositBalance;
   final int? status;
 
   CustomerModel({
     this.customerId,
-    required this.registrationId,
+    this.registrationId,
     this.regDate,
     this.customerVat,
     this.dealerCode,
-    required this.businessName,
+    this.businessName,
     this.parentCompany,
     this.ownerName,
     this.address,
@@ -37,11 +37,11 @@ class CustomerModel {
     this.priceLevelId,
     this.routeId,
     this.employeeId,
-    required this.depositBalance,
+    this.depositBalance,
     this.status,
   });
 
-  factory CustomerModel.fromJson(Map<dynamic, dynamic> json) => CustomerModel(
+  factory CustomerModel.fromJson(Map<String, dynamic> json) => CustomerModel(
         customerId: json["customerId"],
         registrationId: json["registrationId"],
         regDate:

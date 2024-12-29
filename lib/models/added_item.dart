@@ -1,7 +1,7 @@
-import 'package:gsr/models/item/item_model.dart';
+import 'package:gsr/models/item.dart';
 
 class AddedItem {
-  final ItemModel item;
+  final Item item;
   double quantity;
   final double maxQuantity;
   final int? loanType;

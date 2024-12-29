@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/providers/data_provider.dart';
+import 'package:pattern_formatter/pattern_formatter.dart';
 import 'package:provider/provider.dart';
 
 class ChequeForm extends StatefulWidget {

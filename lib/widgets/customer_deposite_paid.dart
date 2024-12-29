@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/balance.dart';
+import 'package:gsr/models/customer_deposite.dart';
 import 'package:gsr/providers/data_provider.dart';
+import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
 
-import '../models/issued_invoice_paid_model/issued_invoice_paid.dart';
-import '../modules/view_receipt/invoice_receipt_view_model.dart';
+import '../models/issued_invoice_paid.dart';
 
 class CustomerDepositePaid extends StatefulWidget {
   final double balnce;
@@ -32,17 +33,19 @@ class _CustomerDepositePaidState extends State<CustomerDepositePaid> {
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    final invoiceReceiptViewModel = InvoiceReceiptViewModel();
     return SingleChildScrollView(
       child: Form(
         key: widget.formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            FutureBuilder<List<dynamic>>(
-              future: invoiceReceiptViewModel.getCustomerDeposites(context),
-              builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
-                return DropdownButtonFormField<dynamic>(
+            FutureBuilder<List<CustomerDeposite>>(
+              future: getCustomerDeposites(context,
+                  cId: dataProvider.selectedCustomer!.customerId,
+                  routecardId: dataProvider.currentRouteCard?.routeCardId),
+              builder:
+                  (context, AsyncSnapshot<List<CustomerDeposite>> snapshot) {
+                return DropdownButtonFormField<CustomerDeposite>(
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
@@ -57,6 +60,18 @@ class _CustomerDepositePaidState extends State<CustomerDepositePaid> {
                   value: snapshot.hasData && snapshot.data!.isNotEmpty
                       ? snapshot.data![0]
                       : null,
+                  // validator: (value) {
+                  //   if (value == null) {
+                  //     return 'Select an invoice!';
+                  //   } else if (dataProvider.paidBalanceList
+                  //       .where((element) =>
+                  //           element.balance.customerBalanceId ==
+                  //           value.customerBalanceId)
+                  //       .isNotEmpty) {
+                  //     return 'Already added!';
+                  //   }
+                  //   return null;
+                  // },
                   items: snapshot.hasData
                       ? snapshot.data!.map((element) {
                           return DropdownMenuItem(
@@ -100,7 +115,7 @@ class _CustomerDepositePaidState extends State<CustomerDepositePaid> {
                     return 'Maximum ${price(-widget.balnce)}';
                   }
                   data.addPaidDeposite(
-                    IssuedDepositePaidModel(
+                    IssuedDepositePaid(
                       depositeValue: data.selectedDeposite!.value?.toDouble(),
                       issuedDeposite: data.selectedDeposite!,
                       paymentAmount: doub(

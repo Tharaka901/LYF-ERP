@@ -153,12 +153,12 @@ class _LeakNoteScreenState extends State<LeakNoteScreen> {
                                 .toList(),
                             invoiceNo: snapshot.data!,
                             routecardId:
-                                dataProvider.currentRouteCard!.routeCardId!,
+                                dataProvider.currentRouteCard!.routeCardId,
                             amount: dataProvider.getTotalAmount(),
                             customerId:
                                 dataProvider.selectedCustomer?.customerId ?? 0,
                             employeeId:
-                                dataProvider.currentEmployee!.employeeId!,
+                                dataProvider.currentEmployee!.employeeId,
                           ));
                           return Text(
                               (dataProvider.itemList[0].leakType == 2

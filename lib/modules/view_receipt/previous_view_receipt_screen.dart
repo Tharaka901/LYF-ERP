@@ -3,13 +3,12 @@ import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/providers/payment_provider.dart';
+import 'package:gsr/services/database.dart';
 import 'package:gsr/widgets/confirm_for_save_and_print.dart';
 import 'package:provider/provider.dart';
 
-import '../../services/database.dart';
-import '../previous_customer_select/previous_screen.dart';
+import '../../screens/previous_screen.dart';
 import '../print/print_invoice_view.dart';
-import 'invoice_receipt_view_model.dart';
 
 class PreviousViewReceiptScreen extends StatefulWidget {
   static const routeId = 'PREVIOUS_RECEIPT';
@@ -36,7 +35,6 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final invoiceReceiptViewModel = InvoiceReceiptViewModel();
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     final double cash = (ModalRoute.of(context)!.settings.arguments
         as Map<String, dynamic>)['cash'];
@@ -508,17 +506,20 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                               return;
                             }
                             waiting(context, body: 'Sending...');
-                            await invoiceReceiptViewModel
-                                .pay(
-                              context: context,
-                              cash: cash,
-                              isDirectPrevious: false,
-                              balance: 0,
+                            await sendCreditPayment(
+                              context,
+                              dataProvider.getTotalChequeAmount() +
+                                  cash +
+                                  (dataProvider.selectedVoucher != null
+                                      ? dataProvider.selectedVoucher!.value
+                                      : 0.0),
+                              cash,
+                              false,
+                              0,
                               receiptNo: dataProvider.isManualReceipt
                                   ? _usernameController.text
                                   : null,
-                            )
-                                .then((value) {
+                            ).then((value) {
                               Navigator.popUntil(context,
                                   ModalRoute.withName(PreviousScreen.routeId));
                               toast(

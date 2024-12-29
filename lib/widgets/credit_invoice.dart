@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/balance.dart';
-import 'package:gsr/modules/invoice/invoice_provider.dart';
+import 'package:gsr/models/issued_invoice.dart';
 import 'package:gsr/providers/data_provider.dart';
+import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
 
-import '../models/issued_invoice_paid_model/issued_invoice_paid.dart';
-import '../modules/view_receipt/invoice_receipt_view_model.dart';
+import '../models/issued_invoice_paid.dart';
 
 class CreditInvoice extends StatefulWidget {
   final TextEditingController paymentController;
   final GlobalKey<FormState> formKey;
   final double balance;
+  final int? invoiceId;
   final void Function(Balance selectedBalance) callBack;
   const CreditInvoice({
     Key? key,
@@ -19,6 +20,7 @@ class CreditInvoice extends StatefulWidget {
     required this.formKey,
     required this.callBack,
     required this.balance,
+    this.invoiceId,
   }) : super(key: key);
 
   @override
@@ -31,26 +33,21 @@ class _CreditInvoiceState extends State<CreditInvoice> {
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    final invoiceProvider =
-        Provider.of<InvoiceProvider>(context, listen: false);
-    final invoiceReceiptViewModel = InvoiceReceiptViewModel();
     return SingleChildScrollView(
       child: Form(
         key: widget.formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            FutureBuilder<List<dynamic>>(
-              future: invoiceReceiptViewModel.getCreditInvoices(
+            FutureBuilder<List<IssuedInvoice>>(
+              future: creditInvoices(
                 context,
                 cId: dataProvider.selectedCustomer!.customerId,
                 type: 'with-cheque',
-                invoiceId: invoiceProvider.invoiceRes?.data['invoice']
-                        ['invoiceId'] ??
-                    0,
+                invoiceId: widget.invoiceId,
               ),
-              builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
-                return DropdownButtonFormField<dynamic>(
+              builder: (context, AsyncSnapshot<List<IssuedInvoice>> snapshot) {
+                return DropdownButtonFormField<IssuedInvoice>(
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
@@ -70,7 +67,7 @@ class _CreditInvoiceState extends State<CreditInvoice> {
                           return DropdownMenuItem(
                             value: element,
                             child: Text(
-                              '${element.invoiceNo}  ${price(element.creditValue ?? 0)}',
+                              '${element.invoiceNo}  ${price(element.creditValue)}',
                             ),
                           );
                         }).toList()
@@ -111,7 +108,7 @@ class _CreditInvoiceState extends State<CreditInvoice> {
                     return 'Maximum ${price(widget.balance - data.getTotalCreditPaymentAmount())}';
                   }
                   data.addPaidIssuedInvoice(
-                    IssuedInvoicePaidModel(
+                    IssuedInvoicePaid(
                       creditAmount: data.selectedInvoice!.creditValue,
                       issuedInvoice: data.selectedInvoice!,
                       chequeId: data.selectedInvoice?.chequeId,

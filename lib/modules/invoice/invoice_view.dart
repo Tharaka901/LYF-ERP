@@ -25,8 +25,8 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
   void initState() {
     final invoiceProvider =
         Provider.of<InvoiceProvider>(context, listen: false);
-    invoiceProvider.invoiceNu == null;
-    invoiceProvider.getInvoiceNu(context);
+    if (invoiceProvider.invoiceNu == null)
+      invoiceProvider.getInvoiceNu(context);
     super.initState();
   }
 
@@ -64,6 +64,7 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                     waiting(context, body: 'Sending...');
                     await invoiceProvider.createInvoiceDB(context, null);
                     pop(context);
+                    print(invoiceProvider.invoiceRes);
                     Navigator.pushNamed(context, AddPaymentScreen.routeId,
                         arguments: {'invoiceRes': invoiceProvider.invoiceRes});
                   }
@@ -109,7 +110,7 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
-                              dataProvider.selectedCustomer!.businessName,
+                              dataProvider.selectedCustomer?.businessName ?? '',
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontSize: 16.0,
@@ -122,6 +123,40 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                     ],
                   ),
                 ),
+                SizedBox(
+                  width: double.infinity,
+                  child: Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.all(5.0),
+                            child: Text(
+                              'Address to:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Text(
+                              dataProvider.selectedCustomer?.address ?? '-',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 16.0,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                    ],
+                  ),
+                ),
+
                 SizedBox(
                   width: double.infinity,
                   child: Row(
@@ -320,7 +355,6 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                                     child: Text(
                                       price(item.item.hasSpecialPrice != null
                                           ? item.item.hasSpecialPrice!.itemPrice
-                                              .toDouble()
                                           : item.item.salePrice),
                                       textAlign: TextAlign.center,
                                     ),

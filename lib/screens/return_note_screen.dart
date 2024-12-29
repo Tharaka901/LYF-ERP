@@ -141,12 +141,12 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
                                 .toList(),
                             invoiceNo: snapshot.data!,
                             routecardId:
-                                dataProvider.currentRouteCard!.routeCardId!,
+                                dataProvider.currentRouteCard!.routeCardId,
                             amount: dataProvider.getTotalAmount(),
                             customerId:
                                 dataProvider.selectedCustomer?.customerId ?? 0,
                             employeeId:
-                                dataProvider.currentEmployee!.employeeId!,
+                                dataProvider.currentEmployee!.employeeId,
                           ));
                           return Text('GRN/' + snapshot.data!,
                               textAlign: TextAlign.center,

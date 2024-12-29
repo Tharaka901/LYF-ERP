@@ -33,22 +33,22 @@ class AboutRCScreen extends StatelessWidget {
                   },
                   confirmText: 'Accept',
                   moreActions: [
-                    TextButton(
-                      onPressed: () {
-                        pop(context);
-                        popValue(
-                          context,
-                          value: 4,
-                        );
-                      },
-                      child: const Text(
-                        'Reject',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 20.0,
-                        ),
-                      ),
-                    ),
+                    // TextButton(
+                    //   onPressed: () {
+                    //     pop(context);
+                    //     popValue(
+                    //       context,
+                    //       value: 4,
+                    //     );
+                    //   },
+                    //   child: const Text(
+                    //     'Rejectss',
+                    //     style: TextStyle(
+                    //       color: Colors.red,
+                    //       fontSize: 20.0,
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 );
               },
@@ -69,15 +69,15 @@ class AboutRCScreen extends StatelessWidget {
                   '${dataProvider.currentEmployee!.firstName} ${dataProvider.currentEmployee!.lastName}',
             ),
             const Divider(),
-            ...routeCard.relatedEmployees!
+            ...routeCard.relatedEmployees
                 .where((re) =>
-                    re.employee!.employeeId! !=
+                    re.employee.employeeId !=
                     dataProvider.currentEmployee!.employeeId)
                 .map(
                   (re) => DetailCard(
                     detailKey: 'Helper',
                     detailvalue:
-                        '${re.employee!.firstName} ${re.employee!.lastName}',
+                        '${re.employee.firstName} ${re.employee.lastName}',
                   ),
                 ),
             const Divider(),
@@ -88,7 +88,7 @@ class AboutRCScreen extends StatelessWidget {
                   //   '12.5',
                   // ),
                   height: 20,
-                  title: (rci.item!).itemName,
+                  title: (rci.item ?? dummyItem).itemName,
                   titleFontSize: 20.0,
                   trailing: Text(
                     num(rci.transferQty),

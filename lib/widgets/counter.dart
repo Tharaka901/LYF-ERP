@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:gsr/models/item/item_model.dart';
-import 'package:gsr/models/route_card_item/route_card_item_model.dart';
+import 'package:gsr/models/item.dart';
+import 'package:gsr/models/routecard_item.dart';
 import 'package:provider/provider.dart';
 
 import '../models/added_item.dart';
 import '../providers/data_provider.dart';
 
 class CounterWidget extends StatefulWidget {
-  final RouteCardItemModel routecardItem;
+  final RoutecardItem routecardItem;
 
   const CounterWidget({super.key, required this.routecardItem});
   @override
@@ -34,7 +34,7 @@ class _CounterWidgetState extends State<CounterWidget> {
         final item = widget.routecardItem.item;
         dataProvider.addItem(
           AddedItem(
-            item: ItemModel(
+            item: Item(
                 id: item!.id,
                 itemRegNo: item.itemRegNo,
                 itemName: item.itemName,
@@ -50,7 +50,7 @@ class _CounterWidgetState extends State<CounterWidget> {
                 isNew: item.isNew,
                 status: item.status,
                 nonVatAmount: item.hasSpecialPrice != null
-                    ? item.hasSpecialPrice?.nonVatAmount!.toDouble()
+                    ? item.hasSpecialPrice?.nonVatAmount
                     : item.nonVatAmount),
             quantity: 1,
             maxQuantity: 1,
@@ -99,7 +99,7 @@ class _CounterWidgetState extends State<CounterWidget> {
         final item = widget.routecardItem.item;
         dataProvider.addItem(
           AddedItem(
-            item: ItemModel(
+            item: Item(
                 id: item!.id,
                 itemRegNo: item.itemRegNo,
                 itemName: item.itemName,
@@ -115,7 +115,7 @@ class _CounterWidgetState extends State<CounterWidget> {
                 isNew: item.isNew,
                 status: item.status,
                 nonVatAmount: item.hasSpecialPrice != null
-                    ? item.hasSpecialPrice?.nonVatAmount!.toDouble()
+                    ? item.hasSpecialPrice?.nonVatAmount
                     : item.nonVatAmount),
             quantity: value,
             maxQuantity: 1,
