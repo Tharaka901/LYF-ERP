@@ -95,9 +95,9 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                   const SizedBox(
                     height: 30.0,
                   ),
-                  TypeAheadFormField<Customer>(
-                    direction: AxisDirection.up,
-                    onSuggestionSelected: (customer) => setState(() {
+                  TypeAheadField<Customer>(
+                    direction: VerticalDirection.up,
+                    onSelected: (customer) => setState(() {
                       qrController.text = customer.registrationId;
                       dataProvider.setSelectedCustomer(customer);
                       setState(() {});
@@ -106,26 +106,29 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                       title: Text(customer.businessName),
                       subtitle: Text(customer.registrationId),
                     ),
-                    noItemsFoundBuilder: (context) => const Padding(
+                    emptyBuilder: (context) => const Padding(
                       padding: EdgeInsets.all(10.0),
                       child: Text('No customers matched!'),
                     ),
                     loadingBuilder: (context) =>
                         const Center(child: CircularProgressIndicator()),
-                    suggestionsCallback: (pattern) => getCustomers(pattern),
-                    textFieldConfiguration: TextFieldConfiguration(
-                      style: const TextStyle(fontSize: 18.0),
-                      controller: qrController,
-                      textAlign: TextAlign.center,
-                      decoration: InputDecoration(
-                        labelText: 'Scan or search customer',
-                        fillColor: Colors.grey,
-                        border: OutlineInputBorder(
-                          borderRadius: defaultBorderRadius,
+                    suggestionsCallback: (pattern) => selectCustomerViewModel
+                        .onPressedSearchCustomerTextField(pattern, context),
+                    builder: (context, controller, focusNode) {
+                      return TextField(
+                        controller: controller,
+                        focusNode: focusNode,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: 'Search customer',
+                          fillColor: Colors.grey,
+                          border: OutlineInputBorder(
+                            borderRadius: defaultBorderRadius,
+                          ),
                         ),
-                      ),
-                      onTap: () => qrController.clear(),
-                    ),
+                        onTap: () => qrController.clear(),
+                      );
+                    },
                   ),
                   const SizedBox(
                     height: 20.0,
