@@ -112,8 +112,7 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                     ),
                     loadingBuilder: (context) =>
                         const Center(child: CircularProgressIndicator()),
-                    suggestionsCallback: (pattern) => selectCustomerViewModel
-                        .onPressedSearchCustomerTextField(pattern, context),
+                    suggestionsCallback: (pattern) => getCustomers(pattern),
                     builder: (context, controller, focusNode) {
                       return TextField(
                         controller: controller,
