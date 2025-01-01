@@ -30,11 +30,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  mobile_scanner: ^3.5.6
   profile: ^0.0.1
   intl: ^0.19.0
   badges: ^2.0.3
   money_formatter: ^0.0.3
-  qr_code_scanner: ^1.0.1
+  # qr_code_scanner: ^1.0.1
   qr_flutter: ^4.0.0
   flutter_email_sender: ^6.0.3
   lottie: ^1.4.2
@@ -47,7 +48,7 @@ dependencies:
   shared_preferences: ^2.0.15
   fluttertoast: ^8.0.9
   provider: ^6.0.3
-  flutter_typeahead: ^4.3.7
+  flutter_typeahead: ^5.2.0
   number_to_words_english: ^2.0.2
   string_extensions: ^0.7.3
   printing: ^5.11.1
