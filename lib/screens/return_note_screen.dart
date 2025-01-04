@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 
 class ReturnNoteScreen extends StatefulWidget {
   final String type;
-  const ReturnNoteScreen({Key? key, required this.type}) : super(key: key);
+  const ReturnNoteScreen({super.key, required this.type});
 
   @override
   State<ReturnNoteScreen> createState() => _ReturnNoteScreenState();
@@ -22,14 +22,13 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
     const titleRowColor = Colors.white;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Return Note'),
+        title: const Text('Return Note'),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) =>
-                  SelectCreditInvoiceForReturnCylinderScreen()));
-         
+                  const SelectCreditInvoiceForReturnCylinderScreen()));
         },
         child: const Text('Next'),
       ),
@@ -39,14 +38,14 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 'Return Note',
                 style: TextStyle(
                     fontSize: 25.0,
                     color: Colors.blue,
                     fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: Row(
@@ -54,7 +53,7 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
+                        const Padding(
                           padding: EdgeInsets.all(5.0),
                           child: Text(
                             'Return From:',
@@ -107,7 +106,7 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
               ),
               Row(
                 children: [
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.all(5.0),
                     child: Text(
                       'Return Note Num:',
@@ -148,7 +147,7 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
                             employeeId:
                                 dataProvider.currentEmployee!.employeeId,
                           ));
-                          return Text('GRN/' + snapshot.data!,
+                          return Text('GRN/${snapshot.data!}',
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontSize: 16.0,
@@ -169,15 +168,15 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: Consumer<DataProvider>(
                   builder: (context, data, _) => Table(
-                    border: TableBorder.symmetric(),
+                    border: const TableBorder.symmetric(),
                     defaultColumnWidth: const IntrinsicColumnWidth(),
                     children: [
-                      TableRow(
+                      const TableRow(
                         decoration: BoxDecoration(
                           color: Colors.blue,
                         ),
@@ -242,50 +241,47 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
                           ),
                         ],
                       ),
-                      ...data.itemList
-                          .map(
-                            (item) => TableRow(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text(
-                                    (data.itemList.indexOf(item) + 1)
-                                        .toString(),
-                                    textAlign: TextAlign.start,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text(
-                                    item.item.itemName,
-                                    textAlign: TextAlign.start,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text(
-                                    num(item.quantity),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text(
-                                    num(item.item.salePrice),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text(
-                                    num(item.quantity * item.item.salePrice),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ],
+                      ...data.itemList.map(
+                        (item) => TableRow(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Text(
+                                (data.itemList.indexOf(item) + 1).toString(),
+                                textAlign: TextAlign.start,
+                              ),
                             ),
-                          )
-                          .toList(),
+                            Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Text(
+                                item.item.itemName,
+                                textAlign: TextAlign.start,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Text(
+                                num(item.quantity),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Text(
+                                num(item.item.salePrice),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Text(
+                                num(item.quantity * item.item.salePrice),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -298,7 +294,7 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
                   text('Total Return Cylinder Price'),
                   const Spacer(),
                   text(price(dataProvider.itemList
-                      .map((e) => e.item.salePrice*e.quantity)
+                      .map((e) => e.item.salePrice * e.quantity)
                       .reduce((value, element) => value + element))),
                 ],
               ),

@@ -11,7 +11,6 @@ import 'package:gsr/screens/loan_note_screen.dart';
 import 'package:gsr/screens/return_note_screen.dart';
 import 'package:gsr/modules/invoice/invoice_view.dart';
 import 'package:gsr/widgets/add_items.dart';
-import 'package:gsr/widgets/buttons/basic_switch.dart';
 import 'package:gsr/widgets/cards/add_item_card.dart';
 import 'package:gsr/widgets/modify_item.dart';
 import 'package:gsr/widgets/option_card.dart';
@@ -23,7 +22,7 @@ class AddItemsScreen extends StatefulWidget {
   static const routeId = 'ADD_ITEMS';
   final String? type;
   final bool? isManual;
-  const AddItemsScreen({Key? key, this.type, this.isManual}) : super(key: key);
+  const AddItemsScreen({super.key, this.type, this.isManual});
 
   @override
   State<AddItemsScreen> createState() => _AddItemsScreenState();
@@ -90,7 +89,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
               dataProvider.itemList.clear();
               Navigator.pop(context);
             },
-            icon: Icon(Icons.arrow_back)),
+            icon: const Icon(Icons.arrow_back)),
         actions: [
           if (widget.type != 'Default') ...[
             IconButton(
@@ -135,7 +134,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                     if (formKey.currentState!.validate()) {
                       if (leakTypeController.text == 'Leak Issue') {
                         if (dataProvider.selectedCylinderList.isNotEmpty) {
-                          dataProvider.selectedCylinderList.forEach((element) {
+                          for (var element in dataProvider.selectedCylinderList) {
                             dataProvider.addItem(
                               AddedItem(
                                 loanType:
@@ -173,7 +172,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                                     ),
                               ),
                             );
-                          });
+                          }
 
                           toast('An item added successfully',
                               toastState: TS.success);
@@ -275,11 +274,11 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
           ? SafeArea(
               child: Consumer<ItemsProvider>(builder: (context, ip, _) {
                 return ip.isLoadingItems
-                    ? Center(child: CircularProgressIndicator())
+                    ? const Center(child: CircularProgressIndicator())
                     : ListView(shrinkWrap: true, children: [
                         //! Basic items list
-                        SizedBox(height: 10),
-                        ...ip.basicItems.map((e) => AddItemCard(e)).toList(),
+                        const SizedBox(height: 10),
+                        ...ip.basicItems.map((e) => AddItemCard(e)),
 
                         //! New item section
                         ToogleTextButton(
@@ -287,7 +286,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                           onChanged: ip.onNewItemSwitchPressed,
                         ),
                         if (ip.isViewNewItems)
-                          ...ip.newItems.map((e) => AddItemCard(e)).toList(),
+                          ...ip.newItems.map((e) => AddItemCard(e)),
 
                         //! Other item section
                         ToogleTextButton(
@@ -295,8 +294,8 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                           onChanged: ip.onOtherItemSwitchPressed,
                         ),
                         if (ip.isViewOtherItems)
-                          ...ip.otherItems.map((e) => AddItemCard(e)).toList(),
-                        SizedBox(height: 10)
+                          ...ip.otherItems.map((e) => AddItemCard(e)),
+                        const SizedBox(height: 10)
                       ]);
               }),
             )
