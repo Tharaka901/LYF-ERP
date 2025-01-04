@@ -12,8 +12,7 @@ class QRScanScreen extends StatefulWidget {
   static const routeId = 'QR';
   final String screen;
   final String? type;
-  const QRScanScreen({Key? key, required this.screen, this.type})
-      : super(key: key);
+  const QRScanScreen({super.key, required this.screen, this.type});
 
   @override
   State<QRScanScreen> createState() => _QRScanScreenState();
