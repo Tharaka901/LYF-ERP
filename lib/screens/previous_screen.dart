@@ -13,7 +13,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 class PreviousScreen extends StatefulWidget {
   static const routeId = 'PREVIOUS';
   final String? qrText;
-  const PreviousScreen({Key? key, this.qrText}) : super(key: key);
+  const PreviousScreen({super.key, this.qrText});
 
   @override
   State<PreviousScreen> createState() => _PreviousScreenState();
