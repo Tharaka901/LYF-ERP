@@ -188,7 +188,7 @@ class _AddItemsState extends State<AddItems> {
                               ? 'Loading...'
                               : (snapshot.hasData ? 'Select item' : 'No items'),
                     ),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 17.0,
                       color: Colors.black,
                     ),
@@ -226,18 +226,18 @@ class _AddItemsState extends State<AddItems> {
                   );
                 },
               ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             if (widget.type == 'Leak' &&
                 widget.leakTypeController.text != 'Leak Recive') ...[
               Consumer<DataProvider>(builder: (context, data, child) {
                 return data.cylinderList.isEmpty
-                    ? Text('No Cylinders')
+                    ? const Text('No Cylinders')
                     : SizedBox(
                         height: 100,
                         width: 200,
                         child: ListView.builder(
                             itemCount: data.cylinderList.length,
-                            physics: NeverScrollableScrollPhysics(),
+                            physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (context, i) => CheckboxListTile(
                                   value: dataProvider.selectedCylinderList
                                       .contains(data.cylinderList[i]),
@@ -326,7 +326,7 @@ class _AddItemsState extends State<AddItems> {
                               value: element,
                               child: Text(
                                 item.itemName,
-                                style: TextStyle(fontSize: 15),
+                                style: const TextStyle(fontSize: 15),
                               ),
                             );
                           }).toList()
@@ -400,7 +400,7 @@ class _AddItemsState extends State<AddItems> {
                   return null;
                 },
               ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             if (widget.type == 'Leak' &&
                 widget.leakTypeController.text == 'Leak Recive')
               TextFormField(

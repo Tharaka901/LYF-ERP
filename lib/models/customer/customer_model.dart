@@ -1,3 +1,5 @@
+import '../vat/vat.dart';
+
 class CustomerModel {
   final int? customerId;
   final String? registrationId;
@@ -18,6 +20,7 @@ class CustomerModel {
   final int? employeeId;
   final double? depositBalance;
   final int? status;
+  final Vat? vat;
 
   CustomerModel({
     this.customerId,
@@ -39,6 +42,7 @@ class CustomerModel {
     this.employeeId,
     this.depositBalance,
     this.status,
+    this.vat,
   });
 
   factory CustomerModel.fromJson(Map<String, dynamic> json) => CustomerModel(
@@ -66,6 +70,7 @@ class CustomerModel {
             ? json["depositBalance"]?.toDouble()
             : json["depositBalance"],
         status: json["status"],
+        vat: json["vat"] != null ? Vat.fromJson(json["vat"]) : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -89,5 +94,6 @@ class CustomerModel {
         "employeeId": employeeId,
         "depositBalance": depositBalance,
         "status": status,
+        "vat": vat?.toJson(),
       };
 }
