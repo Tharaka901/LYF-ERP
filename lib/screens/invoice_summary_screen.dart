@@ -99,7 +99,7 @@ class InvoiceSummaryScreen extends StatelessWidget {
                                 return OptionCard(
                                   title:
                                       '${issuedInvoice.invoiceNo} (${issuedInvoice.customer.businessName})',
-                                  subtitle: price(issuedInvoice.amount),
+                                  subtitle: formatPrice(issuedInvoice.amount),
                                   onTap: () => Navigator.push(
                                     context,
                                     MaterialPageRoute(

@@ -40,7 +40,7 @@ class ReceiptSummaryViewModel {
                     : p.paymentMethod == 2
                         ? 'Cheque'
                         : 'Voucher',
-                amount: price(p.amount).replaceAll('Rs.', ''),
+                amount: formatPrice(p.amount).replaceAll('Rs.', ''),
                 chequeNu: p.chequeNo ?? '-',
               ),
             )

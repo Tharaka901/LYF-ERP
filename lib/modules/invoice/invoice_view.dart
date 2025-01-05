@@ -353,7 +353,8 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                                   Padding(
                                     padding: const EdgeInsets.all(5.0),
                                     child: Text(
-                                      price(item.item.hasSpecialPrice != null
+                                      formatPrice(item.item.hasSpecialPrice !=
+                                              null
                                           ? item.item.hasSpecialPrice!.itemPrice
                                           : item.item.salePrice),
                                       textAlign: TextAlign.center,
@@ -362,11 +363,12 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                                   Padding(
                                     padding: const EdgeInsets.all(5.0),
                                     child: Text(
-                                      price((item.item.hasSpecialPrice != null
-                                              ? item.item.hasSpecialPrice!
-                                                  .itemPrice
-                                              : item.item.salePrice) *
-                                          item.quantity),
+                                      formatPrice(
+                                          (item.item.hasSpecialPrice != null
+                                                  ? item.item.hasSpecialPrice!
+                                                      .itemPrice
+                                                  : item.item.salePrice) *
+                                              item.quantity),
                                       textAlign: TextAlign.end,
                                     ),
                                   ),
@@ -385,8 +387,9 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                 //! Invoice total summery
                 BasicTile(
                     label: 'Sub Total',
-                    value: price(dataProvider.getTotalAmount())),
-                BasicTile(label: 'VAT 18%', value: price(dataProvider.vat)),
+                    value: formatPrice(dataProvider.getTotalAmount())),
+                BasicTile(
+                    label: 'VAT 18%', value: formatPrice(dataProvider.vat)),
                 BasicTile(
                     label: 'Non VAT Item Total',
                     value: dataProvider.nonVatItemTotal.toString()),
@@ -425,7 +428,7 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(5.0),
                                   child: Text(
-                                    price(dataProvider.grandTotal),
+                                    formatPrice(dataProvider.grandTotal),
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(color: Colors.white),
                                   ),

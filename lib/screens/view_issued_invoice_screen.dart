@@ -305,11 +305,11 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                                   align: TextAlign.center,
                                 ),
                                 cell(
-                                  price(item.itemPrice),
+                                  formatPrice(item.itemPrice),
                                   align: TextAlign.center,
                                 ),
                                 cell(
-                                  price(item.itemPrice * item.itemQty),
+                                  formatPrice(item.itemPrice * item.itemQty),
                                   align: TextAlign.end,
                                 ),
                               ],
@@ -329,7 +329,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                   children: [
                     text('Sub Total'),
                     const Spacer(),
-                    text(price(issuedInvoice.subTotal ?? 0)),
+                    text(formatPrice(issuedInvoice.subTotal ?? 0)),
                   ],
                 ),
               ),
@@ -339,7 +339,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                   children: [
                     text('VAT 18%'),
                     const Spacer(),
-                    text(price(
+                    text(formatPrice(
                       issuedInvoice.vat ?? 0,
                     )),
                   ],
@@ -351,7 +351,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                   children: [
                     text('Grand Total:'),
                     const Spacer(),
-                    text(price(
+                    text(formatPrice(
                       issuedInvoice.amount,
                     )),
                   ],
@@ -418,7 +418,8 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                               ),
                               cell(invoice.creditInvoice!.invoiceNo),
                               cell(
-                                price(invoice.value).replaceAll('Rs.', ''),
+                                formatPrice(invoice.value)
+                                    .replaceAll('Rs.', ''),
                                 align: TextAlign.center,
                               ),
                             ],
@@ -434,7 +435,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                     children: [
                       text('Total Previous Payment'),
                       const Spacer(),
-                      text(price(issuedInvoice.previousPayments!
+                      text(formatPrice(issuedInvoice.previousPayments!
                           .map((e) => e.value)
                           .toList()
                           .reduce((value, element) => value + element))),
@@ -511,7 +512,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                                     Padding(
                                       padding: const EdgeInsets.all(5.0),
                                       child: Text(
-                                        price(payment.amount)
+                                        formatPrice(payment.amount)
                                             .replaceAll('Rs.', ''),
                                         textAlign: TextAlign.end,
                                       ),
@@ -537,7 +538,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                                   ),
                                   const Spacer(),
                                   text(
-                                    price(_totalPayment()),
+                                    formatPrice(_totalPayment()),
                                     align: TextAlign.end,
                                   ),
                                 ],
@@ -552,7 +553,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                                   if (issuedInvoice
                                       .previousPayments!.isNotEmpty)
                                     text(
-                                      price(issuedInvoice.amount +
+                                      formatPrice(issuedInvoice.amount +
                                           issuedInvoice.previousPayments!
                                               .map((e) => e.value)
                                               .toList()
@@ -563,7 +564,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                                     ),
                                   if (issuedInvoice.previousPayments!.isEmpty)
                                     text(
-                                      price(issuedInvoice.amount -
+                                      formatPrice(issuedInvoice.amount -
                                           _totalPayment()),
                                       align: TextAlign.end,
                                     ),

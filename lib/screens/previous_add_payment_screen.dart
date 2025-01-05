@@ -106,7 +106,7 @@ class _PreviousAddPaymentScreenState extends State<PreviousAddPaymentScreen> {
                 DetailCard(
                   detailKey: 'Total amount',
                   detailvalue:
-                      price(dataProvider.getTotalInvoicePaymentAmount()),
+                      formatPrice(dataProvider.getTotalInvoicePaymentAmount()),
                 ),
                 TextFormField(
                   controller: cashController,
@@ -241,7 +241,7 @@ class _PreviousAddPaymentScreenState extends State<PreviousAddPaymentScreen> {
                                       return DropdownMenuItem(
                                         value: element,
                                         child: Text(
-                                            '${element.code} ${element.id != 0 ? price(element.value) : ''}'),
+                                            '${element.code} ${element.id != 0 ? formatPrice(element.value) : ''}'),
                                       );
                                     }).toList()
                                   : [],

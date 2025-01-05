@@ -92,7 +92,7 @@ class _CustomerDepositePaidForPriviousInvoiceState
                                         return DropdownMenuItem(
                                           value: element,
                                           child: Text(
-                                              '${element.invoiceNo}  ${price(element.creditValue)}',
+                                              '${element.invoiceNo}  ${formatPrice(element.creditValue)}',
                                               style: TextStyle(fontSize: 12)),
                                         );
                                       }).toList()
@@ -150,7 +150,7 @@ class _CustomerDepositePaidForPriviousInvoiceState
                           return DropdownMenuItem(
                             value: element,
                             child: Text(
-                              '${element.receiptNo}  ${price(element.value?.toDouble() ?? 0)}',
+                              '${element.receiptNo}  ${formatPrice(element.value?.toDouble() ?? 0)}',
                               style: TextStyle(fontSize: 12),
                             ),
                           );
@@ -183,12 +183,12 @@ class _CustomerDepositePaidForPriviousInvoiceState
                   } else if (doub(text) <= 0) {
                     return 'Invalid payment!';
                   } else if (doub(text) > (data.selectedDeposite?.value)) {
-                    return 'Maximum ${price(data.selectedDeposite?.value?.toDouble() ?? 0)}';
+                    return 'Maximum ${formatPrice(data.selectedDeposite?.value?.toDouble() ?? 0)}';
                   } else if (doub(text) >
                       (double.parse(data.selectedInvoice?.creditValue
                               .toStringAsFixed(2) ??
                           '0'))) {
-                    return 'Maximum ${price(data.selectedInvoice?.creditValue.toDouble() ?? 0)}';
+                    return 'Maximum ${formatPrice(data.selectedInvoice?.creditValue.toDouble() ?? 0)}';
                   }
 
                   pop(context);

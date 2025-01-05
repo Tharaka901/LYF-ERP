@@ -164,11 +164,11 @@ class PrintInvoiceView extends StatelessWidget {
                                 align: pw.TextAlign.left,
                               ),
                               pwcell(
-                                price(invoiceItem.item.salePrice),
+                                formatPrice(invoiceItem.item.salePrice),
                                 align: pw.TextAlign.left,
                               ),
                               pwcell(
-                                price(
+                                formatPrice(
                                   invoiceItem.quantity *
                                       invoiceItem.item.salePrice,
                                 ),
@@ -195,7 +195,7 @@ class PrintInvoiceView extends StatelessWidget {
                             ),
                           ),
                           pwtitleCell(
-                              price(double.parse(
+                              formatPrice(double.parse(
                                   '${issuedInvoice?.subTotal?.toStringAsFixed(2) ?? dataProvider.getTotalAmount().toStringAsFixed(2)}')),
                               align: pw.TextAlign.left,
                               mainAxisAlignment:
@@ -218,7 +218,7 @@ class PrintInvoiceView extends StatelessWidget {
                             ),
                           ),
                           pwtitleCell(
-                              price(double.parse(
+                              formatPrice(double.parse(
                                   '${(issuedInvoice?.vat ?? (dataProvider.getTotalAmount() * 0.18)).toStringAsFixed(2)}')),
                               align: pw.TextAlign.left,
                               mainAxisAlignment:
@@ -244,7 +244,7 @@ class PrintInvoiceView extends StatelessWidget {
                               ),
                             ),
                             pwtitleCell(
-                                price(double.parse(
+                                formatPrice(double.parse(
                                     '${(issuedInvoice?.nonVatItemTotal ?? (dataProvider.nonVatItemTotal)).toStringAsFixed(2)}')),
                                 align: pw.TextAlign.left,
                                 mainAxisAlignment:
@@ -267,7 +267,7 @@ class PrintInvoiceView extends StatelessWidget {
                             ),
                           ),
                           pwtitleCell(
-                              price(double.parse(
+                              formatPrice(double.parse(
                                   '${(issuedInvoice?.amount ?? (dataProvider.getTotalAmount() + dataProvider.nonVatItemTotal + dataProvider.getTotalAmount() * 0.18)).toStringAsFixed(2)}')),
                               align: pw.TextAlign.left,
                               mainAxisAlignment:
@@ -325,7 +325,7 @@ class PrintInvoiceView extends StatelessWidget {
                                 align: pw.TextAlign.left,
                               ),
                               pwcell(
-                                price(cash ?? 0),
+                                formatPrice(cash ?? 0),
                                 align: pw.TextAlign.end,
                               ),
                             ],
@@ -343,7 +343,7 @@ class PrintInvoiceView extends StatelessWidget {
                                   align: pw.TextAlign.left,
                                 ),
                                 pwcell(
-                                  price(m.chequeAmount),
+                                  formatPrice(m.chequeAmount),
                                   align: pw.TextAlign.end,
                                 ),
                               ],
@@ -366,7 +366,7 @@ class PrintInvoiceView extends StatelessWidget {
                             ),
                           ),
                           pwtitleCell(
-                              price(double.parse(
+                              formatPrice(double.parse(
                                   '${issuedInvoice != null ? _totalPayment() : (dataProvider.getTotalChequeAmount() + cash)}')),
                               align: pw.TextAlign.left,
                               mainAxisAlignment:
@@ -453,7 +453,8 @@ class PrintInvoiceView extends StatelessWidget {
                                 align: pw.TextAlign.left,
                               ),
                               pwcell(
-                                price(dp.paymentAmount).replaceAll('Rs.', ''),
+                                formatPrice(dp.paymentAmount)
+                                    .replaceAll('Rs.', ''),
                                 align: pw.TextAlign.end,
                               ),
                             ],
@@ -468,7 +469,7 @@ class PrintInvoiceView extends StatelessWidget {
                             style: pw.TextStyle(fontSize: 22)),
                         pw.Spacer(),
                         pw.Text(
-                            price(issuedInvoice != null
+                            formatPrice(issuedInvoice != null
                                 ? previousPayments!
                                     .map((e) => e.paymentAmount)
                                     .toList()

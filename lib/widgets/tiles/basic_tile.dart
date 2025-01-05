@@ -14,7 +14,7 @@ class BasicTile extends StatelessWidget {
           Text(
             label,
             textAlign: TextAlign.end,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
             ),
           ),

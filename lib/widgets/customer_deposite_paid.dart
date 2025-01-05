@@ -77,7 +77,7 @@ class _CustomerDepositePaidState extends State<CustomerDepositePaid> {
                           return DropdownMenuItem(
                             value: element,
                             child: Text(
-                              '${element.receiptNo}  ${price(element.value?.toDouble() ?? 0)}',
+                              '${element.receiptNo}  ${formatPrice(element.value?.toDouble() ?? 0)}',
                               style: TextStyle(fontSize: 12),
                             ),
                           );
@@ -110,9 +110,9 @@ class _CustomerDepositePaidState extends State<CustomerDepositePaid> {
                   } else if (doub(text) <= 0) {
                     return 'Invalid payment!';
                   } else if (doub(text) > (data.selectedDeposite?.value)) {
-                    return 'Maximum ${price(data.selectedDeposite?.value?.toDouble() ?? 0)}';
+                    return 'Maximum ${formatPrice(data.selectedDeposite?.value?.toDouble() ?? 0)}';
                   } else if (doub(text) > (-widget.balnce)) {
-                    return 'Maximum ${price(-widget.balnce)}';
+                    return 'Maximum ${formatPrice(-widget.balnce)}';
                   }
                   data.addPaidDeposite(
                     IssuedDepositePaid(

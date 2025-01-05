@@ -67,7 +67,7 @@ class _CreditInvoiceState extends State<CreditInvoice> {
                           return DropdownMenuItem(
                             value: element,
                             child: Text(
-                              '${element.invoiceNo}  ${price(element.creditValue)}',
+                              '${element.invoiceNo}  ${formatPrice(element.creditValue)}',
                             ),
                           );
                         }).toList()
@@ -105,7 +105,7 @@ class _CreditInvoiceState extends State<CreditInvoice> {
                       double.parse(
                           (widget.balance - data.getTotalCreditPaymentAmount())
                               .toStringAsFixed(2))) {
-                    return 'Maximum ${price(widget.balance - data.getTotalCreditPaymentAmount())}';
+                    return 'Maximum ${formatPrice(widget.balance - data.getTotalCreditPaymentAmount())}';
                   }
                   data.addPaidIssuedInvoice(
                     IssuedInvoicePaid(

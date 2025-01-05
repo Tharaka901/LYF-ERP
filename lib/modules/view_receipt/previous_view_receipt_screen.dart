@@ -196,7 +196,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
-                              price(invoice.paymentAmount)
+                              formatPrice(invoice.paymentAmount)
                                   .replaceAll('Rs.', ''),
                               textAlign: TextAlign.end,
                               style: const TextStyle(fontSize: 16.0),
@@ -278,7 +278,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                         Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: Text(
-                            price(cash).replaceAll('Rs.', ''),
+                            formatPrice(cash).replaceAll('Rs.', ''),
                             textAlign: TextAlign.end,
                             style: const TextStyle(fontSize: 16.0),
                           ),
@@ -306,7 +306,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
-                              price(dataProvider
+                              formatPrice(dataProvider
                                       .getTotalDepositePaymentAmount())
                                   .replaceAll('Rs.', ''),
                               textAlign: TextAlign.end,
@@ -336,7 +336,8 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
-                              price(cheque.chequeAmount).replaceAll('Rs.', ''),
+                              formatPrice(cheque.chequeAmount)
+                                  .replaceAll('Rs.', ''),
                               textAlign: TextAlign.end,
                               style: const TextStyle(fontSize: 16.0),
                             ),
@@ -373,7 +374,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                                           dataProvider.selectedVoucher!.value ==
                                               0)
                                       ? '0.00'
-                                      : price(dataProvider
+                                      : formatPrice(dataProvider
                                               .selectedVoucher!.value)
                                           .replaceAll('Rs.', ''),
                                   textAlign: TextAlign.end,
@@ -411,7 +412,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                           ),
                           const Spacer(),
                           Text(
-                            price(dataProvider.getTotalChequeAmount() +
+                            formatPrice(dataProvider.getTotalChequeAmount() +
                                 dataProvider.getTotalDepositePaymentAmount() +
                                 cash +
                                 (dataProvider.selectedVoucher != null
@@ -440,7 +441,8 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                           ),
                           const Spacer(),
                           Text(
-                            price(dataProvider.getTotalInvoicePaymentAmount()),
+                            formatPrice(
+                                dataProvider.getTotalInvoicePaymentAmount()),
                             textAlign: TextAlign.end,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,

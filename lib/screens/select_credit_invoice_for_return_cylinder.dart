@@ -10,7 +10,7 @@ import '../services/database.dart';
 import '../widgets/previous_invoice_form.dart';
 
 class SelectCreditInvoiceForReturnCylinderScreen extends StatefulWidget {
-  const SelectCreditInvoiceForReturnCylinderScreen({Key? key});
+  const SelectCreditInvoiceForReturnCylinderScreen({super.key});
 
   @override
   State<SelectCreditInvoiceForReturnCylinderScreen> createState() =>
@@ -46,7 +46,7 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
                       ),
                       const Spacer(),
                       Text(
-                          price(dataProvider.itemList
+                          formatPrice(dataProvider.itemList
                               .map((e) => e.item.salePrice * e.quantity)
                               .reduce((value, element) => value + element)),
                           style: TextStyle(
@@ -107,7 +107,7 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
                                                 return DropdownMenuItem(
                                                   value: element,
                                                   child: Text(
-                                                    '${element.invoiceNo}  ${price(element.creditValue)}',
+                                                    '${element.invoiceNo}  ${formatPrice(element.creditValue)}',
                                                   ),
                                                 );
                                               }).toList()
@@ -251,7 +251,7 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
                                             cell(invoice
                                                 .issuedInvoice.invoiceNo),
                                             cell(
-                                              price(invoice.paymentAmount)
+                                              formatPrice(invoice.paymentAmount)
                                                   .replaceAll('Rs.', ''),
                                               align: TextAlign.center,
                                             ),
@@ -277,7 +277,7 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
                                   children: [
                                     text('Total Payment'),
                                     const Spacer(),
-                                    text(price(
+                                    text(formatPrice(
                                         data.getTotalInvoicePaymentAmount())),
                                   ],
                                 ),
@@ -307,7 +307,7 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
                             waiting(context, body: 'Sending...');
                             final invoiceRes =
                                 await createReturnCylinderInvoice(context);
-                           
+
                             for (var invoice
                                 in dataProvider.issuedInvoicePaidList) {
                               if (invoice.creditAmount! <=
@@ -363,7 +363,7 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
                                     : invoice.issuedInvoice.invoiceId,
                                 "receiptNo": invoiceRes.data["invoice"]
                                     ["invoiceNo"],
-                                "status": 4,//invoice.chequeId != null ? 3 : 2,
+                                "status": 4, //invoice.chequeId != null ? 3 : 2,
                                 "type": "return-cheque"
                               };
                               await respo('credit-payment/create',
@@ -395,15 +395,16 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
                                 method: Method.post,
                                 data: {
                                   "value": (dataProvider.itemList
-                                          .map((e) =>
-                                              e.item.salePrice * e.quantity)
-                                          .reduce((value, element) =>
-                                              value + element) -
-                                      dataProvider
-                                          .getTotalInvoicePaymentAmount()).toStringAsFixed(2),
+                                              .map((e) =>
+                                                  e.item.salePrice * e.quantity)
+                                              .reduce((value, element) =>
+                                                  value + element) -
+                                          dataProvider
+                                              .getTotalInvoicePaymentAmount())
+                                      .toStringAsFixed(2),
                                   "status": 2,
-                                  "paymentInvoiceId":  invoiceRes.data["invoice"]
-                                    ["id"],
+                                  "paymentInvoiceId": invoiceRes.data["invoice"]
+                                      ["id"],
                                   "routecardId": dataProvider
                                       .currentRouteCard!.routeCardId,
                                   "receiptNo": invoiceRes.data["invoice"]

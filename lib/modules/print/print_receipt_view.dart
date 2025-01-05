@@ -103,7 +103,7 @@ class PrintReceiptView extends StatelessWidget {
                   ),
                   PdfTile.basic(
                       label: 'Total: ',
-                      value: price(receiptModel.totalPayment)),
+                      value: formatPrice(receiptModel.totalPayment)),
                   pw.Divider(thickness: 0.5),
 
                   //! Previous payments invoicess
@@ -155,7 +155,7 @@ class PrintReceiptView extends StatelessWidget {
                   ),
                   PdfTile.basic(
                       label: 'Credit Invoice Total: ',
-                      value: price(receiptModel.totalPreviousPayment)),
+                      value: formatPrice(receiptModel.totalPreviousPayment)),
                   pw.Divider(thickness: 0.5),
 
                   //! Bottom section

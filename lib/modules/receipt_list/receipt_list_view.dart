@@ -63,7 +63,7 @@ class _ViewReceiptListScreenState extends State<ViewReceiptListScreen> {
                             title:
                                 '${receipt.receiptNo} (${receipt.creditInvoice?.customer?.businessName})',
                             subtitle: receipt.payments!.isNotEmpty
-                                ? price(receipt.payments!
+                                ? formatPrice(receipt.payments!
                                         .map((e) => e.amount)
                                         .reduce((value, element) =>
                                             value! + element!) ??

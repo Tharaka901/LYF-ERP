@@ -276,7 +276,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
-                              price(cash).replaceAll('Rs.', ''),
+                              formatPrice(cash).replaceAll('Rs.', ''),
                               textAlign: TextAlign.end,
                               style: const TextStyle(fontSize: 16.0),
                             ),
@@ -304,7 +304,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                             Padding(
                               padding: const EdgeInsets.all(5.0),
                               child: Text(
-                                price(cheque.chequeAmount)
+                                formatPrice(cheque.chequeAmount)
                                     .replaceAll('Rs.', ''),
                                 textAlign: TextAlign.end,
                                 style: const TextStyle(fontSize: 16.0),
@@ -344,7 +344,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                                     .selectedVoucher!.value ==
                                                 0)
                                         ? '0.00'
-                                        : price(dataProvider
+                                        : formatPrice(dataProvider
                                                 .selectedVoucher!.value)
                                             .replaceAll('Rs.', ''),
                                     textAlign: TextAlign.end,
@@ -382,7 +382,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                             ),
                             const Spacer(),
                             Text(
-                              price(dataProvider.getTotalChequeAmount() +
+                              formatPrice(dataProvider.getTotalChequeAmount() +
                                   cash +
                                   (dataProvider.selectedVoucher != null
                                       ? dataProvider.selectedVoucher!.value
@@ -410,7 +410,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                             ),
                             const Spacer(),
                             Text(
-                              price(dataProvider.grandTotal),
+                              formatPrice(dataProvider.grandTotal),
                               textAlign: TextAlign.end,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -437,7 +437,8 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                     ),
                                     const Spacer(),
                                     Text(
-                                      price(data.getTotalCreditPaymentAmount()),
+                                      formatPrice(
+                                          data.getTotalCreditPaymentAmount()),
                                       textAlign: TextAlign.end,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -474,7 +475,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                       if (dataProvider
                                           .issuedInvoicePaidList.isNotEmpty)
                                         Text(
-                                          price(currentBalance < 0
+                                          formatPrice(currentBalance < 0
                                               ? -currentBalance
                                               : currentBalance -
                                                   (dataProvider
@@ -497,7 +498,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                       if (!dataProvider
                                           .issuedInvoicePaidList.isNotEmpty)
                                         Text(
-                                          price(currentBalance < 0
+                                          formatPrice(currentBalance < 0
                                               ? -currentBalance
                                               : currentBalance),
                                           textAlign: TextAlign.end,
@@ -613,7 +614,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                               padding:
                                                   const EdgeInsets.all(5.0),
                                               child: Text(
-                                                price(-paidBalance
+                                                formatPrice(-paidBalance
                                                         .balance.balanceAmount)
                                                     .replaceAll('Rs.', ''),
                                                 textAlign: TextAlign.center,
@@ -628,7 +629,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                               padding:
                                                   const EdgeInsets.all(5.0),
                                               child: Text(
-                                                price(paidBalance.payment)
+                                                formatPrice(paidBalance.payment)
                                                     .replaceAll('Rs.', ''),
                                                 textAlign: TextAlign.end,
                                               ),
@@ -834,7 +835,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                             .issuedDeposite.paymentInvoiceId
                                             .toString()),
                                         cell(
-                                          price(invoice.paymentAmount)
+                                          formatPrice(invoice.paymentAmount)
                                               .replaceAll('Rs.', ''),
                                           align: TextAlign.center,
                                         ),
@@ -860,7 +861,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                               children: [
                                 text('Total Previous Payment'),
                                 const Spacer(),
-                                text(price(
+                                text(formatPrice(
                                     data.getTotalDepositePaymentAmount())),
                               ],
                             ),
@@ -930,7 +931,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                         ),
                                         cell(invoice.issuedInvoice.invoiceNo),
                                         cell(
-                                          price(invoice.paymentAmount)
+                                          formatPrice(invoice.paymentAmount)
                                               .replaceAll('Rs.', ''),
                                           align: TextAlign.center,
                                         ),
@@ -955,8 +956,8 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                               children: [
                                 text('Total Previous Payment'),
                                 const Spacer(),
-                                text(
-                                    price(data.getTotalInvoicePaymentAmount())),
+                                text(formatPrice(
+                                    data.getTotalInvoicePaymentAmount())),
                               ],
                             ),
                             const Divider(

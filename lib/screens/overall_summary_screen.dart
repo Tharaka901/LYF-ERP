@@ -98,7 +98,7 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                                     ),
                                     cell(payment.invoice!.invoiceNo.toString()),
                                     cell(
-                                      price(payment.amount),
+                                      formatPrice(payment.amount),
                                       align: TextAlign.end,
                                     ),
                                   ],
@@ -114,7 +114,7 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                           children: [
                             text('Total cash:'),
                             const Spacer(),
-                            text(price(cashTotal)),
+                            text(formatPrice(cashTotal)),
                           ],
                         ),
                         const Divider(
@@ -201,7 +201,7 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                                     cell(payment.invoice!.invoiceNo.toString()),
                                     cell(payment.chequeNo!),
                                     cell(
-                                      price(payment.amount),
+                                      formatPrice(payment.amount),
                                       align: TextAlign.end,
                                     ),
                                   ],
@@ -217,7 +217,7 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                           children: [
                             text('Total cheque:'),
                             const Spacer(),
-                            text(price(chequeTotal)),
+                            text(formatPrice(chequeTotal)),
                           ],
                         ),
                         const Divider(
@@ -308,7 +308,7 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                                             .toString()),
                                         cell(payment.chequeNo ?? '-'),
                                         cell(
-                                          price(payment.amount),
+                                          formatPrice(payment.amount),
                                           align: TextAlign.end,
                                         ),
                                       ],
@@ -324,7 +324,7 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                           children: [
                             text('Total voucher:'),
                             const Spacer(),
-                            text(price(voucherTotal)),
+                            text(formatPrice(voucherTotal)),
                           ],
                         ),
                         const Divider(

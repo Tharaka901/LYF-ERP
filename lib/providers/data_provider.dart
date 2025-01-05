@@ -45,13 +45,16 @@ class DataProvider extends ChangeNotifier {
   List<RoutecardItem> get rcItemList => _rcItemList;
   List<PaidBalance> get paidBalanceList => _paidBalanceList;
   List<IssuedInvoicePaid> get issuedInvoicePaidList => _issuedInvoicePaidList;
-  double get nonVatItemTotal => itemList.isEmpty ? 0: itemList
-      .map((e) => e.item.nonVatAmount! * e.quantity)
-      .reduce((value, element) => value + element);
+  double get nonVatItemTotal => itemList.isEmpty
+      ? 0
+      : itemList
+          .map((e) => e.item.nonVatAmount ?? 0 * e.quantity)
+          .reduce((value, element) => value + element);
 
   double get vat =>
       double.parse(((getTotalAmount() / 100) * 18).toStringAsFixed(2));
-  double get grandTotal => double.parse((getTotalAmount() + vat + nonVatItemTotal).toStringAsFixed(2));
+  double get grandTotal => double.parse(
+      (getTotalAmount() + vat + nonVatItemTotal).toStringAsFixed(2));
 
   setCurrentEmployee(Employee currentEmployee) {
     _currentEmployee = currentEmployee;

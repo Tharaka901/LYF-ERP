@@ -131,7 +131,7 @@ class _SelectPreviousInvoiceScreenState
                                                 return DropdownMenuItem(
                                                   value: element,
                                                   child: Text(
-                                                    '${element.invoiceNo}  ${price(element.creditValue)}',
+                                                    '${element.invoiceNo}  ${formatPrice(element.creditValue)}',
                                                   ),
                                                 );
                                               }).toList()
@@ -477,7 +477,8 @@ class _SelectPreviousInvoiceScreenState
                                                 cell(invoice
                                                     .issuedInvoice.invoiceNo),
                                                 cell(
-                                                  price(invoice.paymentAmount)
+                                                  formatPrice(
+                                                          invoice.paymentAmount)
                                                       .replaceAll('Rs.', ''),
                                                   align: TextAlign.center,
                                                 ),
@@ -503,7 +504,7 @@ class _SelectPreviousInvoiceScreenState
                                       children: [
                                         text('Total Payment'),
                                         const Spacer(),
-                                        text(price(data
+                                        text(formatPrice(data
                                             .getTotalInvoicePaymentAmount())),
                                       ],
                                     ),
@@ -593,7 +594,7 @@ class _SelectPreviousInvoiceScreenState
                                                                 .paymentInvoiceId
                                                                 .toString()),
                                                             cell(
-                                                              price(invoice
+                                                              formatPrice(invoice
                                                                       .paymentAmount)
                                                                   .replaceAll(
                                                                       'Rs.',
@@ -625,7 +626,7 @@ class _SelectPreviousInvoiceScreenState
                                                   children: [
                                                     text('Total Over Payment'),
                                                     const Spacer(),
-                                                    text(price(data
+                                                    text(formatPrice(data
                                                         .getTotalDepositePaymentAmount())),
                                                   ],
                                                 ),

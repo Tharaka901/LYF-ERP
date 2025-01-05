@@ -160,7 +160,7 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
                                             cell(invoice
                                                 .creditInvoice!.invoiceNo),
                                             cell(
-                                              price(invoice.value)
+                                              formatPrice(invoice.value)
                                                   .replaceAll('Rs.', ''),
                                               align: TextAlign.center,
                                             ),
@@ -222,7 +222,7 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
                                               padding:
                                                   const EdgeInsets.all(5.0),
                                               child: Text(
-                                                price(payment.amount)
+                                                formatPrice(payment.amount)
                                                     .replaceAll('Rs.', ''),
                                                 textAlign: TextAlign.end,
                                               ),
@@ -247,7 +247,7 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
                                             align: TextAlign.end,
                                           ),
                                           const Spacer(),
-                                          text(price(snapshot.data!
+                                          text(formatPrice(snapshot.data!
                                               .map((e) => e.value)
                                               .toList()
                                               .reduce((value, current) =>

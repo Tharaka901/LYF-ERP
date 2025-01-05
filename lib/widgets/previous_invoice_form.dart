@@ -28,7 +28,7 @@ class _PreviousInvoiceFormState extends State<PreviousInvoiceForm> {
         child: Column(
           children: [
             Text(
-              price(widget.issuedInvoice.creditValue),
+              formatPrice(widget.issuedInvoice.creditValue),
               style: const TextStyle(fontSize: 20.0),
             ),
             const SizedBox(
