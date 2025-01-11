@@ -6,7 +6,11 @@ class BasicSwitch extends StatelessWidget {
   final String title;
   final bool value;
   final void Function(bool) onChanged;
-  const BasicSwitch({super.key, required this.title, required this.onChanged, required this.value});
+  const BasicSwitch(
+      {super.key,
+      required this.title,
+      required this.onChanged,
+      required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +23,7 @@ class BasicSwitch extends StatelessWidget {
           ),
           Text(
             title,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           )
         ],
       );

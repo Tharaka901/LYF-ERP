@@ -7,7 +7,7 @@ import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/modules/print/print_invoice_view.dart';
 import 'package:gsr/providers/items_provider.dart';
 import 'package:gsr/screens/route_card_screen.dart';
-import 'package:gsr/screens/select_customer_screen.dart';
+import 'package:gsr/modules/select_customer/select_customer_screen.dart';
 import 'package:gsr/screens/select_previous_invoice_screen.dart';
 import 'package:gsr/services/database.dart';
 import 'package:gsr/widgets/credit_invoice.dart';

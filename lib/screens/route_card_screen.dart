@@ -8,7 +8,7 @@ import 'package:gsr/screens/invoice_summary_screen.dart';
 import 'package:gsr/screens/overall_summary_screen.dart';
 import 'package:gsr/screens/previous_screen.dart';
 import 'package:gsr/screens/rc_summary_screen.dart';
-import 'package:gsr/screens/select_customer_screen.dart';
+import 'package:gsr/modules/select_customer/select_customer_screen.dart';
 import 'package:gsr/screens/stock_screen.dart';
 import 'package:gsr/services/database.dart';
 import 'package:gsr/widgets/option_card.dart';

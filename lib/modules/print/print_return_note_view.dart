@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gsr/modules/return_cylinder/return_cylinder_view_model.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -20,7 +21,8 @@ class PrintReturnNoteView extends StatelessWidget {
       ),
       body: PdfPreview(
         onPrinted: (context) async {
-          // await onSaveData();
+          final returnCylinderViewModel = ReturnCylinderViewModel(context);
+          returnCylinderViewModel.onPressedSaveButton();
         },
         build: (format) => _generatePdf(format, context),
       ),

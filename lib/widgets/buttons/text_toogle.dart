@@ -16,10 +16,10 @@ class ToogleTextButton extends StatelessWidget {
           children: [
             Text(
               label,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
-            SizedBox(width: 10),
-            Icon(Icons.arrow_circle_down, size: 28)
+            const SizedBox(width: 10),
+            const Icon(Icons.arrow_circle_down, size: 28)
           ],
         ),
       ),

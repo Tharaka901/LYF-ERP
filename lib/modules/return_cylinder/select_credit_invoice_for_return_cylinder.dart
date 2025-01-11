@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gsr/screens/route_card_screen.dart';
-import 'package:gsr/screens/select_customer_screen.dart';
 import 'package:provider/provider.dart';
 import '../../commons/common_methods.dart';
 import '../../models/issued_invoice.dart';
@@ -9,6 +7,7 @@ import '../../providers/data_provider.dart';
 import '../../services/database.dart';
 import '../../widgets/previous_invoice_form.dart';
 import '../../widgets/tiles/basic_tile.dart';
+import 'return_cylinder_view_model.dart';
 
 class SelectCreditInvoiceForReturnCylinderScreen extends StatefulWidget {
   const SelectCreditInvoiceForReturnCylinderScreen({super.key});
@@ -21,6 +20,14 @@ class SelectCreditInvoiceForReturnCylinderScreen extends StatefulWidget {
 class _SelectCreditInvoiceForReturnCylinderScreenState
     extends State<SelectCreditInvoiceForReturnCylinderScreen> {
   final invoiceFormKey = GlobalKey<FormState>();
+  ReturnCylinderViewModel? returnCylinderViewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    returnCylinderViewModel = ReturnCylinderViewModel(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
@@ -267,172 +274,56 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
               const SizedBox(
                 height: 10.0,
               ),
-              SizedBox(
-                width: double.infinity,
-                height: 55.0,
-                child: OutlinedButton(
-                  onPressed: () async {
-                    final sum = dataProvider.itemList
-                        .map((e) => e.item.salePrice * e.quantity)
-                        .reduce((value, element) => value + element);
-                    if (dataProvider.itemList
-                            .map((e) => e.item.salePrice * e.quantity)
-                            .reduce((value, element) => value + element) >=
-                        dataProvider.getTotalInvoicePaymentAmount()) {
-                      try {
-                        waiting(context, body: 'Sending...');
-                        final invoiceRes =
-                            await createReturnCylinderInvoice(context);
-
-                        for (var invoice
-                            in dataProvider.issuedInvoicePaidList) {
-                          if (invoice.creditAmount! <= invoice.paymentAmount &&
-                              invoice.chequeId == null) {
-                            await respo('invoice/update',
-                                method: Method.put,
-                                data: {
-                                  "invoiceId": invoice.issuedInvoice.invoiceId,
-                                  "status": 2,
-                                  "creditValue": 0
-                                });
-                          } else {
-                            await respo('invoice/update',
-                                method: Method.put,
-                                data: {
-                                  "invoiceId": invoice.issuedInvoice.invoiceId,
-                                  "status": 1,
-                                  "creditValue": invoice.creditAmount! -
-                                      invoice.paymentAmount
-                                });
-                          }
-                          if (invoice.chequeId != null) {
-                            if (invoice.creditAmount! <=
-                                invoice.paymentAmount) {
-                              await respo('cheque/update',
-                                  method: Method.put,
-                                  data: {
-                                    "id": invoice.chequeId,
-                                    "isActive": 2,
-                                    "balance": 0
-                                  });
-                            } else {
-                              await respo('cheque/update',
-                                  method: Method.put,
-                                  data: {
-                                    "id": invoice.chequeId,
-                                    "balance": invoice.creditAmount! -
-                                        invoice.paymentAmount
-                                  });
-                            }
-                          }
-                          final data = {
-                            "value": invoice.paymentAmount,
-                            "paymentInvoiceId": invoiceRes.data["invoice"]
-                                ["id"],
-                            "routecardId":
-                                dataProvider.currentRouteCard!.routeCardId,
-                            "creditInvoiceId": invoice.chequeId ??
-                                invoice.issuedInvoice.invoiceId,
-                            "receiptNo": invoiceRes.data["invoice"]
-                                ["invoiceNo"],
-                            "status": 4, //invoice.chequeId != null ? 3 : 2,
-                            "type": "return-cheque"
-                          };
-                          await respo('credit-payment/create',
-                              method: Method.post, data: data);
-                        }
-                        if (dataProvider.itemList
-                                .map((e) => e.item.salePrice * e.quantity)
-                                .reduce((value, element) => value + element) >
-                            dataProvider.getTotalInvoicePaymentAmount()) {
-                          await respo(
-                            'customers/update',
-                            method: Method.put,
-                            data: {
-                              "customerId": selectedCustomer.customerId,
-                              "depositBalance":
-                                  selectedCustomer.depositBalance! +
-                                      (dataProvider.itemList
-                                              .map((e) =>
-                                                  e.item.salePrice * e.quantity)
-                                              .reduce((value, element) =>
-                                                  value + element) -
-                                          dataProvider
-                                              .getTotalInvoicePaymentAmount()),
-                            },
-                          );
-                          await respo(
-                            'over-payment/create',
-                            method: Method.post,
-                            data: {
-                              "value": (dataProvider.itemList
-                                          .map((e) =>
-                                              e.item.salePrice * e.quantity)
-                                          .reduce((value, element) =>
-                                              value + element) -
-                                      dataProvider
-                                          .getTotalInvoicePaymentAmount())
-                                  .toStringAsFixed(2),
-                              "status": 2,
-                              "paymentInvoiceId": invoiceRes.data["invoice"]
-                                  ["id"],
-                              "routecardId":
-                                  dataProvider.currentRouteCard!.routeCardId,
-                              "receiptNo": invoiceRes.data["invoice"]
-                                  ["invoiceNo"],
-                              "customerId": selectedCustomer.customerId
-                            },
-                          );
-                        }
-                        dataProvider.itemList.clear();
-                        dataProvider.issuedInvoicePaidList.clear();
-                        pop(context);
-                        Navigator.pushNamedAndRemoveUntil(
-                            context, RouteCardScreen.routeId, (route) => false);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SelectCustomerScreen(
-                                    type: 'Return',
-                                  )),
-                        ).then((value) {
-                          dataProvider.clearItemList();
-                          dataProvider.clearChequeList();
-                          dataProvider.clearRCItems();
-                          dataProvider.clearPaidBalanceList();
-                          dataProvider.setSelectedCustomer(null);
-                          dataProvider.setSelectedVoucher(null);
-                          dataProvider.setCurrentInvoice(null);
-                        });
-                        toast('Success', toastState: TS.success);
-                      } catch (e) {
-                        toast(e.toString(), toastState: TS.error);
-                      }
-                    } else {
-                      toast('Please set total payment $sum',
-                          toastState: TS.error);
-                    }
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all(Colors.blue[800]),
-                    shape: WidgetStateProperty.all(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildButton(
+                      onPressed: returnCylinderViewModel!.onPressedSaveButton,
+                      text: 'Save',
+                      color: Colors.blue[800],
                     ),
                   ),
-                  child: const Text(
-                    'Save',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      color: Colors.white,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildButton(
+                      onPressed: returnCylinderViewModel!.onPressedPrintButton,
+                      text: 'Print',
+                      color: Colors.green[800],
                     ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
         ));
+  }
+
+  Widget _buildButton({
+    required VoidCallback onPressed,
+    required String text,
+    Color? color,
+  }) {
+    return SizedBox(
+      height: 55.0,
+      child: OutlinedButton(
+        onPressed: onPressed,
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.all(color),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+          ),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontSize: 20.0,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
   }
 }
 

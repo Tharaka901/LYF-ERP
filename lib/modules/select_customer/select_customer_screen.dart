@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import '../commons/common_methods.dart';
-import '../models/customer/customer_model.dart';
-import '../models/route_card.dart';
-import '../providers/data_provider.dart';
-import '../services/database.dart';
-import 'add_items_screen.dart';
-import 'qr_scan_screen.dart';
-import '../config/styles.dart';
+import '../../commons/common_methods.dart';
+import '../../models/customer/customer_model.dart';
+import '../../models/route_card.dart';
+import '../../providers/data_provider.dart';
+import '../../services/database.dart';
+import '../../screens/add_items_screen.dart';
+import '../../screens/qr_scan_screen.dart';
+import '../../config/styles.dart';
 
 class SelectCustomerScreen extends StatefulWidget {
   static const routeId = 'BILLING';

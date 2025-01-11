@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/data_provider.dart';
 import '../../screens/invoice_summary_screen.dart';
 import '../../screens/route_card_screen.dart';
-import '../../screens/select_customer_screen.dart';
+import '../select_customer/select_customer_screen.dart';
 
 class PrintInvoiceViewModel {
   onPrinted(BuildContext context, final bool isBillingFrom) {

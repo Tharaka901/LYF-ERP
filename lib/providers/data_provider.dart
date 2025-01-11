@@ -46,15 +46,31 @@ class DataProvider extends ChangeNotifier {
   List<RoutecardItem> get rcItemList => _rcItemList;
   List<PaidBalance> get paidBalanceList => _paidBalanceList;
   List<IssuedInvoicePaid> get issuedInvoicePaidList => _issuedInvoicePaidList;
+
+  //! Calculate total amount of non-VAT items
   double get nonVatItemTotal => itemList.isEmpty
       ? 0
       : itemList
           .map((e) => e.item.nonVatAmount ?? 0 * e.quantity)
           .reduce((value, element) => value + element);
 
+  //! Calculate total amount of VAT
   double get vat => double.parse(((getTotalAmount() / 100) *
           double.parse(selectedCustomer!.vat!.vatAmount))
       .toStringAsFixed(2));
+
+  //! Calculate total amount of items
+  double getTotalAmount() {
+    if (_itemList.isEmpty) return 0.0;
+
+    return _itemList.fold(0.0, (total, addedItem) {
+      final price =
+          addedItem.item.hasSpecialPrice?.itemPrice ?? addedItem.item.salePrice;
+      return total + (price * addedItem.quantity);
+    });
+  }
+
+  //! Calculate grand total
   double get grandTotal => double.parse(
       (getTotalAmount() + vat + nonVatItemTotal).toStringAsFixed(2));
 
@@ -189,17 +205,6 @@ class DataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  double getTotalAmount() {
-    double totalAmount = 0.0;
-    for (var addedItem in _itemList) {
-      totalAmount += (addedItem.item.hasSpecialPrice != null
-              ? addedItem.item.hasSpecialPrice!.itemPrice
-              : addedItem.item.salePrice) *
-          addedItem.quantity;
-    }
-    return totalAmount;
-  }
-
   getTotalCreditPaymentAmount() {
     double totalAmount = 0.0;
     for (var paidBalance in _paidBalanceList) {
@@ -208,12 +213,13 @@ class DataProvider extends ChangeNotifier {
     return totalAmount;
   }
 
-  getTotalInvoicePaymentAmount() {
-    double totalAmount = 0.0;
-    for (var paidBalance in _issuedInvoicePaidList) {
-      totalAmount += paidBalance.paymentAmount;
-    }
-    return totalAmount;
+  double getTotalInvoicePaymentAmount() {
+    if (_issuedInvoicePaidList.isEmpty) return 0.0;
+
+    return _issuedInvoicePaidList
+        .map((payment) => payment.paymentAmount)
+        .reduce((sum, amount) => sum + amount)
+        .toDouble();
   }
 
   double getTotalDepositePaymentAmount() {

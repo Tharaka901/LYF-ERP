@@ -20,4 +20,28 @@ class PaymentService {
     List<dynamic> list = response.data;
     return list.map((element) => CreditPayment.fromJson(element)).toList();
   }
+
+  Future<void> createCreditPayment(Map<String, dynamic> data) async {
+    respo('credit-payment/create', method: Method.post, data: data);
+  }
+
+  Future<void> createOverPayment(
+      {required double overPayment,
+      required int paymentInvoiceId,
+      required int routecardId,
+      required String receiptNo,
+      required int customerId}) async {
+    await respo(
+      'over-payment/create',
+      method: Method.post,
+      data: {
+        "value": overPayment,
+        "status": 2,
+        "paymentInvoiceId": paymentInvoiceId,
+        "routecardId": routecardId,
+        "receiptNo": receiptNo,
+        "customerId": customerId
+      },
+    );
+  }
 }

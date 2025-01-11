@@ -21,7 +21,7 @@ import 'package:gsr/models/routecard_item.dart';
 import 'package:gsr/models/voucher.dart';
 import 'package:gsr/modules/invoice/invoice_provider.dart';
 import 'package:gsr/providers/data_provider.dart';
-import 'package:gsr/screens/select_customer_screen.dart';
+import 'package:gsr/modules/select_customer/select_customer_screen.dart';
 import 'package:gsr/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';

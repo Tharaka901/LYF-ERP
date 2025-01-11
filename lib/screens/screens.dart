@@ -1,7 +1,7 @@
 export 'about_rc_screen.dart';
 export 'add_items_screen.dart';
 export 'add_payment_screen.dart';
-export 'select_customer_screen.dart';
+export '../modules/select_customer/select_customer_screen.dart';
 export 'completed_rc_screen.dart';
 export 'home_screen.dart';
 export 'invoice_summary_screen.dart';
