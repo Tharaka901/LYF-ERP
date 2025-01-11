@@ -127,6 +127,65 @@ class PrintReturnNoteView extends StatelessWidget {
                   _buildTotalRow('Grand Total', dataProvider.grandTotal),
                   pw.Divider(thickness: 0.5),
 
+                  // Add Paid Invoices Table if there are any
+                  if (dataProvider.issuedInvoicePaidList.isNotEmpty) ...[
+                    pw.SizedBox(height: 10),
+                    pw.Text(
+                      'Paid Invoices',
+                      style: ThemeConstants.boldStyleForPdf,
+                    ),
+                    pw.SizedBox(height: 5),
+                    pw.Table(
+                      children: [
+                        pw.TableRow(
+                          decoration: const pw.BoxDecoration(
+                            color: PdfColor.fromInt(0xFFFFFFFF),
+                          ),
+                          children: [
+                            _buildTableHeaderCell('#',
+                                align: pw.TextAlign.left),
+                            _buildTableHeaderCell('Date'),
+                            _buildTableHeaderCell('Invoice No'),
+                            _buildTableHeaderCell('Payment',
+                                align: pw.TextAlign.right),
+                          ],
+                        ),
+                        ...dataProvider.issuedInvoicePaidList.map((invoice) {
+                          return pw.TableRow(
+                            children: [
+                              _buildTableCell(
+                                (dataProvider.issuedInvoicePaidList
+                                            .indexOf(invoice) +
+                                        1)
+                                    .toString(),
+                                align: pw.TextAlign.left,
+                              ),
+                              _buildTableCell(
+                                date(invoice.issuedInvoice.createdAt,
+                                    format: 'dd-MM-yyyy'),
+                              ),
+                              _buildTableCell(invoice.issuedInvoice.invoiceNo),
+                              _buildTableCell(
+                                formatPrice(invoice.paymentAmount),
+                                align: pw.TextAlign.right,
+                              ),
+                            ],
+                          );
+                        }),
+                      ],
+                    ),
+                    pw.SizedBox(height: 5),
+                    _buildTotalRow('Total Payment',
+                        dataProvider.getTotalInvoicePaymentAmount()),
+                    if (dataProvider.grandTotal >
+                        dataProvider.getTotalInvoicePaymentAmount())
+                      _buildTotalRow(
+                          'Balance',
+                          dataProvider.grandTotal -
+                              dataProvider.getTotalInvoicePaymentAmount()),
+                    pw.Divider(thickness: 0.5),
+                  ],
+
                   // Footer
                   pw.SizedBox(height: 10),
                   _buildTableHeaderCell(
