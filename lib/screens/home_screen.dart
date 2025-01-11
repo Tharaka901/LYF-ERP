@@ -64,7 +64,7 @@ class HomeScreen extends StatelessWidget {
                         waiting(context, body: 'Checking...');
 
                         await getPendingAndAcceptedRouteCards(
-                                dataProvider.currentEmployee!.employeeId)
+                                dataProvider.currentEmployee!.employeeId!)
                             .then((rcs) {
                           pop(context);
                           if (rcs.isNotEmpty) {

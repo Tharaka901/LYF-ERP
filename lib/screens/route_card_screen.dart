@@ -16,7 +16,7 @@ import 'package:provider/provider.dart';
 
 class RouteCardScreen extends StatefulWidget {
   static const routeId = 'ROUTE_CARD';
-  const RouteCardScreen({Key? key}) : super(key: key);
+  const RouteCardScreen({super.key});
 
   @override
   State<RouteCardScreen> createState() => _RouteCardScreenState();

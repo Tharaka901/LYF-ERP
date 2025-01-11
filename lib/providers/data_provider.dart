@@ -14,10 +14,11 @@ import 'package:gsr/models/voucher.dart';
 
 import '../models/customer/customer_model.dart';
 import '../models/cylinder.dart';
+import '../models/employee/employee_model.dart';
 import '../services/database.dart';
 
 class DataProvider extends ChangeNotifier {
-  Employee? _currentEmployee;
+  EmployeeModel? _currentEmployee;
   RouteCard? _currentRouteCard;
   CustomerModel? _selectedCustomer;
   IssuedInvoice? _selectedInvoice;
@@ -35,7 +36,7 @@ class DataProvider extends ChangeNotifier {
   List<int> selectedCylinderItemIds = [];
   bool isManualReceipt = false;
 
-  Employee? get currentEmployee => _currentEmployee;
+  EmployeeModel? get currentEmployee => _currentEmployee;
   RouteCard? get currentRouteCard => _currentRouteCard;
   CustomerModel? get selectedCustomer => _selectedCustomer;
   Invoice? get currentInvoice => _currentInvoice;
@@ -74,7 +75,7 @@ class DataProvider extends ChangeNotifier {
   double get grandTotal => double.parse(
       (getTotalAmount() + vat + nonVatItemTotal).toStringAsFixed(2));
 
-  setCurrentEmployee(Employee currentEmployee) {
+  setCurrentEmployee(EmployeeModel currentEmployee) {
     _currentEmployee = currentEmployee;
     notifyListeners();
   }

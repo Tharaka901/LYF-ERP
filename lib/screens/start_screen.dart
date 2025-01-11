@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../commons/common_methods.dart';
-import '../models/employee.dart';
+import '../models/employee/employee_model.dart';
 import '../providers/data_provider.dart';
 import '../services/database.dart';
 import 'home_screen.dart';
@@ -55,7 +55,7 @@ class _StartScreenState extends State<StartScreen> {
       if (response.success) {
         if (!mounted) return;
         final dataProvider = Provider.of<DataProvider>(context, listen: false);
-        dataProvider.setCurrentEmployee(Employee.fromJson(response.data));
+        dataProvider.setCurrentEmployee(EmployeeModel.fromJson(response.data));
         if (mounted) _navigateToHome(context); // Navigate if still mounted
       } else {
         if (mounted) _navigateToLogin(); // Navigate if still mounted

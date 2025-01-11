@@ -7,15 +7,26 @@ import 'package:gsr/screens/route_card_screen.dart';
 import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
 
+import '../../widgets/buttons/custom_outline_button.dart';
+import 'loan_cylinder_view_model.dart';
+
 class LoanNoteScreen extends StatefulWidget {
   final String type;
-  const LoanNoteScreen({Key? key, required this.type}) : super(key: key);
+  const LoanNoteScreen({super.key, required this.type});
 
   @override
   State<LoanNoteScreen> createState() => _LoanNoteScreenState();
 }
 
 class _LoanNoteScreenState extends State<LoanNoteScreen> {
+  LoanCylinderViewModel? loanCylinderViewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    loanCylinderViewModel = LoanCylinderViewModel(context: context);
+  }
+
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
@@ -26,19 +37,19 @@ class _LoanNoteScreenState extends State<LoanNoteScreen> {
             ? 'Recived Note'
             : 'Issued Note'),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          waiting(context, body: 'Sending...');
-          await createLoanInvoice(context);
-          dataProvider.itemList.clear();
-          pop(context);
-          Navigator.pushNamed(
-            context,
-            RouteCardScreen.routeId,
-          );
-        },
-        child: const Text('Done'),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {
+      //     waiting(context, body: 'Sending...');
+      //     await createLoanInvoice(context);
+      //     dataProvider.itemList.clear();
+      //     pop(context);
+      //     Navigator.pushNamed(
+      //       context,
+      //       RouteCardScreen.routeId,
+      //     );
+      //   },
+      //   child: const Text('Done'),
+      // ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(10.0),
@@ -49,12 +60,12 @@ class _LoanNoteScreenState extends State<LoanNoteScreen> {
                 dataProvider.itemList[0].loanType == 2
                     ? 'Loan Recived Note'
                     : 'Loan Issued Note',
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 25.0,
                     color: Colors.blue,
                     fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: Row(
@@ -63,12 +74,12 @@ class _LoanNoteScreenState extends State<LoanNoteScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: EdgeInsets.all(5.0),
+                          padding: const EdgeInsets.all(5.0),
                           child: Text(
                             dataProvider.itemList[0].loanType == 2
                                 ? 'Recived To:'
                                 : 'Issued To:',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 17.0,
                             ),
@@ -118,13 +129,13 @@ class _LoanNoteScreenState extends State<LoanNoteScreen> {
               Row(
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(5.0),
+                    padding: const EdgeInsets.all(5.0),
                     child: Text(
                       dataProvider.itemList[0].loanType == 2
                           ? 'Recived Note Num:'
                           : 'Issued Note Num:',
                       textAlign: TextAlign.start,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 17.0,
                       ),
@@ -158,7 +169,7 @@ class _LoanNoteScreenState extends State<LoanNoteScreen> {
                             customerId:
                                 dataProvider.selectedCustomer?.customerId ?? 0,
                             employeeId:
-                                dataProvider.currentEmployee!.employeeId,
+                                dataProvider.currentEmployee!.employeeId!,
                           ));
                           return Text(
                               (dataProvider.itemList[0].loanType == 2
@@ -185,15 +196,15 @@ class _LoanNoteScreenState extends State<LoanNoteScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: Consumer<DataProvider>(
                   builder: (context, data, _) => Table(
-                    border: TableBorder.symmetric(),
+                    border: const TableBorder.symmetric(),
                     defaultColumnWidth: const IntrinsicColumnWidth(),
                     children: [
-                      TableRow(
+                      const TableRow(
                         decoration: BoxDecoration(
                           color: Colors.blue,
                         ),
@@ -234,39 +245,48 @@ class _LoanNoteScreenState extends State<LoanNoteScreen> {
                           ),
                         ],
                       ),
-                      ...data.itemList
-                          .map(
-                            (item) => TableRow(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text(
-                                    (data.itemList.indexOf(item) + 1)
-                                        .toString(),
-                                    textAlign: TextAlign.start,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text(
-                                    item.item.itemName,
-                                    textAlign: TextAlign.start,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text(
-                                    num(item.quantity),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ],
+                      ...data.itemList.map(
+                        (item) => TableRow(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Text(
+                                (data.itemList.indexOf(item) + 1).toString(),
+                                textAlign: TextAlign.start,
+                              ),
                             ),
-                          )
-                          .toList(),
+                            Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Text(
+                                item.item.itemName,
+                                textAlign: TextAlign.start,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Text(
+                                num(item.quantity),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
+              ),
+              const SizedBox(height: 10),
+              CustomOutlineButton(
+                text: 'Save',
+                onPressed: loanCylinderViewModel!.onPressedSaveButton,
+                color: Colors.blue[800],
+              ),
+              const SizedBox(height: 10),
+              CustomOutlineButton(
+                text: 'Print',
+                onPressed: loanCylinderViewModel!.onPressedPrintButton,
+                color: Colors.blue[800],
               ),
             ],
           ),

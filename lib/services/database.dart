@@ -27,6 +27,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/credit_payment/credit_payment_model.dart';
 import '../models/customer/customer_model.dart';
+import '../models/employee/employee_model.dart';
 
 login(
   BuildContext context, {
@@ -48,7 +49,7 @@ login(
             ? await prefs.setString('password', password).then((value) {
                 context
                     .read<DataProvider>()
-                    .setCurrentEmployee(Employee.fromJson(response.data));
+                    .setCurrentEmployee(EmployeeModel.fromJson(response.data));
                 toast(
                   'Logged in successfully',
                   toastState: TS.success,

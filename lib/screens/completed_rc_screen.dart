@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 
 class CompletedRCScreen extends StatefulWidget {
   static const routeId = 'COMPLETED_RC';
-  const CompletedRCScreen({Key? key}) : super(key: key);
+  const CompletedRCScreen({super.key});
 
   @override
   State<CompletedRCScreen> createState() => _CompletedRCScreenState();
@@ -93,7 +93,7 @@ class _CompletedRCScreenState extends State<CompletedRCScreen> {
       ),
       body: FutureBuilder<List<RouteCard>>(
         future: getRouteCards(
-          dataProvider.currentEmployee!.employeeId,
+          dataProvider.currentEmployee!.employeeId!,
           rcStatus: RC.completed,
         ),
         builder: (context, AsyncSnapshot<List<RouteCard>> snapshot) {

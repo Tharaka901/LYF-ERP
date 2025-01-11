@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 
 class PendingRCScreen extends StatefulWidget {
   static const routeId = 'PENDING_RC';
-  const PendingRCScreen({Key? key}) : super(key: key);
+  const PendingRCScreen({super.key});
 
   @override
   State<PendingRCScreen> createState() => _PendingRCScreenState();
@@ -26,7 +26,7 @@ class _PendingRCScreenState extends State<PendingRCScreen> {
       ),
       body: FutureBuilder<List<RouteCard>>(
         future: getPendingAndAcceptedRouteCards(
-            dataProvider.currentEmployee!.employeeId),
+            dataProvider.currentEmployee!.employeeId!),
         builder: (context, AsyncSnapshot<List<RouteCard>> snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
                 ? const Center(

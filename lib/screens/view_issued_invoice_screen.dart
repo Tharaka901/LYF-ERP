@@ -15,8 +15,7 @@ import '../modules/print/print_invoice_view.dart';
 class ViewIssuedInvoiceScreen extends StatelessWidget {
   static const routeId = 'ISSUED_INVOICE';
   final IssuedInvoice issuedInvoice;
-  const ViewIssuedInvoiceScreen({Key? key, required this.issuedInvoice})
-      : super(key: key);
+  const ViewIssuedInvoiceScreen({super.key, required this.issuedInvoice});
 
   _totalPayment() {
     var total = 0.0;
@@ -135,7 +134,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                   ),
                 );
               },
-              icon: Icon(Icons.print))
+              icon: const Icon(Icons.print))
         ],
       ),
       body: SingleChildScrollView(
@@ -315,7 +314,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                               ],
                             ),
                           )
-                          .toList(),
+                          ,
                     ],
                   ),
                 ),

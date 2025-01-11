@@ -58,7 +58,7 @@ class InvoiceProvider extends ChangeNotifier {
       routecardId: dataProvider.currentRouteCard!.routeCardId,
       amount: dataProvider.getTotalAmount(),
       customerId: dataProvider.selectedCustomer?.customerId ?? 0,
-      employeeId: dataProvider.currentEmployee!.employeeId,
+      employeeId: dataProvider.currentEmployee!.employeeId!,
     ));
   }
 
@@ -84,7 +84,7 @@ class InvoiceProvider extends ChangeNotifier {
       routecardId: dataProvider.currentRouteCard!.routeCardId,
       amount: dataProvider.getTotalAmount(),
       customerId: dataProvider.selectedCustomer!.customerId ?? 0,
-      employeeId: dataProvider.currentEmployee!.employeeId,
+      employeeId: dataProvider.currentEmployee!.employeeId!,
     ));
     notifyListeners();
   }
