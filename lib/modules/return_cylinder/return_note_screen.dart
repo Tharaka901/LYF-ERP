@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
-import 'package:gsr/models/invoice.dart';
-import 'package:gsr/models/invoice_item.dart';
 import 'package:gsr/providers/data_provider.dart';
-import 'package:gsr/screens/select_credit_invoice_for_return_cylinder.dart';
-import 'package:gsr/services/database.dart';
+import 'package:gsr/modules/return_cylinder/select_credit_invoice_for_return_cylinder.dart';
 import 'package:provider/provider.dart';
 
-import '../widgets/text/column_text.dart';
-import '../widgets/text/row_text.dart';
-import '../widgets/tiles/basic_tile.dart';
+import '../invoice/invoice_provider.dart';
+import '../../widgets/text/column_text.dart';
+import '../../widgets/text/row_text.dart';
+import '../../widgets/tiles/basic_tile.dart';
 
 class ReturnNoteScreen extends StatefulWidget {
   final String type;
@@ -20,9 +18,20 @@ class ReturnNoteScreen extends StatefulWidget {
 }
 
 class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
+  DataProvider? dataProvider;
+  InvoiceProvider? invoiceProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    invoiceProvider = Provider.of<InvoiceProvider>(context, listen: false);
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
+    invoiceProvider!.getReturnCylinderInvoiceNumber(
+        dataProvider!.currentRouteCard!, context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final dataProvider = Provider.of<DataProvider>(context, listen: false);
     const titleRowColor = Colors.white;
     return Scaffold(
       appBar: AppBar(
@@ -54,7 +63,7 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
               const SizedBox(height: 10),
               ColumnText(
                 title: 'Return From:',
-                content: dataProvider.selectedCustomer!.businessName,
+                content: dataProvider!.selectedCustomer!.businessName ?? '',
               ),
               const SizedBox(height: 10),
               RowText(
@@ -72,50 +81,25 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
                       fontSize: 17.0,
                     ),
                   ),
-                  FutureBuilder<String>(
-                    future: returnCylinderInvoiceNumber(context),
-                    builder: (context, AsyncSnapshot<String> snapshot) {
-                      if (snapshot.hasData) {
-                        dataProvider.setCurrentInvoice(Invoice(
-                          invoiceItems: dataProvider.itemList
-                              .map(
-                                (addedItem) => InvoiceItem(
-                                  item: addedItem.item,
-                                  itemPrice:
-                                      addedItem.item.hasSpecialPrice != null
-                                          ? addedItem
-                                              .item.hasSpecialPrice!.itemPrice
-                                          : addedItem.item.salePrice,
-                                  itemQty: addedItem.quantity,
-                                  status: 1,
+                  Consumer<InvoiceProvider>(
+                    builder: (context, invoiceProvider, _) =>
+                        invoiceProvider.returnCylinderInvoiceNu != null
+                            ? Text(
+                                'GRN/${invoiceProvider.returnCylinderInvoiceNu}',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 16.0,
                                 ),
+                                maxLines: 2,
+                                overflow: TextOverflow.clip,
                               )
-                              .toList(),
-                          invoiceNo: snapshot.data!,
-                          routecardId:
-                              dataProvider.currentRouteCard!.routeCardId,
-                          amount: dataProvider.getTotalAmount(),
-                          customerId:
-                              dataProvider.selectedCustomer?.customerId ?? 0,
-                          employeeId: dataProvider.currentEmployee!.employeeId,
-                        ));
-                        return Text('GRN/${snapshot.data!}',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 16.0,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.clip);
-                      } else {
-                        return const Text(
-                          'Generating...',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      }
-                    },
+                            : const Text(
+                                'Generating...',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                   ),
                 ],
               ),
@@ -242,11 +226,12 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
               ),
               BasicTile(
                   label: 'Sub Total',
-                  value: formatPrice(dataProvider.getTotalAmount())),
-              BasicTile(label: 'VAT 18%', value: formatPrice(dataProvider.vat)),
+                  value: formatPrice(dataProvider!.getTotalAmount())),
+              BasicTile(
+                  label: 'VAT 18%', value: formatPrice(dataProvider!.vat)),
               BasicTile(
                   label: 'Grand Total',
-                  value: formatPrice(dataProvider.grandTotal)),
+                  value: formatPrice(dataProvider!.grandTotal)),
               const Divider(
                 color: Colors.black,
               ),

@@ -6,6 +6,7 @@ import 'package:gsr/screens/previous_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../commons/common_methods.dart';
+import '../models/customer/customer_model.dart';
 import '../providers/data_provider.dart';
 
 class QRScanScreen extends StatefulWidget {
@@ -28,7 +29,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     final response = await respo('customers/get-by-reg-id',
         method: Method.post, data: {"registrationId": code});
-    final customer = Customer.fromJson(response.data);
+    final customer = CustomerModel.fromJson(response.data);
     dataProvider.setSelectedCustomer(customer);
 
     if (screen == 'Previous') {

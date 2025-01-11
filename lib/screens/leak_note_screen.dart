@@ -77,7 +77,7 @@ class _LeakNoteScreenState extends State<LeakNoteScreen> {
                         Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: Text(
-                            dataProvider.selectedCustomer!.businessName,
+                            dataProvider.selectedCustomer!.businessName ?? '',
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 16.0,

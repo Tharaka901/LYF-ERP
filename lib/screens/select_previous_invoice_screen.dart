@@ -41,7 +41,7 @@ class _SelectPreviousInvoiceScreenState
               child: Column(
                 children: [
                   Text(
-                    selectedCustomer.businessName,
+                    selectedCustomer.businessName ?? '',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 25.0,

@@ -118,7 +118,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    dataProvider.selectedCustomer!.businessName,
+                                    dataProvider.selectedCustomer!.businessName ?? '',
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(fontSize: 18.0),
                                     maxLines: 2,

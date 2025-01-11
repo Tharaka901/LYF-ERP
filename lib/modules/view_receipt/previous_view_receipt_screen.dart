@@ -96,7 +96,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                               ),
                               Expanded(
                                 child: Text(
-                                    dataProvider.selectedCustomer!.businessName,
+                                    dataProvider.selectedCustomer!.businessName ?? '',
                                     // textAlign: TextAlign.,
                                     style: const TextStyle(fontSize: 18.0),
                                     maxLines: 2,

@@ -101,7 +101,7 @@ class _PreviousAddPaymentScreenState extends State<PreviousAddPaymentScreen> {
                 ),
                 DetailCard(
                   detailKey: 'Customer name',
-                  detailvalue: dataProvider.selectedCustomer!.businessName,
+                  detailvalue: dataProvider.selectedCustomer!.businessName ?? '',
                 ),
                 DetailCard(
                   detailKey: 'Total amount',

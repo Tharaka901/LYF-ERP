@@ -3,7 +3,8 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../commons/common_methods.dart';
-import '../models/customer.dart';
+import '../models/customer/customer_model.dart';
+import '../models/route_card.dart';
 import '../providers/data_provider.dart';
 import '../services/database.dart';
 import 'add_items_screen.dart';
@@ -29,13 +30,20 @@ class SelectCustomerScreen extends StatefulWidget {
 }
 
 class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
-  final TextEditingController _qrController = TextEditingController();
+  DataProvider? dataProvider;
+  CustomerModel? selectedCustomer;
+  RouteCard? routeCard;
   bool? _isManual;
+
+  final TextEditingController _qrController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    dataProvider = Provider.of<DataProvider>(context, listen: false);
     _qrController.text = widget.qrText ?? '';
+    selectedCustomer = dataProvider!.selectedCustomer;
+    routeCard = dataProvider!.currentRouteCard;
   }
 
   @override
@@ -44,9 +52,10 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
     super.dispose();
   }
 
-  void _handleCustomerSelection(Customer customer, DataProvider dataProvider) {
+  void _handleCustomerSelection(
+      CustomerModel customer, DataProvider dataProvider) {
     setState(() {
-      _qrController.text = customer.registrationId;
+      _qrController.text = customer.registrationId ?? '';
       dataProvider.setSelectedCustomer(customer);
     });
   }
@@ -77,44 +86,44 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    final routeCard = dataProvider.currentRouteCard!;
-    final selectedCustomer = dataProvider.selectedCustomer;
-
     if (ModalRoute.of(context)?.settings.arguments != null) {
       _isManual = (ModalRoute.of(context)!.settings.arguments
           as Map<dynamic, dynamic>)['isManual'];
     }
-
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        appBar: _buildAppBar(routeCard),
-        floatingActionButton: _buildFloatingActionButton(selectedCustomer),
-        body: _buildBody(selectedCustomer, dataProvider),
+        appBar: _buildAppBar(),
+        floatingActionButton: _buildFloatingActionButton(),
+        body: _buildBody(),
       ),
     );
   }
 
-  AppBar _buildAppBar(dynamic routeCard) {
+  AppBar _buildAppBar() {
     return AppBar(
       title: Text(
-        '${routeCard.route.routeName} - ${routeCard.date}',
+        '${routeCard!.route.routeName} - ${routeCard!.date}',
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
     );
   }
 
-  Widget? _buildFloatingActionButton(Customer? selectedCustomer) {
-    return selectedCustomer != null
-        ? FloatingActionButton(
+  Widget? _buildFloatingActionButton() {
+    return Consumer<DataProvider>(
+      builder: (context, dataProvider, child) {
+        if (dataProvider.selectedCustomer != null) {
+          return FloatingActionButton(
             onPressed: _navigateToAddItems,
             child: const Icon(Icons.arrow_forward_rounded, size: 40),
-          )
-        : null;
+          );
+        }
+        return const SizedBox.shrink();
+      },
+    );
   }
 
-  Widget _buildBody(Customer? selectedCustomer, DataProvider dataProvider) {
+  Widget _buildBody() {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: SingleChildScrollView(
@@ -123,9 +132,9 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildCustomerDisplay(selectedCustomer),
+              _buildCustomerDisplay(),
               const SizedBox(height: 30.0),
-              _buildCustomerSearch(dataProvider),
+              _buildCustomerSearch(),
               const SizedBox(height: 20.0),
               _buildScanButton(),
               const SizedBox(height: 20.0),
@@ -136,7 +145,7 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
     );
   }
 
-  Widget _buildCustomerDisplay(Customer? selectedCustomer) {
+  Widget _buildCustomerDisplay() {
     return selectedCustomer == null
         ? image('scan')
         : Column(
@@ -146,7 +155,7 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                 data: _qrController.text,
               ),
               Text(
-                selectedCustomer.businessName,
+                selectedCustomer!.businessName ?? '',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 25.0,
@@ -157,14 +166,14 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
           );
   }
 
-  Widget _buildCustomerSearch(DataProvider dataProvider) {
-    return TypeAheadField<Customer>(
+  Widget _buildCustomerSearch() {
+    return TypeAheadField<CustomerModel>(
       direction: VerticalDirection.up,
       onSelected: (customer) =>
-          _handleCustomerSelection(customer, dataProvider),
+          _handleCustomerSelection(customer, dataProvider!),
       itemBuilder: (context, customer) => ListTile(
-        title: Text(customer.businessName),
-        subtitle: Text(customer.registrationId),
+        title: Text(customer.businessName ?? ''),
+        subtitle: Text(customer.registrationId ?? ''),
       ),
       emptyBuilder: (context) => const Padding(
         padding: EdgeInsets.all(10.0),
@@ -183,7 +192,8 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
       controller: controller,
       focusNode: focusNode,
       decoration: AppStyles.textFieldDecoration(
-        labelText: 'Search customer',
+        labelText:
+            dataProvider!.selectedCustomer?.businessName ?? 'Search customer',
         fillColor: Colors.grey[200],
       ),
       onTap: () => _qrController.clear(),

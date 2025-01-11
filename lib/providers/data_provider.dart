@@ -12,13 +12,14 @@ import 'package:gsr/models/route_card.dart';
 import 'package:gsr/models/routecard_item.dart';
 import 'package:gsr/models/voucher.dart';
 
+import '../models/customer/customer_model.dart';
 import '../models/cylinder.dart';
 import '../services/database.dart';
 
 class DataProvider extends ChangeNotifier {
   Employee? _currentEmployee;
   RouteCard? _currentRouteCard;
-  Customer? _selectedCustomer;
+  CustomerModel? _selectedCustomer;
   IssuedInvoice? _selectedInvoice;
   final _itemList = <AddedItem>[];
   final _chequeList = <Cheque>[];
@@ -36,7 +37,7 @@ class DataProvider extends ChangeNotifier {
 
   Employee? get currentEmployee => _currentEmployee;
   RouteCard? get currentRouteCard => _currentRouteCard;
-  Customer? get selectedCustomer => _selectedCustomer;
+  CustomerModel? get selectedCustomer => _selectedCustomer;
   Invoice? get currentInvoice => _currentInvoice;
   Voucher? get selectedVoucher => _selectedVoucher;
   IssuedInvoice? get selectedInvoice => _selectedInvoice;
@@ -51,8 +52,9 @@ class DataProvider extends ChangeNotifier {
           .map((e) => e.item.nonVatAmount ?? 0 * e.quantity)
           .reduce((value, element) => value + element);
 
-  double get vat =>
-      double.parse(((getTotalAmount() / 100) * 18).toStringAsFixed(2));
+  double get vat => double.parse(((getTotalAmount() / 100) *
+          double.parse(selectedCustomer!.vat!.vatAmount))
+      .toStringAsFixed(2));
   double get grandTotal => double.parse(
       (getTotalAmount() + vat + nonVatItemTotal).toStringAsFixed(2));
 
@@ -70,7 +72,7 @@ class DataProvider extends ChangeNotifier {
     _currentInvoice = currentInvoice;
   }
 
-  setSelectedCustomer(Customer? selectedCustomer) {
+  setSelectedCustomer(CustomerModel? selectedCustomer) {
     _selectedCustomer = selectedCustomer;
     notifyListeners();
   }

@@ -10,6 +10,8 @@ import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../models/customer/customer_model.dart';
+
 class PreviousScreen extends StatefulWidget {
   static const routeId = 'PREVIOUS';
   final String? qrText;
@@ -54,7 +56,7 @@ class _PreviousScreenState extends State<PreviousScreen> {
                             data: qrController.text,
                           ),
                           Text(
-                            selectedCustomer.businessName,
+                            selectedCustomer.businessName ?? '',
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 25.0,
@@ -66,17 +68,17 @@ class _PreviousScreenState extends State<PreviousScreen> {
                 const SizedBox(
                   height: 30.0,
                 ),
-                TypeAheadField<Customer>(
+                TypeAheadField<CustomerModel>(
                   direction: VerticalDirection.up,
                   onSelected: (customer) => setState(() {
                     setState(() {
-                      qrController.text = customer.businessName;
+                      qrController.text = customer.businessName ?? '';
                       dataProvider.setSelectedCustomer(customer);
                     });
                   }),
                   itemBuilder: (context, customer) => ListTile(
-                    title: Text(customer.businessName),
-                    subtitle: Text(customer.registrationId),
+                    title: Text(customer.businessName ?? ''),
+                    subtitle: Text(customer.registrationId ?? ''),
                   ),
                   emptyBuilder: (context) => const Padding(
                     padding: EdgeInsets.all(10.0),

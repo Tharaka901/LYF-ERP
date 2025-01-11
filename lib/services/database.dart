@@ -26,6 +26,7 @@ import 'package:gsr/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/credit_payment/credit_payment_model.dart';
+import '../models/customer/customer_model.dart';
 
 login(
   BuildContext context, {
@@ -469,7 +470,7 @@ Future<List<IssuedInvoice>> creditInvoices(BuildContext context,
   String url =
       'invoice/get?customerId=${cId ?? context.read<DataProvider>().selectedCustomer!.customerId}';
   if (type != null) {
-    url = url + '&type=${type}';
+    url = '$url&type=$type';
   }
 
   final response = await respo(url);
@@ -587,17 +588,17 @@ Future<void> updateRouteCard({
   });
 }
 
-Future<List<Customer>> getCustomers(String pattern) async {
+Future<List<CustomerModel>> getCustomers(String pattern) async {
   try {
     final response = await respo('customers/get-all');
     List<dynamic> list = response.data;
     return list
-        .map((element) => Customer.fromJson(element))
+        .map((element) => CustomerModel.fromJson(element))
         .where((element) =>
-            element.businessName
+            element.businessName!
                 .toLowerCase()
                 .contains(pattern.toLowerCase()) ||
-            element.registrationId
+            element.registrationId!
                 .toLowerCase()
                 .contains(pattern.toLowerCase()))
         .toList();
@@ -699,7 +700,7 @@ Future<Respo> createReturnCylinderInvoice(BuildContext context) async {
       method: Method.post,
       data: {
         "invoice": {
-          "invoiceNo": 'GRN/' + invoiceNo,
+          "invoiceNo": 'GRN/$invoiceNo',
           "routecardId": dataProvider.currentRouteCard!.routeCardId,
           "customerId": selectedCustomer.customerId,
           "employeeId": dataProvider.currentEmployee!.employeeId,
@@ -845,7 +846,7 @@ Future<void> sendPaymentWithPrevious(BuildContext context, double total,
         method: Method.put,
         data: {
           "customerId": selectedCustomer.customerId,
-          "depositBalance": selectedCustomer.depositBalance + balance,
+          "depositBalance": selectedCustomer.depositBalance! + balance,
         },
       );
       await respo(
@@ -1100,7 +1101,7 @@ Future<void> sendCreditPayment(BuildContext context, double total, double cash,
           method: Method.put,
           data: {
             "customerId": selectedCustomer.customerId,
-            "depositBalance": selectedCustomer.depositBalance +
+            "depositBalance": selectedCustomer.depositBalance! +
                 (total -
                     dataProvider.issuedInvoicePaidList
                         .map((e) => e.paymentAmount)
@@ -1208,7 +1209,7 @@ Future<void> sendPayment(BuildContext context,
         method: Method.put,
         data: {
           "customerId": selectedCustomer.customerId,
-          "depositBalance": selectedCustomer.depositBalance -
+          "depositBalance": selectedCustomer.depositBalance! -
               dataProvider.issuedDepositePaidList
                   .map((e) => e.paymentAmount)
                   .reduce((value, element) => value + element),
@@ -1335,7 +1336,7 @@ Future<void> sendPayment(BuildContext context,
         method: Method.put,
         data: {
           "customerId": selectedCustomer.customerId,
-          "depositBalance": selectedCustomer.depositBalance + balance,
+          "depositBalance": selectedCustomer.depositBalance! + balance,
         },
       );
       await respo(
