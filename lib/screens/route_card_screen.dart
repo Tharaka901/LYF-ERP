@@ -383,6 +383,8 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                           }
                         }
                       });
+                      print("routeCard.routeCardId");
+                      print(routeCard.routeCardId);
                       final rcItemSummary = await getItemsSummaryByRoutecard(
                           routeCardId: routeCard.routeCardId);
                       pop(context);

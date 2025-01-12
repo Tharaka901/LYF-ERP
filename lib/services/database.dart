@@ -14,7 +14,7 @@ import 'package:gsr/models/loanItem.dart';
 import 'package:gsr/models/loan_stock.dart' as ls;
 import 'package:gsr/models/payment.dart';
 import 'package:gsr/models/payments.dart';
-import 'package:gsr/models/rcItemSummary.dart';
+import 'package:gsr/models/rc_item_summary.dart';
 import 'package:gsr/models/response.dart';
 import 'package:gsr/models/route_card.dart';
 import 'package:gsr/models/routecard_item.dart';

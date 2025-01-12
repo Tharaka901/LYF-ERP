@@ -1,12 +1,16 @@
 class RcItemsSummary {
   int id;
   String name;
-  String refill;
-  String deposite;
-  String empty;
-  String total;
-  String? returnRefillCount;
-  String? returnEmptyCount;
+  int refill;
+  int deposite;
+  int empty;
+  int freeEmpty;
+  int leak;
+  int damage;
+  int free;
+  int total;
+  int? returnRefillCount;
+  int? returnEmptyCount;
 
   RcItemsSummary(
       {required this.id,
@@ -14,6 +18,10 @@ class RcItemsSummary {
       required this.refill,
       required this.deposite,
       required this.empty,
+      required this.freeEmpty,
+      required this.leak,
+      required this.damage,
+      required this.free,
       required this.total,
       this.returnEmptyCount,
       this.returnRefillCount});
@@ -24,6 +32,10 @@ class RcItemsSummary {
       refill: json["refill"],
       deposite: json["deposite"],
       empty: json["empty"],
+      freeEmpty: json["freeEmpty"],
+      leak: json["leak"],
+      damage: json["damage"],
+      free: json["free"],
       total: json["total"],
       returnRefillCount: json["returnRefillCount"],
       returnEmptyCount: json["returnEmptyCount"]);
@@ -34,6 +46,10 @@ class RcItemsSummary {
         "refill": refill,
         "deposite": deposite,
         "empty": empty,
+        "freeEmpty": freeEmpty,
+        "leak": leak,
+        "damage": damage,
+        "free": free,
         "total": total,
       };
 }
