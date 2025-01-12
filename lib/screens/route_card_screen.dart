@@ -3,7 +3,7 @@ import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/item_summary_customer_wise.dart';
 import 'package:gsr/providers/data_provider.dart';
-import 'package:gsr/screens/about_rc_screen.dart';
+import 'package:gsr/modules/route_card/about_rc_screen.dart';
 import 'package:gsr/screens/invoice_summary_screen.dart';
 import 'package:gsr/screens/overall_summary_screen.dart';
 import 'package:gsr/screens/previous_screen.dart';
@@ -97,21 +97,6 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                               );
                             });
                             data.acceptRouteCard();
-                          }
-                          if (value == 4) {
-                            waiting(context, body: 'Rejecting Route Card...');
-                            updateRouteCard(
-                              routeCardId: data.currentRouteCard!.routeCardId,
-                              status: 4,
-                            ).then((value) {
-                              pop(context);
-                              pop(context);
-                              toast(
-                                'Routecard ${data.currentRouteCard!.routeCardNo} rejected successfully',
-                                toastState: TS.success,
-                              );
-                            });
-                            data.rejectRouteCard();
                           }
                         }
                       });

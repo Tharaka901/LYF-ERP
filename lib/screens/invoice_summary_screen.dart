@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/issued_invoice.dart';
-import 'package:gsr/modules/route_card_cash/route_card_cash_view.dart';
+import 'package:gsr/modules/route_card/route_card_cash_view.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/screens/view_issued_invoice_screen.dart';
 import 'package:gsr/modules/receipt_list/receipt_list_view.dart';

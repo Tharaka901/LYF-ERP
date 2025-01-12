@@ -13,4 +13,14 @@ class RouteCardService {
       rethrow;
     }
   }
+
+  Future<void> updateRouteCard({
+    required int routeCardId,
+    required int status,
+  }) async {
+    await respo('route-card/update', method: Method.post, data: {
+      'routeCardId': routeCardId,
+      'status': status,
+    });
+  }
 }

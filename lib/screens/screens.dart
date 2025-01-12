@@ -1,4 +1,4 @@
-export 'about_rc_screen.dart';
+export '../modules/route_card/about_rc_screen.dart';
 export 'add_items_screen.dart';
 export 'add_payment_screen.dart';
 export '../modules/select_customer/select_customer_screen.dart';

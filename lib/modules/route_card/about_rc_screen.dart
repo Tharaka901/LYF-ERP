@@ -6,59 +6,21 @@ import 'package:gsr/widgets/detail_card.dart';
 import 'package:gsr/widgets/option_card.dart';
 import 'package:provider/provider.dart';
 
+import '../../widgets/buttons/custom_outline_button.dart';
+import 'route_card_view_model.dart';
+
 class AboutRCScreen extends StatelessWidget {
   static const routeId = 'ABOUT_RC';
-  const AboutRCScreen({Key? key}) : super(key: key);
+  const AboutRCScreen({super.key});
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
+    final routeCardViewModel = RouteCardViewModel();
     final routeCard = dataProvider.currentRouteCard!;
     return Scaffold(
       appBar: AppBar(
         title: Text('${routeCard.routeCardNo} - ${routeCard.date}'),
       ),
-      floatingActionButton: routeCard.status == 0
-          ? FloatingActionButton(
-              onPressed: () {
-                confirm(
-                  context,
-                  title: '',
-                  body: 'Accept or reject this R/C',
-                  onConfirm: () {
-                    pop(context);
-                    popValue(
-                      context,
-                      value: 1,
-                    );
-                  },
-                  confirmText: 'Accept',
-                  moreActions: [
-                    // TextButton(
-                    //   onPressed: () {
-                    //     pop(context);
-                    //     popValue(
-                    //       context,
-                    //       value: 4,
-                    //     );
-                    //   },
-                    //   child: const Text(
-                    //     'Rejectss',
-                    //     style: TextStyle(
-                    //       color: Colors.red,
-                    //       fontSize: 20.0,
-                    //     ),
-                    //   ),
-                    // ),
-                  ],
-                );
-              },
-              backgroundColor: Colors.green,
-              child: const Icon(
-                Icons.question_mark_rounded,
-                size: 40,
-              ),
-            )
-          : dummy,
       body: Padding(
         padding: defaultPadding,
         child: ListView(
@@ -84,9 +46,6 @@ class AboutRCScreen extends StatelessWidget {
             ...dataProvider.rcItemList.map(
               (rci) {
                 return OptionCard(
-                  // leading: image(
-                  //   '12.5',
-                  // ),
                   height: 20,
                   title: (rci.item ?? dummyItem).itemName,
                   titleFontSize: 20.0,
@@ -100,6 +59,32 @@ class AboutRCScreen extends StatelessWidget {
                 );
               },
             ),
+            if (routeCard.status == 0) ...[
+              const SizedBox(height: 10),
+              CustomOutlineButton(
+                text: 'Accept',
+                onPressed: () {
+                  routeCardViewModel.onPressedAcceptButton(context);
+                },
+                color: Colors.blue[800],
+              ),
+              const SizedBox(height: 10),
+              CustomOutlineButton(
+                text: 'Accept & Print',
+                onPressed: () {
+                  routeCardViewModel.onPressedAcceptAndPrintButton(context);
+                },
+                color: Colors.blue[800],
+              ),
+              const SizedBox(height: 10),
+              CustomOutlineButton(
+                text: 'Reject',
+                onPressed: () {
+                  routeCardViewModel.onPressedRejectButton(context);
+                },
+                color: Colors.red[800],
+              ),
+            ],
           ],
         ),
       ),

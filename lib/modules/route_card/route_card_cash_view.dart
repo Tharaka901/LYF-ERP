@@ -7,7 +7,7 @@ import '../../services/database.dart';
 import 'route_card_cash_provider.dart';
 
 class RouteCardCashView extends StatefulWidget {
-  RouteCardCashView({super.key});
+  const RouteCardCashView({super.key});
 
   @override
   State<RouteCardCashView> createState() => _RouteCardCashViewState();
@@ -76,11 +76,11 @@ class _RouteCardCashViewState extends State<RouteCardCashView> {
             _buildCashEntryField('20', cashProvider!.cash20Controller),
             _buildCashEntryField('10', cashProvider!.cash10Controller),
             _buildCashEntryField('Coins', cashProvider!.coinController),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Consumer<RouteCardCashProvider>(builder: (context, cash, __) {
               return Text(
                 'Total - Rs ${cash.totalCash}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -100,7 +100,7 @@ class _RouteCardCashViewState extends State<RouteCardCashView> {
         controller: controller,
         keyboardType: TextInputType.number,
         decoration: InputDecoration(
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
           labelText: 'Enter quantity of $denomination',
         ),
       ),

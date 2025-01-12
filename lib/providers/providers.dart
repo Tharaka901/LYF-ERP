@@ -9,7 +9,7 @@ import 'items_provider.dart';
 import 'payment_provider.dart';
 import '../modules/invoice/invoice_provider.dart';
 import '../modules/receipt_summary/receipt_summary_provider.dart';
-import '../modules/route_card_cash/route_card_cash_provider.dart';
+import '../modules/route_card/route_card_cash_provider.dart';
 
 class AppProviders {
   static List<SingleChildWidget> get providers => [
