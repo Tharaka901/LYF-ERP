@@ -37,19 +37,6 @@ class _LoanNoteScreenState extends State<LoanNoteScreen> {
             ? 'Recived Note'
             : 'Issued Note'),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () async {
-      //     waiting(context, body: 'Sending...');
-      //     await createLoanInvoice(context);
-      //     dataProvider.itemList.clear();
-      //     pop(context);
-      //     Navigator.pushNamed(
-      //       context,
-      //       RouteCardScreen.routeId,
-      //     );
-      //   },
-      //   child: const Text('Done'),
-      // ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(10.0),

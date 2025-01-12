@@ -2,11 +2,9 @@ import 'package:gsr/models/added_item.dart';
 import 'package:gsr/models/customer/customer_model.dart';
 import 'package:gsr/models/employee/employee_model.dart';
 import 'package:gsr/models/route_card.dart';
-import 'package:provider/provider.dart';
 
 import '../commons/common_methods.dart';
 import '../models/response.dart';
-import '../providers/data_provider.dart';
 
 class InvoiceService {
   Future<String> invoiceNumber(RouteCard routeCard) async {
@@ -26,6 +24,13 @@ class InvoiceService {
   Future<String> loanInvoiceNumber(RouteCard routeCard) async {
     final response = await respo(
         'loan-invoice/count-by-routecard?id=${routeCard.routeCardId}');
+    final int count = response.data;
+    return '${routeCard.routeCardNo}/${count + 1}';
+  }
+
+  Future<String> leakInvoiceNumber(RouteCard routeCard) async {
+    final response = await respo(
+        'leak-invoice/count-by-routecard?id=${routeCard.routeCardId}');
     final int count = response.data;
     return '${routeCard.routeCardNo}/${count + 1}';
   }
@@ -79,6 +84,57 @@ class InvoiceService {
               .toList()
         },
       );
+      return invoiceResponse;
+    } catch (e) {
+      toast(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<Respo> createLeakInvoice(
+      {required RouteCard routeCard,
+      required CustomerModel customer,
+      required List<AddedItem> itemList,
+      required List<int> selectedCylinderItemIds,
+      required EmployeeModel employee,
+      int? leakType}) async {
+    try {
+      final invoiceNo = await leakInvoiceNumber(routeCard);
+      //! Create invoice
+      final invoiceResponse = await respo(
+        'leak-invoice/create',
+        method: Method.post,
+        data: {
+          "invoice": {
+            "invoiceNo":
+                invoiceNo.replaceAll('RCN', leakType == 2 ? 'LE/R' : 'LE/I'),
+            "routecardId": routeCard.routeCardId,
+            "customerId": customer.customerId,
+            "employeeId": employee.employeeId,
+            "status": leakType,
+          },
+          "invoiceItems": leakType == 2
+              ? itemList
+                  .map((invoiceItem) => {
+                        "itemId": invoiceItem.item.id,
+                        "itemQty": invoiceItem.quantity,
+                        "routecardId": routeCard.routeCardId,
+                        "customerId1": customer.customerId,
+                        "cylinderNo": invoiceItem.item.cylinderNo,
+                        "referenceNo": invoiceItem.item.referenceNo,
+                        "status": leakType == 2 ? 1 : 6
+                      })
+                  .toList()
+              : selectedCylinderItemIds
+                  .map((id) => {
+                        "id": id,
+                        "status": 6,
+                        "routecardId": routeCard.routeCardId,
+                      })
+                  .toList()
+        },
+      );
+
       return invoiceResponse;
     } catch (e) {
       toast(e.toString());

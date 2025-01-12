@@ -3,19 +3,28 @@ import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/invoice.dart';
 import 'package:gsr/models/invoice_item.dart';
 import 'package:gsr/providers/data_provider.dart';
-import 'package:gsr/screens/route_card_screen.dart';
 import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
 
+import '../../widgets/buttons/custom_outline_button.dart';
+import 'leak_invoice_view_model.dart';
+
 class LeakNoteScreen extends StatefulWidget {
   final String type;
-  const LeakNoteScreen({Key? key, required this.type}) : super(key: key);
+  const LeakNoteScreen({super.key, required this.type});
 
   @override
   State<LeakNoteScreen> createState() => _LeakNoteScreenState();
 }
 
 class _LeakNoteScreenState extends State<LeakNoteScreen> {
+  late LeakInvoiceViewModel viewModel;
+  @override
+  void initState() {
+    super.initState();
+    viewModel = LeakInvoiceViewModel(context: context);
+  }
+
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
@@ -25,19 +34,6 @@ class _LeakNoteScreenState extends State<LeakNoteScreen> {
         title: Text(dataProvider.itemList[0].leakType == 2
             ? 'Leak Recived Note'
             : 'Leak Issued Note'),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          waiting(context, body: 'Sending...');
-          await createLeakInvoice(context);
-          dataProvider.itemList.clear();
-          pop(context);
-          Navigator.pushNamed(
-            context,
-            RouteCardScreen.routeId,
-          );
-        },
-        child: const Text('Done'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -49,12 +45,12 @@ class _LeakNoteScreenState extends State<LeakNoteScreen> {
                 dataProvider.itemList[0].leakType == 2
                     ? 'Leak Recived Note'
                     : 'Leak Issued Note',
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 25.0,
                     color: Colors.blue,
                     fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: Row(
@@ -63,12 +59,12 @@ class _LeakNoteScreenState extends State<LeakNoteScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: EdgeInsets.all(5.0),
+                          padding: const EdgeInsets.all(5.0),
                           child: Text(
                             dataProvider.itemList[0].leakType == 2
                                 ? 'Recived To:'
                                 : 'Issued To:',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 17.0,
                             ),
@@ -118,13 +114,13 @@ class _LeakNoteScreenState extends State<LeakNoteScreen> {
               Row(
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(5.0),
+                    padding: const EdgeInsets.all(5.0),
                     child: Text(
                       dataProvider.itemList[0].leakType == 2
                           ? 'Recived Note Num:'
                           : 'Issued Note Num:',
                       textAlign: TextAlign.start,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 17.0,
                       ),
@@ -185,16 +181,16 @@ class _LeakNoteScreenState extends State<LeakNoteScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               if (dataProvider.itemList[0].leakType == 2)
                 SizedBox(
                   width: double.infinity,
                   child: Consumer<DataProvider>(
                     builder: (context, data, _) => Table(
-                      border: TableBorder.symmetric(),
+                      border: const TableBorder.symmetric(),
                       defaultColumnWidth: const IntrinsicColumnWidth(),
                       children: [
-                        TableRow(
+                        const TableRow(
                           decoration: BoxDecoration(
                             color: Colors.blue,
                           ),
@@ -247,43 +243,40 @@ class _LeakNoteScreenState extends State<LeakNoteScreen> {
                             ),
                           ],
                         ),
-                        ...data.itemList
-                            .map(
-                              (item) => TableRow(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(
-                                      (data.itemList.indexOf(item) + 1)
-                                          .toString(),
-                                      textAlign: TextAlign.start,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(
-                                      item.item.itemName,
-                                      textAlign: TextAlign.start,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(
-                                      item.cylinderNo ?? '',
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(
-                                      item.referenceNo ?? '',
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ],
+                        ...data.itemList.map(
+                          (item) => TableRow(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  (data.itemList.indexOf(item) + 1).toString(),
+                                  textAlign: TextAlign.start,
+                                ),
                               ),
-                            )
-                            .toList(),
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  item.item.itemName,
+                                  textAlign: TextAlign.start,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  item.cylinderNo ?? '',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  item.referenceNo ?? '',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -293,10 +286,10 @@ class _LeakNoteScreenState extends State<LeakNoteScreen> {
                   width: double.infinity,
                   child: Consumer<DataProvider>(
                     builder: (context, data, _) => Table(
-                      border: TableBorder.symmetric(),
+                      border: const TableBorder.symmetric(),
                       defaultColumnWidth: const IntrinsicColumnWidth(),
                       children: [
-                        TableRow(
+                        const TableRow(
                           decoration: BoxDecoration(
                             color: Colors.blue,
                           ),
@@ -337,40 +330,49 @@ class _LeakNoteScreenState extends State<LeakNoteScreen> {
                             ),
                           ],
                         ),
-                        ...data.itemList
-                            .map(
-                              (item) => TableRow(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(
-                                      (data.itemList.indexOf(item) + 1)
-                                          .toString(),
-                                      textAlign: TextAlign.start,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(
-                                      item.item.itemName,
-                                      textAlign: TextAlign.start,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(
-                                      item.cylinderNo.toString(),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ],
+                        ...data.itemList.map(
+                          (item) => TableRow(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  (data.itemList.indexOf(item) + 1).toString(),
+                                  textAlign: TextAlign.start,
+                                ),
                               ),
-                            )
-                            .toList(),
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  item.item.itemName,
+                                  textAlign: TextAlign.start,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  item.cylinderNo.toString(),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
+              const SizedBox(height: 10),
+              CustomOutlineButton(
+                text: 'Save',
+                onPressed: viewModel.onPressedSaveButton,
+                color: Colors.blue[800],
+              ),
+              const SizedBox(height: 10),
+              CustomOutlineButton(
+                text: 'Print',
+                onPressed: viewModel.onPressedPrintButton,
+                color: Colors.blue[800],
+              ),
             ],
           ),
         ),

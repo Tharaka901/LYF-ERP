@@ -7,24 +7,24 @@ import 'package:provider/provider.dart';
 import '../../commons/common_consts.dart';
 import '../../commons/common_methods.dart';
 import '../../providers/data_provider.dart';
-import '../loan_cylinder/loan_cylinder_view_model.dart';
+import '../leak_cylinders/leak_invoice_view_model.dart';
 
-class LoanNotePrintScreen extends StatelessWidget {
-  const LoanNotePrintScreen({super.key});
+class LeakNotePrintScreen extends StatelessWidget {
+  const LeakNotePrintScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
+    final viewModel = LeakInvoiceViewModel(context: context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(dataProvider.itemList[0].loanType == 2
-            ? 'Print Received Note'
-            : 'Print Issued Note'),
+        title: Text(dataProvider.itemList[0].leakType == 2
+            ? 'Print Leak Received Note'
+            : 'Print Leak Issued Note'),
       ),
       body: PdfPreview(
         onPrinted: (context) async {
-          final loanCylinderViewModel = LoanCylinderViewModel(context: context);
-          loanCylinderViewModel.onPressedSaveButton();
+          viewModel.onPressedSaveButton();
         },
         build: (format) => _generatePdf(format, context),
       ),
@@ -47,12 +47,12 @@ class LoanNotePrintScreen extends StatelessWidget {
                   // Company details
                   ...CompanyConstants.companyDetails,
 
-                  // Loan Note Title
+                  // Leak Note Title
                   pw.SizedBox(height: 5.0),
                   pw.Text(
-                    dataProvider.itemList[0].loanType == 2
-                        ? 'Loan Received Note'
-                        : 'Loan Issued Note',
+                    dataProvider.itemList[0].leakType == 2
+                        ? 'Leak Received Note'
+                        : 'Leak Issued Note',
                     style: ThemeConstants.boldStyleForPdf,
                   ),
                   pw.SizedBox(height: 5.0),
@@ -65,7 +65,7 @@ class LoanNotePrintScreen extends StatelessWidget {
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           pw.Text(
-                            '${dataProvider.itemList[0].loanType == 2 ? "Received To" : "Issued To"}: ${dataProvider.selectedCustomer?.businessName}',
+                            '${dataProvider.itemList[0].leakType == 2 ? "Received To" : "Issued To"}: ${dataProvider.selectedCustomer?.businessName}',
                             style: const pw.TextStyle(fontSize: 22.0),
                           ),
                           pw.Text(
@@ -92,7 +92,12 @@ class LoanNotePrintScreen extends StatelessWidget {
                         children: [
                           _buildTableHeaderCell('#', align: pw.TextAlign.left),
                           _buildTableHeaderCell('Item'),
-                          _buildTableHeaderCell('Qty'),
+                          if (dataProvider.itemList[0].leakType == 2) ...[
+                            _buildTableHeaderCell('Cylinder No'),
+                            _buildTableHeaderCell('Reference'),
+                          ] else ...[
+                            _buildTableHeaderCell('Cylinder No'),
+                          ],
                         ],
                       ),
                       ...dataProvider.itemList.map((item) {
@@ -103,10 +108,13 @@ class LoanNotePrintScreen extends StatelessWidget {
                                   .toString(),
                               align: pw.TextAlign.left,
                             ),
-                            _buildTableCell(item.item.itemName,
-                                align: pw.TextAlign.center),
-                            _buildTableCell(num(item.quantity),
-                                align: pw.TextAlign.center),
+                            _buildTableCell(item.item.itemName),
+                            if (dataProvider.itemList[0].leakType == 2) ...[
+                              _buildTableCell(item.cylinderNo ?? ''),
+                              _buildTableCell(item.referenceNo ?? ''),
+                            ] else ...[
+                              _buildTableCell(item.cylinderNo ?? ''),
+                            ],
                           ],
                         );
                       }),
@@ -116,7 +124,7 @@ class LoanNotePrintScreen extends StatelessWidget {
                   // Footer
                   pw.SizedBox(height: 10),
                   _buildTableHeaderCell(
-                    '${dataProvider.itemList[0].loanType == 2 ? "Received" : "Issued"} By: ${dataProvider.currentEmployee?.firstName}',
+                    '${dataProvider.itemList[0].leakType == 2 ? "Received" : "Issued"} By: ${dataProvider.currentEmployee?.firstName}',
                     color: const PdfColor.fromInt(0xFF000000),
                   ),
                   _buildTableHeaderCell(
