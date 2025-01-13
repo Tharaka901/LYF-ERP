@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../commons/common_consts.dart';
 import '../../commons/common_methods.dart';
 import '../../providers/data_provider.dart';
+import '../../widgets/tables/custom_table_cell_for_pdf.dart';
 import '../leak_cylinders/leak_invoice_view_model.dart';
 
 class LeakNotePrintScreen extends StatelessWidget {
@@ -90,30 +91,32 @@ class LeakNotePrintScreen extends StatelessWidget {
                           color: PdfColor.fromInt(0xFFFFFFFF),
                         ),
                         children: [
-                          _buildTableHeaderCell('#', align: pw.TextAlign.left),
-                          _buildTableHeaderCell('Item'),
+                          buildTableHeaderCell('#', align: pw.TextAlign.left),
+                          buildTableHeaderCell('Item',
+                              align: pw.TextAlign.left, ph: 50),
                           if (dataProvider.itemList[0].leakType == 2) ...[
-                            _buildTableHeaderCell('Cylinder No'),
-                            _buildTableHeaderCell('Reference'),
+                            buildTableHeaderCell('Cylinder No'),
+                            buildTableHeaderCell('Reference'),
                           ] else ...[
-                            _buildTableHeaderCell('Cylinder No'),
+                            buildTableHeaderCell('Cylinder No'),
                           ],
                         ],
                       ),
                       ...dataProvider.itemList.map((item) {
                         return pw.TableRow(
                           children: [
-                            _buildTableCell(
+                            buildTableCell(
                               (dataProvider.itemList.indexOf(item) + 1)
                                   .toString(),
                               align: pw.TextAlign.left,
                             ),
-                            _buildTableCell(item.item.itemName),
+                            buildTableCell(item.item.itemName,
+                                align: pw.TextAlign.start, ph: 50),
                             if (dataProvider.itemList[0].leakType == 2) ...[
-                              _buildTableCell(item.cylinderNo ?? ''),
-                              _buildTableCell(item.referenceNo ?? ''),
+                              buildTableCell(item.cylinderNo ?? ''),
+                              buildTableCell(item.referenceNo ?? ''),
                             ] else ...[
-                              _buildTableCell(item.cylinderNo ?? ''),
+                              buildTableCell(item.cylinderNo ?? ''),
                             ],
                           ],
                         );
@@ -122,18 +125,23 @@ class LeakNotePrintScreen extends StatelessWidget {
                   ),
 
                   // Footer
-                  pw.SizedBox(height: 10),
-                  _buildTableHeaderCell(
-                    '${dataProvider.itemList[0].leakType == 2 ? "Received" : "Issued"} By: ${dataProvider.currentEmployee?.firstName}',
-                    color: const PdfColor.fromInt(0xFF000000),
-                  ),
-                  _buildTableHeaderCell(
-                    'Date & Time: ${date(DateTime.now(), format: 'dd.MM.yyyy hh:mm a')}',
-                    color: const PdfColor.fromInt(0xFF000000),
-                  ),
-                  pw.SizedBox(height: 2),
-                  MessageConstants.signatureNotRequired,
-                  pw.SizedBox(height: 5),
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.SizedBox(height: 10),
+                      buildTableHeaderCell(
+                        '${dataProvider.itemList[0].leakType == 2 ? "Received" : "Issued"} By: ${dataProvider.currentEmployee?.firstName}',
+                        color: const PdfColor.fromInt(0xFF000000),
+                      ),
+                      buildTableHeaderCell(
+                        'Date & Time: ${date(DateTime.now(), format: 'dd.MM.yyyy hh:mm a')}',
+                        color: const PdfColor.fromInt(0xFF000000),
+                      ),
+                      pw.SizedBox(height: 2),
+                      MessageConstants.signatureNotRequired,
+                      pw.SizedBox(height: 5),
+                    ],
+                  )
                 ],
               ),
             ),
@@ -143,32 +151,5 @@ class LeakNotePrintScreen extends StatelessWidget {
     );
 
     return pdf.save();
-  }
-
-  pw.Widget _buildTableHeaderCell(String value,
-      {pw.TextAlign? align, PdfColor? color}) {
-    return pw.Padding(
-      padding: const pw.EdgeInsets.all(1),
-      child: pw.Text(
-        value,
-        textAlign: align ?? pw.TextAlign.center,
-        style: pw.TextStyle(
-          fontWeight: pw.FontWeight.bold,
-          fontSize: 22.0,
-          color: color ?? const PdfColor.fromInt(0xFF000000),
-        ),
-      ),
-    );
-  }
-
-  pw.Widget _buildTableCell(String value, {pw.TextAlign? align}) {
-    return pw.Padding(
-      padding: const pw.EdgeInsets.all(1),
-      child: pw.Text(
-        value,
-        textAlign: align ?? pw.TextAlign.center,
-        style: const pw.TextStyle(fontSize: 22.0),
-      ),
-    );
   }
 }

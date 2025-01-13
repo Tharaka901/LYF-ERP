@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../commons/common_consts.dart';
 import '../../commons/common_methods.dart';
 import '../../providers/data_provider.dart';
+import '../../widgets/tables/custom_table_cell_for_pdf.dart';
 import '../loan_cylinder/loan_cylinder_view_model.dart';
 
 class LoanNotePrintScreen extends StatelessWidget {
@@ -90,22 +91,22 @@ class LoanNotePrintScreen extends StatelessWidget {
                           color: PdfColor.fromInt(0xFFFFFFFF),
                         ),
                         children: [
-                          _buildTableHeaderCell('#', align: pw.TextAlign.left),
-                          _buildTableHeaderCell('Item'),
-                          _buildTableHeaderCell('Qty'),
+                          buildTableHeaderCell('#', align: pw.TextAlign.left),
+                          buildTableHeaderCell('Item'),
+                          buildTableHeaderCell('Qty'),
                         ],
                       ),
                       ...dataProvider.itemList.map((item) {
                         return pw.TableRow(
                           children: [
-                            _buildTableCell(
+                            buildTableCell(
                               (dataProvider.itemList.indexOf(item) + 1)
                                   .toString(),
                               align: pw.TextAlign.left,
                             ),
-                            _buildTableCell(item.item.itemName,
+                            buildTableCell(item.item.itemName,
                                 align: pw.TextAlign.center),
-                            _buildTableCell(num(item.quantity),
+                            buildTableCell(num(item.quantity),
                                 align: pw.TextAlign.center),
                           ],
                         );
@@ -115,11 +116,11 @@ class LoanNotePrintScreen extends StatelessWidget {
 
                   // Footer
                   pw.SizedBox(height: 10),
-                  _buildTableHeaderCell(
+                  buildTableHeaderCell(
                     '${dataProvider.itemList[0].loanType == 2 ? "Received" : "Issued"} By: ${dataProvider.currentEmployee?.firstName}',
                     color: const PdfColor.fromInt(0xFF000000),
                   ),
-                  _buildTableHeaderCell(
+                  buildTableHeaderCell(
                     'Date & Time: ${date(DateTime.now(), format: 'dd.MM.yyyy hh:mm a')}',
                     color: const PdfColor.fromInt(0xFF000000),
                   ),
@@ -135,32 +136,5 @@ class LoanNotePrintScreen extends StatelessWidget {
     );
 
     return pdf.save();
-  }
-
-  pw.Widget _buildTableHeaderCell(String value,
-      {pw.TextAlign? align, PdfColor? color}) {
-    return pw.Padding(
-      padding: const pw.EdgeInsets.all(1),
-      child: pw.Text(
-        value,
-        textAlign: align ?? pw.TextAlign.center,
-        style: pw.TextStyle(
-          fontWeight: pw.FontWeight.bold,
-          fontSize: 22.0,
-          color: color ?? const PdfColor.fromInt(0xFF000000),
-        ),
-      ),
-    );
-  }
-
-  pw.Widget _buildTableCell(String value, {pw.TextAlign? align}) {
-    return pw.Padding(
-      padding: const pw.EdgeInsets.all(1),
-      child: pw.Text(
-        value,
-        textAlign: align ?? pw.TextAlign.center,
-        style: const pw.TextStyle(fontSize: 22.0),
-      ),
-    );
   }
 }

@@ -5,7 +5,6 @@ import 'package:gsr/models/credit_payment.dart';
 import 'package:gsr/models/customer.dart';
 import 'package:gsr/models/customer_deposite.dart';
 import 'package:gsr/models/cylinder.dart';
-import 'package:gsr/models/employee.dart';
 import 'package:gsr/models/issued_invoice.dart';
 import 'package:gsr/models/item.dart';
 import 'package:gsr/models/item_summary.dart' as it;
@@ -137,7 +136,7 @@ Future<List<RoutecardItem>> getLeakIssueItems(int routeCardId, int customerId1,
     {int? status}) async {
   try {
     final response = await respo(
-        'items/leak-issue?routecardId=$routeCardId&customerId1=${customerId1}');
+        'items/leak-issue?routecardId=$routeCardId&customerId1=$customerId1');
     List<dynamic> list = response.data;
 
     return list.map((element) {
@@ -540,7 +539,6 @@ Future<String> loanInvoiceNumber(BuildContext context) async {
   final int count = response.data;
   return '${routeCard.routeCardNo}/${count + 1}';
 }
-
 
 Future<String> leakInvoiceNumber(BuildContext context) async {
   final routeCard = context.read<DataProvider>().currentRouteCard!;

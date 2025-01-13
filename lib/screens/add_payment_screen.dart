@@ -84,9 +84,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                 ),
                 DetailCard(
                   detailKey: 'Total amount',
-                  detailvalue: formatPrice(dataProvider.getTotalAmount() +
-                      dataProvider.nonVatItemTotal +
-                      (dataProvider.getTotalAmount() / 100) * 18),
+                  detailvalue: formatPrice(dataProvider.grandTotal),
                 ),
                 const Divider(),
                 TextFormField(
