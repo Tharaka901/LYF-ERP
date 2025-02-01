@@ -30,6 +30,10 @@ class _QRScanScreenState extends State<QRScanScreen> {
     final response = await respo('customers/get-by-reg-id',
         method: Method.post, data: {"registrationId": code});
     final customer = CustomerModel.fromJson(response.data);
+    //! avoid navigate when user is deleted
+    if (customer.status == 0) {
+      return;
+    }
     dataProvider.setSelectedCustomer(customer);
 
     if (screen == 'Previous') {

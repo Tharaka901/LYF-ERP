@@ -18,9 +18,12 @@ class IssuedDepositePaid {
   final CustomerDeposite issuedDeposite;
   final double paymentAmount;
   final double? depositeValue;
+  final int? status;
 
-  IssuedDepositePaid(
-      {required this.issuedDeposite,
-      required this.paymentAmount,
-      this.depositeValue});
+  IssuedDepositePaid({
+    required this.issuedDeposite,
+    required this.paymentAmount,
+    this.depositeValue,
+    this.status,
+  });
 }

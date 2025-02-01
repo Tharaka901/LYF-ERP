@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
@@ -20,8 +21,8 @@ import '../invoice/invoice_provider.dart';
 class InvoiceReceiptScreen extends StatefulWidget {
   static const routeId = 'RECEIPT';
   const InvoiceReceiptScreen({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<InvoiceReceiptScreen> createState() => _InvoiceReceiptScreenState();
@@ -118,7 +119,9 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    dataProvider.selectedCustomer!.businessName ?? '',
+                                    dataProvider
+                                            .selectedCustomer!.businessName ??
+                                        '',
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(fontSize: 18.0),
                                     maxLines: 2,
@@ -656,7 +659,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                 const SizedBox(
                   height: 10.0,
                 ),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 if (isManual)
                   TextFormField(
                     controller: receiptNoController,
@@ -674,7 +677,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                       return null;
                     },
                   ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Consumer<DataProvider>(
                   builder: (context, data, _) {
                     final currentBalance = _balance(data, cash: cash);
@@ -710,8 +713,8 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                               },
                               style: ButtonStyle(
                                 backgroundColor:
-                                    MaterialStateProperty.all(Colors.blue[600]),
-                                shape: MaterialStateProperty.all(
+                                    WidgetStateProperty.all(Colors.blue[600]),
+                                shape: WidgetStateProperty.all(
                                   RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
@@ -755,15 +758,15 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                               },
                               style: ButtonStyle(
                                 backgroundColor:
-                                    MaterialStateProperty.all(Colors.blue[600]),
-                                shape: MaterialStateProperty.all(
+                                    WidgetStateProperty.all(Colors.blue[600]),
+                                shape: WidgetStateProperty.all(
                                   RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
                                 ),
                               ),
                               child: const Text(
-                                'Previous Payment',
+                                'Over Payment',
                                 style: TextStyle(
                                   fontSize: 20.0,
                                   color: Colors.white,
@@ -873,7 +876,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                             ),
                           ],
                         )
-                      : SizedBox();
+                      : const SizedBox();
                 }),
                 Consumer<DataProvider>(builder: (context, data, _) {
                   final currentBalance = _balance(data, cash: cash);
@@ -1103,7 +1106,9 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                             invoiceProvider.iscreateReceipt =
                                                 true;
                                           } catch (e) {
-                                            print(e);
+                                            if (kDebugMode) {
+                                              print(e);
+                                            }
                                           }
                                         }
 
@@ -1131,7 +1136,9 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                                 dataProvider.chequeList.clear(),
                                               });
                                         } catch (e) {
-                                          print(e);
+                                          if (kDebugMode) {
+                                            print(e);
+                                          }
                                         }
                                       }
                                     } else {
@@ -1165,7 +1172,9 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                           invoiceProvider.iscreateReceipt =
                                               true;
                                         } catch (e) {
-                                          print(e);
+                                          if (kDebugMode) {
+                                            print(e);
+                                          }
                                         }
                                       }
 
@@ -1197,15 +1206,17 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                               dataProvider.chequeList.clear(),
                                             });
                                       } catch (e) {
-                                        print(e);
+                                        if (kDebugMode) {
+                                          print(e);
+                                        }
                                       }
                                     }
                                   },
                                 ),
                                 style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
+                                  backgroundColor: WidgetStateProperty.all(
                                       Colors.green[700]),
-                                  shape: MaterialStateProperty.all(
+                                  shape: WidgetStateProperty.all(
                                     RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10.0),
                                     ),
@@ -1429,15 +1440,17 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                         ).then((value) =>
                                             {dataProvider.chequeList.clear()});
                                       } catch (e) {
-                                        print(e);
+                                        if (kDebugMode) {
+                                          print(e);
+                                        }
                                       }
                                     }
                                   },
                                 ),
                                 style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
+                                  backgroundColor: WidgetStateProperty.all(
                                       Colors.green[700]),
-                                  shape: MaterialStateProperty.all(
+                                  shape: WidgetStateProperty.all(
                                     RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10.0),
                                     ),
@@ -1452,7 +1465,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 15),
+                            const SizedBox(height: 15),
                           ],
                         );
                 }),

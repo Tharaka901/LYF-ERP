@@ -812,13 +812,11 @@ Future<void> sendPaymentWithPrevious(BuildContext context, double total,
         method: Method.put,
         data: {
           "overPaymentsPayList": [
-            ...dataProvider.issuedDepositePaidList
-                .map((e) => {
-                      "value": (e.depositeValue! - e.paymentAmount).toInt(),
-                      "customerId": dataProvider.selectedCustomer?.customerId,
-                      "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
-                    })
-                .toList()
+            ...dataProvider.issuedDepositePaidList.map((e) => {
+                  "value": (e.depositeValue! - e.paymentAmount).toInt(),
+                  "customerId": dataProvider.selectedCustomer?.customerId,
+                  "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
+                })
           ]
         },
       );
@@ -1044,13 +1042,11 @@ Future<void> sendCreditPayment(BuildContext context, double total, double cash,
         method: Method.put,
         data: {
           "overPaymentsPayList": [
-            ...dataProvider.issuedDepositePaidList
-                .map((e) => {
-                      "value": (e.depositeValue! - e.paymentAmount).toInt(),
-                      "customerId": dataProvider.selectedCustomer?.customerId,
-                      "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
-                    })
-                .toList()
+            ...dataProvider.issuedDepositePaidList.map((e) => {
+                  "value": (e.depositeValue! - e.paymentAmount).toInt(),
+                  "customerId": dataProvider.selectedCustomer?.customerId,
+                  "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
+                })
           ]
         },
       );
@@ -1091,28 +1087,28 @@ Future<void> sendPayment(BuildContext context,
         method: Method.put,
         data: {
           "overPaymentsPayList": [
-            ...dataProvider.issuedDepositePaidList
-                .map((e) => {
-                      "value": (e.depositeValue! - e.paymentAmount).toInt(),
-                      "customerId": dataProvider.selectedCustomer?.customerId,
-                      "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
-                    })
-                .toList()
+            ...dataProvider.issuedDepositePaidList.map((e) => {
+                  "value": (e.depositeValue! - e.paymentAmount).toInt(),
+                  "customerId": dataProvider.selectedCustomer?.customerId,
+                  "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
+                })
           ]
         },
       );
-      dataProvider.issuedDepositePaidList.forEach((element) async {
+      for (var element in dataProvider.issuedDepositePaidList) {
         final data = {
           "value": element.paymentAmount,
-          "paymentInvoiceId": element.issuedDeposite.paymentInvoiceId,
+          "paymentInvoiceId": element.issuedDeposite.status == 2
+              ? element.issuedDeposite.id
+              : element.issuedDeposite.paymentInvoiceId,
           "routecardId": dataProvider.currentRouteCard!.routeCardId,
           "creditInvoiceId":
               invoiceResponse.data['invoice']['invoiceId'] as int,
           "receiptNo": element.issuedDeposite.receiptNo,
-          "status": 1
+          "status": element.issuedDeposite.status == 2 ? 6 : 1
         };
         await respo('credit-payment/create', method: Method.post, data: data);
-      });
+      }
       await respo(
         'customers/update',
         method: Method.put,

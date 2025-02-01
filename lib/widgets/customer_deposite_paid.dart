@@ -15,13 +15,13 @@ class CustomerDepositePaid extends StatefulWidget {
   // final double balance;
   final void Function(Balance selectedBalance) callBack;
   const CustomerDepositePaid({
-    Key? key,
+    super.key,
     required this.paymentController,
     required this.formKey,
     required this.callBack,
     required this.balnce,
     // required this.balance,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomerDepositePaid> createState() => _CustomerDepositePaidState();
@@ -60,25 +60,13 @@ class _CustomerDepositePaidState extends State<CustomerDepositePaid> {
                   value: snapshot.hasData && snapshot.data!.isNotEmpty
                       ? snapshot.data![0]
                       : null,
-                  // validator: (value) {
-                  //   if (value == null) {
-                  //     return 'Select an invoice!';
-                  //   } else if (dataProvider.paidBalanceList
-                  //       .where((element) =>
-                  //           element.balance.customerBalanceId ==
-                  //           value.customerBalanceId)
-                  //       .isNotEmpty) {
-                  //     return 'Already added!';
-                  //   }
-                  //   return null;
-                  // },
                   items: snapshot.hasData
                       ? snapshot.data!.map((element) {
                           return DropdownMenuItem(
                             value: element,
                             child: Text(
                               '${element.receiptNo}  ${formatPrice(element.value?.toDouble() ?? 0)}',
-                              style: TextStyle(fontSize: 12),
+                              style: const TextStyle(fontSize: 12),
                             ),
                           );
                         }).toList()
@@ -116,6 +104,7 @@ class _CustomerDepositePaidState extends State<CustomerDepositePaid> {
                   }
                   data.addPaidDeposite(
                     IssuedDepositePaid(
+                      status: data.selectedDeposite!.status,
                       depositeValue: data.selectedDeposite!.value?.toDouble(),
                       issuedDeposite: data.selectedDeposite!,
                       paymentAmount: doub(
