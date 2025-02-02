@@ -248,6 +248,8 @@ class StockScreen extends StatelessWidget {
                     int damage = 0;
                     int free = 0;
                     int freeEmpty = 0;
+                    int loanIssued = 0;
+                    int loanReceived = 0;
                     for (var item2 in rcItemSummary) {
                       if (item.itemId == item2.id) {
                         // returnCSum =
@@ -260,6 +262,8 @@ class StockScreen extends StatelessWidget {
                         damage = item2.damage;
                         free = item2.free;
                         freeEmpty = item2.freeEmpty;
+                        loanIssued = item2.loanIssued;
+                        loanReceived = item2.loanReceived;
                       }
                     }
 
@@ -276,7 +280,12 @@ class StockScreen extends StatelessWidget {
                         ),
                         cell(isNew
                             ? '-'
-                            : (refill - depositeCount + damage - freeEmpty)
+                            : (refill -
+                                    depositeCount +
+                                    damage -
+                                    freeEmpty -
+                                    loanIssued +
+                                    loanReceived)
                                 .toString()),
                         Padding(
                           padding: const EdgeInsets.only(right: 0, top: 5),
@@ -292,7 +301,10 @@ class StockScreen extends StatelessWidget {
                                   : item.transferQty.toInt() +
                                       returnCSum +
                                       leak -
-                                      depositeCount + damage)
+                                      depositeCount +
+                                      damage -
+                                      loanIssued +
+                                      loanReceived)
                               .toString(),
                           align: TextAlign.end,
                         ),

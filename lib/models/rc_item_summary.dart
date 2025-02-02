@@ -9,6 +9,8 @@ class RcItemsSummary {
   int damage;
   int free;
   int total;
+  int loanIssued;
+  int loanReceived;
   int? returnRefillCount;
   int? returnEmptyCount;
 
@@ -23,6 +25,8 @@ class RcItemsSummary {
       required this.damage,
       required this.free,
       required this.total,
+      required this.loanIssued,
+      required this.loanReceived,
       this.returnEmptyCount,
       this.returnRefillCount});
 
@@ -37,6 +41,8 @@ class RcItemsSummary {
       damage: json["damage"],
       free: json["free"],
       total: json["total"],
+      loanIssued: json["loanIssued"],
+      loanReceived: json["loanReceived"],
       returnRefillCount: json["returnRefillCount"],
       returnEmptyCount: json["returnEmptyCount"]);
 
@@ -51,5 +57,7 @@ class RcItemsSummary {
         "damage": damage,
         "free": free,
         "total": total,
+        "loanIssued": loanIssued,
+        "loanReceived": loanReceived,
       };
 }
