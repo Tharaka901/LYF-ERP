@@ -17,7 +17,7 @@ class PrintReceiptView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Print Receipt'),
+        title: const Text('Print Receipt'),
         automaticallyImplyLeading: false,
       ),
       body: PdfPreview(
@@ -38,7 +38,7 @@ class PrintReceiptView extends StatelessWidget {
               child: pw.Column(
                 children: [
                   //! Company details
-                  ...CompanyConstants.companyDetails,
+                  ...CompanyConstants.companyDetails(true),
 
                   //! Receipt details
                   pw.Divider(thickness: 0.5),
@@ -53,7 +53,7 @@ class PrintReceiptView extends StatelessWidget {
                     children: [
                       pw.Text(
                         'Receipt No: ${receiptModel.receiptNo}',
-                        style: pw.TextStyle(
+                        style: const pw.TextStyle(
                           fontSize: 22.0,
                         ),
                       )
@@ -65,7 +65,7 @@ class PrintReceiptView extends StatelessWidget {
                   pw.Table(
                     children: [
                       pw.TableRow(
-                        decoration: pw.BoxDecoration(
+                        decoration: const pw.BoxDecoration(
                           color: PdfColor.fromInt(0xFFFFFFFF),
                         ),
                         children: [
@@ -98,7 +98,7 @@ class PrintReceiptView extends StatelessWidget {
                             ),
                           ],
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                   PdfTile.basic(
@@ -111,7 +111,7 @@ class PrintReceiptView extends StatelessWidget {
                   pw.Table(
                     children: [
                       pw.TableRow(
-                        decoration: pw.BoxDecoration(
+                        decoration: const pw.BoxDecoration(
                           color: PdfColor.fromInt(0xFFFFFFFF),
                         ),
                         children: [
@@ -150,7 +150,7 @@ class PrintReceiptView extends StatelessWidget {
                             ),
                           ],
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                   PdfTile.basic(
@@ -161,11 +161,11 @@ class PrintReceiptView extends StatelessWidget {
                   //! Bottom section
                   pwtitleCell(
                     'Billing By: ${receiptModel.employee ?? '-'}',
-                    color: PdfColor.fromInt(0xFF000000),
+                    color: const PdfColor.fromInt(0xFF000000),
                   ),
                   pwtitleCell(
                     'Billing Date & Time: ${receiptModel.billingDate ?? '-'}',
-                    color: PdfColor.fromInt(0xFF000000),
+                    color: const PdfColor.fromInt(0xFF000000),
                   ),
                   pw.SizedBox(height: 2),
                   pw.SizedBox(height: 15.0),

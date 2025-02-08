@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/balance_payment.dart';
@@ -165,7 +166,9 @@ Future<List<RoutecardItem>> getLeakIssueItems(int routeCardId, int customerId1,
               status: loanItem.status?.toInt() ?? 0));
     }).toList();
   } catch (e) {
-    print(e);
+    if (kDebugMode) {
+      print(e);
+    }
     rethrow;
   }
 }
@@ -177,7 +180,9 @@ Future<List<ls.LoanStock>> getLoanStock(int routeCardId) async {
     List<dynamic> list = response.data;
     return list.map((e) => ls.LoanStock.fromJson(e)).toList();
   } catch (e) {
-    print(e);
+    if (kDebugMode) {
+      print(e);
+    }
     rethrow;
   }
 }
@@ -189,7 +194,9 @@ Future<List<ls.LoanStock>> getLeakStock(int routeCardId) async {
     List<dynamic> list = response.data;
     return list.map((e) => ls.LoanStock.fromJson(e)).toList();
   } catch (e) {
-    print(e);
+    if (kDebugMode) {
+      print(e);
+    }
     rethrow;
   }
 }

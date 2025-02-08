@@ -45,7 +45,7 @@ class PrintReturnNoteView extends StatelessWidget {
               child: pw.Column(
                 children: [
                   // Company details
-                  ...CompanyConstants.companyDetails,
+                  ...CompanyConstants.companyDetails(true),
 
                   // Return Note details
                   pw.SizedBox(height: 5.0),

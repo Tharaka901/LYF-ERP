@@ -46,7 +46,7 @@ class LoanNotePrintScreen extends StatelessWidget {
               child: pw.Column(
                 children: [
                   // Company details
-                  ...CompanyConstants.companyDetails,
+                  ...CompanyConstants.companyDetails(false),
 
                   // Loan Note Title
                   pw.SizedBox(height: 5.0),
@@ -115,18 +115,23 @@ class LoanNotePrintScreen extends StatelessWidget {
                   ),
 
                   // Footer
-                  pw.SizedBox(height: 10),
-                  buildTableHeaderCell(
-                    '${dataProvider.itemList[0].loanType == 2 ? "Received" : "Issued"} By: ${dataProvider.currentEmployee?.firstName}',
-                    color: const PdfColor.fromInt(0xFF000000),
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.SizedBox(height: 10),
+                      buildTableHeaderCell(
+                        '${dataProvider.itemList[0].loanType == 2 ? "Received" : "Issued"} By: ${dataProvider.currentEmployee?.firstName}',
+                        color: const PdfColor.fromInt(0xFF000000),
+                      ),
+                      buildTableHeaderCell(
+                        'Date & Time: ${date(DateTime.now(), format: 'dd.MM.yyyy hh:mm a')}',
+                        color: const PdfColor.fromInt(0xFF000000),
+                      ),
+                      pw.SizedBox(height: 2),
+                      MessageConstants.signatureNotRequired,
+                      pw.SizedBox(height: 5),
+                    ],
                   ),
-                  buildTableHeaderCell(
-                    'Date & Time: ${date(DateTime.now(), format: 'dd.MM.yyyy hh:mm a')}',
-                    color: const PdfColor.fromInt(0xFF000000),
-                  ),
-                  pw.SizedBox(height: 2),
-                  MessageConstants.signatureNotRequired,
-                  pw.SizedBox(height: 5),
                 ],
               ),
             ),

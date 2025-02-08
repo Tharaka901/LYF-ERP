@@ -46,7 +46,7 @@ class LeakNotePrintScreen extends StatelessWidget {
               child: pw.Column(
                 children: [
                   // Company details
-                  ...CompanyConstants.companyDetails,
+                  ...CompanyConstants.companyDetails(false),
 
                   // Leak Note Title
                   pw.SizedBox(height: 5.0),

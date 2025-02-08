@@ -75,7 +75,7 @@ class PrintInvoiceView extends StatelessWidget {
               child: pw.Column(
                 children: [
                   //! Company details
-                  ...CompanyConstants.companyDetails,
+                  ...CompanyConstants.companyDetails(true),
 
                   //! Invoice details
                   if (invoiceNo != '0') ...[
@@ -198,7 +198,10 @@ class PrintInvoiceView extends StatelessWidget {
                           ),
                           pwtitleCell(
                               formatPrice(double.parse(
-                                  issuedInvoice?.subTotal?.toStringAsFixed(2) ?? dataProvider.getTotalAmount().toStringAsFixed(2))),
+                                  issuedInvoice?.subTotal?.toStringAsFixed(2) ??
+                                      dataProvider
+                                          .getTotalAmount()
+                                          .toStringAsFixed(2))),
                               align: pw.TextAlign.left,
                               mainAxisAlignment:
                                   pw.MainAxisAlignment.spaceBetween,
@@ -220,8 +223,9 @@ class PrintInvoiceView extends StatelessWidget {
                             ),
                           ),
                           pwtitleCell(
-                              formatPrice(double.parse(
-                                  (issuedInvoice?.vat ?? (dataProvider.getTotalAmount() * 0.18)).toStringAsFixed(2))),
+                              formatPrice(double.parse((issuedInvoice?.vat ??
+                                      (dataProvider.getTotalAmount() * 0.18))
+                                  .toStringAsFixed(2))),
                               align: pw.TextAlign.left,
                               mainAxisAlignment:
                                   pw.MainAxisAlignment.spaceBetween,
@@ -247,7 +251,9 @@ class PrintInvoiceView extends StatelessWidget {
                             ),
                             pwtitleCell(
                                 formatPrice(double.parse(
-                                    (issuedInvoice?.nonVatItemTotal ?? (dataProvider.nonVatItemTotal)).toStringAsFixed(2))),
+                                    (issuedInvoice?.nonVatItemTotal ??
+                                            (dataProvider.nonVatItemTotal))
+                                        .toStringAsFixed(2))),
                                 align: pw.TextAlign.left,
                                 mainAxisAlignment:
                                     pw.MainAxisAlignment.spaceBetween,
@@ -269,8 +275,11 @@ class PrintInvoiceView extends StatelessWidget {
                             ),
                           ),
                           pwtitleCell(
-                              formatPrice(double.parse(
-                                  (issuedInvoice?.amount ?? (dataProvider.getTotalAmount() + dataProvider.nonVatItemTotal + dataProvider.getTotalAmount() * 0.18)).toStringAsFixed(2))),
+                              formatPrice(double.parse((issuedInvoice?.amount ??
+                                      (dataProvider.getTotalAmount() +
+                                          dataProvider.nonVatItemTotal +
+                                          dataProvider.getTotalAmount() * 0.18))
+                                  .toStringAsFixed(2))),
                               align: pw.TextAlign.left,
                               mainAxisAlignment:
                                   pw.MainAxisAlignment.spaceBetween,
@@ -278,6 +287,93 @@ class PrintInvoiceView extends StatelessWidget {
                         ],
                       ),
                     )
+                  ],
+                  pw.SizedBox(height: 10.0),
+
+                  //! Over payment settlement
+                  if (dataProvider.issuedDepositePaidList.isNotEmpty) ...[
+                    pw.SizedBox(height: 5.0),
+                    pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.start,
+                        children: [
+                          pw.Text(
+                            'Previous Deposite Payments',
+                            textAlign: pw.TextAlign.start,
+                            style: pw.TextStyle(
+                              fontSize: 22.0,
+                              fontWeight: pw.FontWeight.bold,
+                            ),
+                          ),
+                        ]),
+                    pw.SizedBox(height: 2.0),
+                    pw.Table(
+                      children: [
+                        pw.TableRow(
+                          decoration: const pw.BoxDecoration(),
+                          children: [
+                            pwtitleCell(
+                              '#',
+                              align: pw.TextAlign.start,
+                            ),
+                            pwtitleCell(
+                              'Date',
+                              align: pw.TextAlign.center,
+                            ),
+                            pwtitleCell(
+                              'Invoice No:',
+                              align: pw.TextAlign.center,
+                            ),
+                            pwtitleCell(
+                              'Payment',
+                              align: pw.TextAlign.right,
+                              mainAxisAlignment: pw.MainAxisAlignment.end,
+                            ),
+                          ],
+                        ),
+                        ...dataProvider.issuedDepositePaidList.map((dp) {
+                          return pw.TableRow(
+                            children: [
+                              pwcell(
+                                (dataProvider.issuedDepositePaidList
+                                            .indexOf(dp) +
+                                        1)
+                                    .toString(),
+                                align: pw.TextAlign.start,
+                              ),
+                              pwcell(
+                                date(
+                                    dp.issuedDeposite.createdAt ??
+                                        DateTime.now(),
+                                    format: 'dd-MM-yyyy'),
+                                align: pw.TextAlign.center,
+                              ),
+                              pwcell(
+                                dp.issuedDeposite.paymentInvoiceId.toString(),
+                                align: pw.TextAlign.center,
+                              ),
+                              pwcell(
+                                formatPrice(dp.paymentAmount)
+                                    .replaceAll('Rs.', ''),
+                                align: pw.TextAlign.end,
+                              ),
+                            ],
+                          );
+                        }),
+                      ],
+                    ),
+                    pw.Divider(thickness: 0.5),
+                    pw.Row(
+                      children: [
+                        pw.Text('Total Previous Deposite Payment',
+                            style: const pw.TextStyle(fontSize: 22)),
+                        pw.Spacer(),
+                        pw.Text(
+                            formatPrice(
+                                dataProvider.getTotalDepositePaymentAmount()),
+                            style: const pw.TextStyle(fontSize: 22)),
+                      ],
+                    ),
+                    pw.Divider(thickness: 0.5),
                   ],
 
                   // //! Payment section
@@ -395,7 +491,8 @@ class PrintInvoiceView extends StatelessWidget {
                             ),
                           ),
                           pwtitleCell(
-                            (balance > 0 ? 1 * balance : -1 * balance).toStringAsFixed(2),
+                            (balance > 0 ? 1 * balance : -1 * balance)
+                                .toStringAsFixed(2),
                             align: pw.TextAlign.left,
                             mainAxisAlignment:
                                 pw.MainAxisAlignment.spaceBetween,

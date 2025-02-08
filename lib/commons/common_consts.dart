@@ -113,36 +113,37 @@ class CompanyConstants {
   static const email = 'Email: hjtrading.vavuniya@gmail.com';
   static const vatNumber = 'Our Vat No - 102899156-7000';
 
-  static final companyDetails = [
-    pw.Text(
-      CompanyConstants.name,
-      style: ThemeConstants.boldStyleForPdf,
-    ),
-    pw.Text(
-      CompanyConstants.distribute,
-      style: ThemeConstants.boldStyleForPdf,
-    ),
-    pw.Text(
-      CompanyConstants.address,
-      style: ThemeConstants.boldStyleForPdf,
-    ),
-    pw.Text(
-      CompanyConstants.phoneNumber,
-      style: ThemeConstants.boldStyleForPdf,
-    ),
-    pw.Text(
-      CompanyConstants.email,
-      style: ThemeConstants.boldStyleForPdf,
-    ),
-    pw.SizedBox(height: 5.0),
-    pw.Row(
-      mainAxisAlignment: pw.MainAxisAlignment.end,
-      children: [
+  static companyDetails(bool hasOurVatNumber) => [
         pw.Text(
-          CompanyConstants.vatNumber,
-          style: const pw.TextStyle(fontSize: 22.0),
+          CompanyConstants.name,
+          style: ThemeConstants.boldStyleForPdf,
         ),
-      ],
-    ),
-  ];
+        pw.Text(
+          CompanyConstants.distribute,
+          style: ThemeConstants.boldStyleForPdf,
+        ),
+        pw.Text(
+          CompanyConstants.address,
+          style: ThemeConstants.boldStyleForPdf,
+        ),
+        pw.Text(
+          CompanyConstants.phoneNumber,
+          style: ThemeConstants.boldStyleForPdf,
+        ),
+        pw.Text(
+          CompanyConstants.email,
+          style: ThemeConstants.boldStyleForPdf,
+        ),
+        pw.SizedBox(height: 5.0),
+        if (hasOurVatNumber)
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.end,
+            children: [
+              pw.Text(
+                CompanyConstants.vatNumber,
+                style: const pw.TextStyle(fontSize: 22.0),
+              ),
+            ],
+          ),
+      ];
 }

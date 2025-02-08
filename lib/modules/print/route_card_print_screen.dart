@@ -47,7 +47,7 @@ class RouteCardPrintScreen extends StatelessWidget {
               child: pw.Column(
                 children: [
                   // Company details
-                  ...CompanyConstants.companyDetails,
+                  ...CompanyConstants.companyDetails(false),
 
                   // Route Card Title
                   pw.SizedBox(height: 5.0),
