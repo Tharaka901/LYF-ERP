@@ -268,13 +268,14 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                               routeCard.routeCardId);
                       final itemSummaryCWReturnC =
                           await getReturnCylinderSummaryCustomerWiseLeak(
-                              routeCard.routeCardId);
+                              routeCard.routeCardId,
+                              isCustomerWise: true);
                       pop(context);
                       final List<ItemSummaryCustomerWiseFull> li = [];
                       final List<ItemSummaryCustomerWiseFull> liLeak = [];
                       final List<ItemSummaryCustomerWiseFull> liRC = [];
-                      itemSummaryCW.forEach((element1) {
-                        itemSummaryCW.forEach((element2) {
+                      for (var element1 in itemSummaryCW) {
+                        for (var element2 in itemSummaryCW) {
                           if (element1.item?.itemName ==
                                   element2.item?.itemName &&
                               element1.invoice?.customer?.businessName ==
@@ -301,7 +302,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                                       (element1.item?.itemName!)!));
                             }
                           }
-                        });
+                        }
                         if (!(li.map((e) => e.unique).contains(
                             (element1.invoice?.customer?.businessName)! +
                                 (element1.item?.itemName!)!))) {
@@ -319,9 +320,9 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                                   (element1.invoice?.customer?.businessName!)! +
                                       (element1.item?.itemName!)!));
                         }
-                      });
+                      }
 
-                      itemSummaryCWLeak.forEach((element1) {
+                      for (var element1 in itemSummaryCWLeak) {
                         liLeak.add(ItemSummaryCustomerWiseFull(
                             customerName:
                                 element1.invoice?.customer?.businessName,
@@ -337,8 +338,8 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                             unique:
                                 (element1.invoice?.customer?.businessName!)! +
                                     (element1.item?.itemName!)!));
-                      });
-                      itemSummaryCWReturnC.forEach((element1) {
+                      }
+                      for (var element1 in itemSummaryCWReturnC) {
                         liRC.add(ItemSummaryCustomerWiseFull(
                             customerName:
                                 element1.invoice?.customer?.businessName,
@@ -346,7 +347,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                             recivedQty: int.parse(element1.selQty ?? '0'),
                             issuedQty: 0,
                             unique: ''));
-                      });
+                      }
                       Navigator.push(
                           context,
                           MaterialPageRoute(

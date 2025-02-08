@@ -4,6 +4,7 @@ import 'package:gsr/models/rc_item_summary.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../models/item_summary_customer_wise.dart' as itcw;
 import '../services/database.dart';
 
 class StockScreen extends StatelessWidget {
@@ -605,7 +606,62 @@ class StockScreen extends StatelessWidget {
                       );
                     }
                   }
-                })
+                }),
+
+            //! Return Cylinder Stock
+            FutureBuilder<List<itcw.ItemSummaryCustomerWise>>(
+                future: getReturnCylinderSummaryCustomerWiseLeak(
+                  dataProvider.currentRouteCard?.routeCardId ?? 0,
+                  isCustomerWise: false,
+                ),
+                builder: (context, snapData) {
+                  if (snapData.hasData && snapData.data!.isNotEmpty) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 15.0),
+                        const Text(
+                          'Return Cylinder Stock',
+                          style: TextStyle(
+                            decoration: TextDecoration.underline,
+                            fontSize: 25.0,
+                          ),
+                        ),
+                        const SizedBox(height: 10.0),
+                        SizedBox(
+                          width: double.infinity,
+                          child: Table(
+                            defaultColumnWidth: const IntrinsicColumnWidth(),
+                            children: [
+                              TableRow(
+                                decoration: BoxDecoration(
+                                  color: Colors.blue,
+                                  borderRadius: BorderRadius.circular(2.0),
+                                ),
+                                children: [
+                                  titleCell('Item', align: TextAlign.start),
+                                  titleCell('Quantity', align: TextAlign.end),
+                                ],
+                              ),
+                              ...snapData.data!.map(
+                                (item) => TableRow(
+                                  children: [
+                                    cell(item.item?.itemName ?? '',
+                                        align: TextAlign.start),
+                                    cell(item.selQty.toString(),
+                                        align: TextAlign.end),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  return const SizedBox
+                      .shrink(); // Return empty widget when no data
+                }),
           ],
         ),
       ),

@@ -12,6 +12,7 @@ class ItemSummaryCustomerWise {
   final Invoice? invoice;
   final Item? item;
   final int? status;
+  final int? customerId1;
 
   ItemSummaryCustomerWise({
     this.selQty,
@@ -19,6 +20,7 @@ class ItemSummaryCustomerWise {
     this.invoice,
     this.item,
     this.status,
+    this.customerId1,
   });
 
   factory ItemSummaryCustomerWise.fromJson(Map<String, dynamic> json) =>
@@ -26,6 +28,7 @@ class ItemSummaryCustomerWise {
         selQty: json["selQty"],
         itemId: json["itemId"],
         status: json["status"],
+        customerId1: json["customerId1"],
         invoice:
             json["invoice"] == null ? null : Invoice.fromJson(json["invoice"]),
         item: json["item"] == null ? null : Item.fromJson(json["item"]),
@@ -36,6 +39,7 @@ class ItemSummaryCustomerWise {
         "itemId": itemId,
         "invoice": invoice?.toJson(),
         "item": item?.toJson(),
+        "customerId1": customerId1,
       };
 }
 

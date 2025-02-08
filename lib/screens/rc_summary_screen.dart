@@ -13,12 +13,11 @@ class RCSummaryScreen extends StatefulWidget {
   final List<ItemSummaryCustomerWiseFull> itemSummaryCWLeak;
   final List<ItemSummaryCustomerWiseFull> itemSummaryCWReturnC;
   const RCSummaryScreen(
-      {Key? key,
+      {super.key,
       required this.itemSummary,
       required this.itemSummaryCW,
       required this.itemSummaryCWLeak,
-      required this.itemSummaryCWReturnC})
-      : super(key: key);
+      required this.itemSummaryCWReturnC});
 
   @override
   State<RCSummaryScreen> createState() => _RCSummaryScreenState();
@@ -33,20 +32,11 @@ class _RCSummaryScreenState extends State<RCSummaryScreen> {
       appBar: AppBar(
         title: const Text('Summary'),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   backgroundColor: Colors.blue,
-      //   onPressed: () {
-      //     Navigator.pop(context);
-      //   },
-      //   child: const Icon(
-      //     Icons.done,
-      //   ),
-      // ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 9),
         child: ListView(
           children: [
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
               child: Column(
@@ -305,18 +295,6 @@ class _RCSummaryScreenState extends State<RCSummaryScreen> {
                           ),
                         ),
                       ),
-                      // Padding(
-                      //   padding: EdgeInsets.all(5.0),
-                      //   child: Text(
-                      //     'Total',
-                      //     textAlign: TextAlign.center,
-                      //     style: TextStyle(
-                      //       fontWeight: FontWeight.bold,
-                      //       color: titleRowColor,
-                      //       fontSize: 11.0,
-                      //     ),
-                      //   ),
-                      // ),
                     ],
                   ),
                   ...widget.itemSummaryCW.map(
@@ -367,7 +345,7 @@ class _RCSummaryScreenState extends State<RCSummaryScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             const Text(
               'Leak Summery',
               textAlign: TextAlign.center,

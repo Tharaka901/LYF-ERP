@@ -254,16 +254,19 @@ Future<List<itcw.ItemSummaryCustomerWise>> getItemSummaryCustomerWiseLeak(
 }
 
 Future<List<itcw.ItemSummaryCustomerWise>>
-    getReturnCylinderSummaryCustomerWiseLeak(int routeCardId) async {
+    getReturnCylinderSummaryCustomerWiseLeak(int routeCardId,
+        {bool isCustomerWise = true}) async {
   try {
     final response = await respo(
         'route-card/get-summary-return-cylinder-customer-wise',
         method: Method.post,
-        data: {"routecardId": routeCardId});
+        data: {"routecardId": routeCardId, "isCustomerWise": isCustomerWise});
     List<dynamic> list = response.data;
     return list.map((e) => itcw.ItemSummaryCustomerWise.fromJson(e)).toList();
   } catch (e) {
-    print(e);
+    if (kDebugMode) {
+      print(e);
+    }
     rethrow;
   }
 }
