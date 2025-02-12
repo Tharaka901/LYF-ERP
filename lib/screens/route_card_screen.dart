@@ -78,6 +78,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                         data.addRCItem(element);
                       }
                     }).then((value) {
+                      if (!context.mounted) return;
                       pop(context);
                       Navigator.pushNamed(
                         context,
@@ -85,11 +86,13 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                       ).then((value) {
                         if (value != null) {
                           if (value == 1) {
+                            if (!context.mounted) return;
                             waiting(context, body: 'Accepting Route Card...');
                             updateRouteCard(
                               routeCardId: data.currentRouteCard!.routeCardId,
                               status: 1,
                             ).then((value) {
+                              if (!context.mounted) return;
                               pop(context);
                               toast(
                                 'Routecard ${data.currentRouteCard!.routeCardNo} accepted successfully',
@@ -191,7 +194,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => SelectCustomerScreen(
+                          builder: (context) => const SelectCustomerScreen(
                                 type: 'Loan',
                               )),
                     ).then((value) {
@@ -213,7 +216,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => SelectCustomerScreen(
+                          builder: (context) => const SelectCustomerScreen(
                                 type: 'Return',
                               )),
                     ).then((value) {
@@ -235,7 +238,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => SelectCustomerScreen(
+                          builder: (context) => const SelectCustomerScreen(
                                 type: 'Leak',
                               )),
                     ).then((value) {
@@ -270,6 +273,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                           await getReturnCylinderSummaryCustomerWiseLeak(
                               routeCard.routeCardId,
                               isCustomerWise: true);
+                      if (!context.mounted) return;
                       pop(context);
                       final List<ItemSummaryCustomerWiseFull> li = [];
                       final List<ItemSummaryCustomerWiseFull> liLeak = [];
@@ -348,6 +352,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                             issuedQty: 0,
                             unique: ''));
                       }
+                      if (!context.mounted) return;
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -369,31 +374,41 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                         context,
                         body: 'Receiving data...',
                       );
+
                       data.clearRCItems();
-                      await getItemsByRoutecard(
-                              routeCardId: routeCard.routeCardId,
-                              onlyRefill: false,
-                              priceLevelId: 1,
-                              type: data.currentRouteCard!.status == 0
-                                  ? ''
-                                  : 'rc-summary')
-                          .then((rcItems) {
-                        for (var element in rcItems) {
-                          if (element.item?.itemTypeId != 5) {
-                            data.addRCItem(element);
-                          }
+
+                      final rcItems = await getItemsByRoutecard(
+                        routeCardId: routeCard.routeCardId,
+                        onlyRefill: false,
+                        priceLevelId: 1,
+                        type: data.currentRouteCard!.status == 0
+                            ? ''
+                            : 'rc-summary',
+                      );
+
+                      if (!context.mounted) return;
+
+                      for (var element in rcItems) {
+                        if (element.item?.itemTypeId != 5) {
+                          data.addRCItem(element);
                         }
-                      });
-                      print("routeCard.routeCardId");
-                      print(routeCard.routeCardId);
+                      }
+
                       final rcItemSummary = await getItemsSummaryByRoutecard(
-                          routeCardId: routeCard.routeCardId);
+                        routeCardId: routeCard.routeCardId,
+                      );
+
+                      if (!context.mounted) return;
+
                       pop(context);
+
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  StockScreen(rcItemSummary: rcItemSummary)));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              StockScreen(rcItemSummary: rcItemSummary),
+                        ),
+                      );
                     },
                     enabled: data.currentRouteCard!.status == 1,
                     titleFontSize: 25.0,

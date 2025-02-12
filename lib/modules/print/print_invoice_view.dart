@@ -54,6 +54,7 @@ class PrintInvoiceView extends StatelessWidget {
             await onSaveData!();
           }
           if (type != 'previous') {
+            if (!context.mounted) return;
             viewModel.onPrinted(context, isBillingFrom ?? false);
           }
         },

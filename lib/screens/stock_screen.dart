@@ -256,7 +256,7 @@ class StockScreen extends StatelessWidget {
                         // returnCSum =
                         //     item2.returnEmptyCount! + item2.returnRefillCount!;
                         fullCount = (item.transferQty.toInt() - item2.refill) +
-                            (item2.returnRefillCount ?? 0);
+                            (item2.returnRefillCount ?? 0); // not workling + item2.returnRefillCount
                         depositeCount = item2.deposite;
                         refill = item2.refill + (item2.returnEmptyCount ?? 0);
                         leak = item2.leak;
@@ -286,7 +286,7 @@ class StockScreen extends StatelessWidget {
                                     damage -
                                     freeEmpty -
                                     loanIssued +
-                                    loanReceived)
+                                    loanReceived) // + return empty
                                 .toString()),
                         Padding(
                           padding: const EdgeInsets.only(right: 0, top: 5),
