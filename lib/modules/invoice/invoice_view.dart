@@ -390,9 +390,10 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                     value: formatPrice(dataProvider.getTotalAmount())),
                 BasicTile(
                     label: 'VAT 18%', value: formatPrice(dataProvider.vat)),
-                BasicTile(
-                    label: 'Non VAT Item Total',
-                    value: dataProvider.nonVatItemTotal.toString()),
+                if (dataProvider.nonVatItemTotal > 0)
+                  BasicTile(
+                      label: 'Non VAT Item Total',
+                      value: dataProvider.nonVatItemTotal.toString()),
 
                 const Divider(
                   color: Colors.black,
