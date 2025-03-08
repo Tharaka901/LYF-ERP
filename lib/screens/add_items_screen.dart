@@ -133,8 +133,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                   onConfirm: () {
                     if (formKey.currentState!.validate()) {
                       if (leakTypeController.text == 'Leak Issue') {
-                        dataProvider.clearItemList();
-                        if (dataProvider.selectedCylinderList.isNotEmpty) {
+                        if (dataProvider.selectedCylinderList.isNotEmpty && dataProvider.itemList.isEmpty) {
                           for (var element
                               in dataProvider.selectedCylinderList) {
                             dataProvider.addItem(
