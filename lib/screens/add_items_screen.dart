@@ -346,6 +346,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                                         quantityController: quantityController,
                                         formKey: formKey,
                                         addedItem: addedItem,
+                                        type: widget.type,
                                       ),
                                       onConfirm: () {
                                         if (formKey.currentState!.validate()) {
