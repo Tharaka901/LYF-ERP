@@ -23,6 +23,7 @@ class LeakInvoiceViewModel {
       selectedCylinderItemIds: dataProvider.selectedCylinderItemIds,
       employee: dataProvider.currentEmployee!,
       leakType: dataProvider.itemList[0].leakType,
+      selectedCylinderList: dataProvider.selectedCylinderList,
     );
     dataProvider.itemList.clear();
     if (context.mounted) {

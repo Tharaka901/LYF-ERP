@@ -4,6 +4,7 @@ import 'package:gsr/models/employee/employee_model.dart';
 import 'package:gsr/models/route_card.dart';
 
 import '../commons/common_methods.dart';
+import '../models/cylinder.dart';
 import '../models/response.dart';
 
 class InvoiceService {
@@ -97,6 +98,7 @@ class InvoiceService {
       required List<AddedItem> itemList,
       required List<int> selectedCylinderItemIds,
       required EmployeeModel employee,
+      required List<Cylinder> selectedCylinderList,
       int? leakType}) async {
     try {
       final invoiceNo = await leakInvoiceNumber(routeCard);
@@ -125,11 +127,12 @@ class InvoiceService {
                         "status": leakType == 2 ? 1 : 6
                       })
                   .toList()
-              : selectedCylinderItemIds
-                  .map((id) => {
-                        "id": id,
+              : selectedCylinderList
+                  .map((cylinder) => {
+                        "id": cylinder.id,
                         "status": 6,
                         "routecardId": routeCard.routeCardId,
+                        "freeCylinderId": cylinder.freeCylinderId
                       })
                   .toList()
         },

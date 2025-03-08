@@ -14,6 +14,7 @@ class Cylinder {
   final int? status;
   final String? cylinderNo;
   final String? referenceNo;
+  final int? freeCylinderId;
 
   Cylinder({
     this.id,
@@ -25,6 +26,7 @@ class Cylinder {
     this.status,
     this.cylinderNo,
     this.referenceNo,
+    this.freeCylinderId,
   });
 
   factory Cylinder.fromJson(Map<String, dynamic> json) => Cylinder(
@@ -37,6 +39,7 @@ class Cylinder {
         status: json["status"],
         cylinderNo: json["cylinderNo"],
         referenceNo: json["referenceNo"],
+        freeCylinderId: json["freeCylinderId"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -49,5 +52,6 @@ class Cylinder {
         "status": status,
         "cylinderNo": cylinderNo,
         "referenceNo": referenceNo,
+        "freeCylinderId": freeCylinderId,
       };
 }
