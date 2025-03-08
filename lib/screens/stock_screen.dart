@@ -295,7 +295,8 @@ class StockScreen extends StatelessWidget {
                                     damage -
                                     freeEmpty -
                                     loanIssued +
-                                    loanReceived) // + return empty
+                                    loanReceived -
+                                    returnCylinderFull) // + return empty
                                 .toString()),
                         Padding(
                           padding: const EdgeInsets.only(right: 0, top: 5),
@@ -316,8 +317,7 @@ class StockScreen extends StatelessWidget {
                                       loanIssued +
                                       loanReceived +
                                       returnCylinderFull -
-                                      returnCylinderEmpty
-                                      )
+                                      returnCylinderEmpty)
                               .toString(),
                           align: TextAlign.end,
                         ),
