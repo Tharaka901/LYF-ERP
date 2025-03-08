@@ -177,7 +177,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                           toast('An item added successfully',
                               toastState: TS.success);
                           quantityController.clear();
-                          dataProvider.clearSelectedCylinderList();
+                          // dataProvider.clearSelectedCylinderList();
                           cylindserNumberController.clear();
                           referenceNumberController.clear();
                           return;

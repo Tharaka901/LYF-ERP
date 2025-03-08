@@ -26,6 +26,7 @@ class LeakInvoiceViewModel {
       selectedCylinderList: dataProvider.selectedCylinderList,
     );
     dataProvider.itemList.clear();
+    dataProvider.clearSelectedCylinderList();
     if (context.mounted) {
       pop(context);
       Navigator.pushNamed(
