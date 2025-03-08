@@ -13,6 +13,8 @@ class RcItemsSummary {
   int loanReceived;
   int? returnRefillCount;
   int? returnEmptyCount;
+  int? returnCylinderFull;
+  int? returnCylinderEmpty;
 
   RcItemsSummary(
       {required this.id,
@@ -28,7 +30,9 @@ class RcItemsSummary {
       required this.loanIssued,
       required this.loanReceived,
       this.returnEmptyCount,
-      this.returnRefillCount});
+      this.returnRefillCount,
+      this.returnCylinderFull,
+      this.returnCylinderEmpty});
 
   factory RcItemsSummary.fromJson(Map<String, dynamic> json) => RcItemsSummary(
       id: json["id"],
@@ -44,7 +48,9 @@ class RcItemsSummary {
       loanIssued: json["loanIssued"],
       loanReceived: json["loanReceived"],
       returnRefillCount: json["returnRefillCount"],
-      returnEmptyCount: json["returnEmptyCount"]);
+      returnEmptyCount: json["returnEmptyCount"],
+      returnCylinderFull: json["returnCylinderFull"],
+      returnCylinderEmpty: json["returnCylinderEmpty"]);
 
   Map<String, dynamic> toJson() => {
         "id": id,
