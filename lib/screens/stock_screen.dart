@@ -251,6 +251,8 @@ class StockScreen extends StatelessWidget {
                     int freeEmpty = 0;
                     int loanIssued = 0;
                     int loanReceived = 0;
+                    int returnCylinderFull = 0;
+                    int returnCylinderEmpty = 0;
                     for (var item2 in rcItemSummary) {
                       if (item.itemId == item2.id) {
                         // returnCSum =
@@ -261,13 +263,17 @@ class StockScreen extends StatelessWidget {
                             (item2.returnRefillCount ??
                                 0); // not workling + item2.returnRefillCount
                         depositeCount = item2.deposite;
-                        refill = item2.refill + (item2.returnCylinderEmpty ?? 0) + (item2.returnEmptyCount ?? 0);
+                        refill = item2.refill +
+                            (item2.returnCylinderEmpty ?? 0) +
+                            (item2.returnEmptyCount ?? 0);
                         leak = item2.leak;
                         damage = item2.damage;
                         free = item2.free;
                         freeEmpty = item2.freeEmpty;
                         loanIssued = item2.loanIssued;
                         loanReceived = item2.loanReceived;
+                        returnCylinderFull = item2.returnCylinderFull ?? 0;
+                        returnCylinderEmpty = item2.returnCylinderEmpty ?? 0;
                       }
                     }
 
@@ -308,7 +314,10 @@ class StockScreen extends StatelessWidget {
                                       depositeCount +
                                       damage -
                                       loanIssued +
-                                      loanReceived)
+                                      loanReceived +
+                                      returnCylinderFull -
+                                      returnCylinderEmpty
+                                      )
                               .toString(),
                           align: TextAlign.end,
                         ),
