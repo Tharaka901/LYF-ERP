@@ -139,7 +139,16 @@ Future<List<RoutecardItem>> getLeakIssueItems(int routeCardId, int customerId1,
     final response = await respo(
         'items/leak-issue?routecardId=$routeCardId&customerId1=$customerId1');
     List<dynamic> list = response.data;
-
+    const itemNameMap = {
+      '36': 'C2 Free Cylinder',
+      '37': 'C5 Free Cylinder',
+      '34': 'C12 Free Cylinder',
+      '35': 'C37 Free Cylinder',
+      '48': 'C12 Free Empty Cylinder',
+      '49': 'C5 Free Empty Cylinder',
+      '50': 'C2 Free Empty Cylinder',
+      '51': 'C37 Free Empty Cylinder'
+    };
     return list.map((element) {
       LoanItem loanItem = LoanItem.fromJson(element);
       return RoutecardItem(
@@ -152,7 +161,7 @@ Future<List<RoutecardItem>> getLeakIssueItems(int routeCardId, int customerId1,
           item: Item(
               id: loanItem.id ?? 0,
               itemRegNo: loanItem.itemRegNo ?? '',
-              itemName: loanItem.itemName ?? '',
+              itemName: itemNameMap[loanItem.itemId.toString()] ?? '',
               costPrice: loanItem.costPrice?.toDouble() ?? 0,
               salePrice: loanItem.salePrice?.toDouble() ?? 0,
               openingQty: loanItem.openingQty?.toDouble() ?? 0,
