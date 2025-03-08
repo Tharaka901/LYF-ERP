@@ -344,6 +344,18 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                   ],
                 ),
               ),
+               SizedBox(
+                width: double.infinity,
+                child: Row(
+                  children: [
+                    text('Non VAT Item Amount'),
+                    const Spacer(),
+                    text(formatPrice(
+                      issuedInvoice.nonVatItemTotal ?? 0,
+                    )),
+                  ],
+                ),
+              ),
               SizedBox(
                 width: double.infinity,
                 child: Row(
