@@ -237,14 +237,15 @@ class _AddItemsState extends State<AddItems> {
                         width: 200,
                         child: ListView.builder(
                             itemCount: data.cylinderList.length,
-                            physics: const NeverScrollableScrollPhysics(),
+                            // physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (context, i) => CheckboxListTile(
                                   value: dataProvider.selectedCylinderList
                                       .contains(data.cylinderList[i]),
                                   onChanged: (bool? value) {
                                     //setState(() {
                                     if (dataProvider.selectedCylinderList
-                                        .contains(data.cylinderList[i])) {
+                                        .map((e) => e.id)
+                                        .contains(data.cylinderList[i].id)) {
                                       widget.quantityController.text =
                                           (int.parse(widget.quantityController
                                                       .text) -
