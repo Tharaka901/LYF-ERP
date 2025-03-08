@@ -316,7 +316,7 @@ class StockScreen extends StatelessWidget {
                                       damage -
                                       loanIssued +
                                       loanReceived +
-                                      returnCylinderFull -
+                                      returnCylinderFull +
                                       returnCylinderEmpty)
                               .toString(),
                           align: TextAlign.end,
