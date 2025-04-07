@@ -36,12 +36,33 @@ class LoanCylinderViewModel {
     }
   }
 
-  void onPressedPrintButton() {
+  Future<void> onPressedPrintButton() async {
+    final dataProvider = Provider.of<DataProvider>(context!, listen: false);
+    final selectedCustomer = dataProvider.selectedCustomer!;
+
+    waiting(context!, body: 'Sending...');
+    await invoiceService.createLoanInvoice(
+      routeCard: dataProvider.currentRouteCard!,
+      customer: selectedCustomer,
+      itemList: dataProvider.itemList,
+      loanType: dataProvider.itemList[0].loanType,
+      employee: dataProvider.currentEmployee!,
+    );
     Navigator.push(
       context!,
       MaterialPageRoute(
         builder: (context) => const LoanNotePrintScreen(),
       ),
+    );
+  }
+
+  void onPrintedButton() {
+    final dataProvider = Provider.of<DataProvider>(context!, listen: false);
+    dataProvider.itemList.clear();
+    pop(context!);
+    Navigator.pushNamed(
+      context!,
+      RouteCardScreen.routeId,
     );
   }
 }

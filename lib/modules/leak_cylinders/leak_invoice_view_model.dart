@@ -36,10 +36,34 @@ class LeakInvoiceViewModel {
     }
   }
 
-  void onPressedPrintButton() {
-    Navigator.push(
+  Future<void> onPressedPrintButton() async {
+    final dataProvider = Provider.of<DataProvider>(context, listen: false);
+    waiting(context, body: 'Sending...');
+    await invoiceService.createLeakInvoice(
+      routeCard: dataProvider.currentRouteCard!,
+      customer: dataProvider.selectedCustomer!,
+      itemList: dataProvider.itemList,
+      selectedCylinderItemIds: dataProvider.selectedCylinderItemIds,
+      employee: dataProvider.currentEmployee!,
+      leakType: dataProvider.itemList[0].leakType,
+      selectedCylinderList: dataProvider.selectedCylinderList,
+    );
+    if (context.mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const LeakNotePrintScreen()),
+      );
+    }
+  }
+
+  void onCompletedPrint() {
+    final dataProvider = Provider.of<DataProvider>(context, listen: false);
+    dataProvider.itemList.clear();
+    dataProvider.clearSelectedCylinderList();
+    pop(context);
+    Navigator.pushNamed(
       context,
-      MaterialPageRoute(builder: (context) => const LeakNotePrintScreen()),
+      RouteCardScreen.routeId,
     );
   }
 }

@@ -25,7 +25,7 @@ class LoanNotePrintScreen extends StatelessWidget {
       body: PdfPreview(
         onPrinted: (context) async {
           final loanCylinderViewModel = LoanCylinderViewModel(context: context);
-          loanCylinderViewModel.onPressedSaveButton();
+          loanCylinderViewModel.onPrintedButton();
         },
         build: (format) => _generatePdf(format, context),
       ),

@@ -25,7 +25,7 @@ class LeakNotePrintScreen extends StatelessWidget {
       ),
       body: PdfPreview(
         onPrinted: (context) async {
-          viewModel.onPressedSaveButton();
+          viewModel.onCompletedPrint();
         },
         build: (format) => _generatePdf(format, context),
       ),
