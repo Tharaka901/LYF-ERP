@@ -3,7 +3,6 @@ import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/invoice.dart';
 import 'package:gsr/models/invoice_item.dart';
 import 'package:gsr/providers/data_provider.dart';
-import 'package:gsr/screens/route_card_screen.dart';
 import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
 

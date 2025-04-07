@@ -74,7 +74,7 @@ class LoanNotePrintScreen extends StatelessWidget {
                             style: const pw.TextStyle(fontSize: 22.0),
                           ),
                           pw.Text(
-                            'Note No: ${dataProvider.currentInvoice?.invoiceNo}',
+                            'Note No: ${(dataProvider.itemList[0].loanType == 2 ? 'LO/R/' : 'LO/I/') + dataProvider.currentInvoice!.invoiceNo.replaceAll('RCN', '')}',
                             style: const pw.TextStyle(fontSize: 22.0),
                           ),
                         ],

@@ -74,7 +74,7 @@ class LeakNotePrintScreen extends StatelessWidget {
                             style: const pw.TextStyle(fontSize: 22.0),
                           ),
                           pw.Text(
-                            'Note No: ${dataProvider.currentInvoice?.invoiceNo}',
+                            'Note No: ${(dataProvider.itemList[0].leakType == 2 ? 'LE/R' : 'LE/I') + dataProvider.currentInvoice!.invoiceNo.replaceAll('RCN', '')}',
                             style: const pw.TextStyle(fontSize: 22.0),
                           ),
                         ],

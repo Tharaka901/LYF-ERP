@@ -87,6 +87,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
         leading: IconButton(
             onPressed: () {
               dataProvider.itemList.clear();
+              dataProvider.selectedCylinderList.clear();
               Navigator.pop(context);
             },
             icon: const Icon(Icons.arrow_back)),
@@ -133,7 +134,8 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                   onConfirm: () {
                     if (formKey.currentState!.validate()) {
                       if (leakTypeController.text == 'Leak Issue') {
-                        if (dataProvider.selectedCylinderList.isNotEmpty && dataProvider.itemList.isEmpty) {
+                        if (dataProvider.selectedCylinderList.isNotEmpty &&
+                            dataProvider.itemList.isEmpty) {
                           for (var element
                               in dataProvider.selectedCylinderList) {
                             dataProvider.addItem(

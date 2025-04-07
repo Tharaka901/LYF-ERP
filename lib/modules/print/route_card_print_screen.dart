@@ -52,7 +52,7 @@ class RouteCardPrintScreen extends StatelessWidget {
                   // Route Card Title
                   pw.SizedBox(height: 5.0),
                   pw.Text(
-                    'Route Card',
+                    'Gate Pass',
                     style: ThemeConstants.boldStyleForPdf,
                   ),
                   pw.SizedBox(height: 5.0),
@@ -118,7 +118,7 @@ class RouteCardPrintScreen extends StatelessWidget {
                             ),
                             _buildTableCell(
                               (item.item ?? dummyItem).itemName,
-                              align: pw.TextAlign.center,
+                              align: pw.TextAlign.left,
                             ),
                             _buildTableCell(
                               num(item.transferQty),
@@ -160,7 +160,7 @@ class RouteCardPrintScreen extends StatelessWidget {
       padding: const pw.EdgeInsets.all(1),
       child: pw.Text(
         value,
-        textAlign: align ?? pw.TextAlign.center,
+        textAlign: align ?? pw.TextAlign.left,
         style: pw.TextStyle(
           fontWeight: pw.FontWeight.bold,
           fontSize: 22.0,
@@ -175,7 +175,7 @@ class RouteCardPrintScreen extends StatelessWidget {
       padding: const pw.EdgeInsets.all(1),
       child: pw.Text(
         value,
-        textAlign: align ?? pw.TextAlign.center,
+        textAlign: align ?? pw.TextAlign.left,
         style: const pw.TextStyle(fontSize: 22.0),
       ),
     );

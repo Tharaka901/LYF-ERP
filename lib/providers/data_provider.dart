@@ -75,6 +75,9 @@ class DataProvider extends ChangeNotifier {
   double get grandTotal => double.parse(
       (getTotalAmount() + vat + nonVatItemTotal).toStringAsFixed(2));
 
+  //! Calculate total payment amount
+   
+
   setCurrentEmployee(EmployeeModel currentEmployee) {
     _currentEmployee = currentEmployee;
     notifyListeners();

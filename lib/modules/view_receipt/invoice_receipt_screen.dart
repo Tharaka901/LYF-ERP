@@ -678,104 +678,105 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                     },
                   ),
                 const SizedBox(height: 10),
-                Consumer<DataProvider>(
-                  builder: (context, data, _) {
-                    final currentBalance = _balance(data, cash: cash);
-                    return currentBalance > 0
-                        ? SizedBox(
-                            width: double.infinity,
-                            height: 60.0,
-                            child: OutlinedButton(
-                              onPressed: () {
-                                final paymentController =
-                                    TextEditingController();
-                                final formKey = GlobalKey<FormState>();
-                                callBack(Balance selectedBalance) {}
-                                confirm(
-                                  context,
-                                  title: 'Previous Invoice',
-                                  body: CreditInvoice(
-                                    paymentController: paymentController,
-                                    formKey: formKey,
-                                    callBack: callBack,
-                                    balance: currentBalance,
-                                    invoiceId: invoiceRes.data['invoice']
-                                        ['invoiceId'] as int,
-                                  ),
-                                  onConfirm: () {
-                                    if (formKey.currentState!.validate()) {
-                                      paymentController.clear();
-                                      return;
-                                    }
-                                  },
-                                  confirmText: 'Add',
-                                );
-                              },
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    WidgetStateProperty.all(Colors.blue[600]),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
+                if (totalpayment != dataProvider.grandTotal)
+                  Consumer<DataProvider>(
+                    builder: (context, data, _) {
+                      final currentBalance = _balance(data, cash: cash);
+                      return currentBalance > 0
+                          ? SizedBox(
+                              width: double.infinity,
+                              height: 60.0,
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  final paymentController =
+                                      TextEditingController();
+                                  final formKey = GlobalKey<FormState>();
+                                  callBack(Balance selectedBalance) {}
+                                  confirm(
+                                    context,
+                                    title: 'Previous Invoice',
+                                    body: CreditInvoice(
+                                      paymentController: paymentController,
+                                      formKey: formKey,
+                                      callBack: callBack,
+                                      balance: currentBalance,
+                                      invoiceId: invoiceRes.data['invoice']
+                                          ['invoiceId'] as int,
+                                    ),
+                                    onConfirm: () {
+                                      if (formKey.currentState!.validate()) {
+                                        paymentController.clear();
+                                        return;
+                                      }
+                                    },
+                                    confirmText: 'Add',
+                                  );
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      WidgetStateProperty.all(Colors.blue[600]),
+                                  shape: WidgetStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              child: const Text(
-                                'Previous payment',
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          )
-                        : SizedBox(
-                            width: double.infinity,
-                            height: 60.0,
-                            child: OutlinedButton(
-                              onPressed: () {
-                                final paymentController =
-                                    TextEditingController();
-                                final formKey = GlobalKey<FormState>();
-                                callBack(Balance selectedBalance) {}
-                                confirm(
-                                  context,
-                                  title: 'Previous Invoices',
-                                  body: CustomerDepositePaid(
-                                    paymentController: paymentController,
-                                    formKey: formKey,
-                                    callBack: callBack,
-                                    balnce: currentBalance,
-                                  ),
-                                  onConfirm: () {
-                                    if (formKey.currentState!.validate()) {
-                                      paymentController.clear();
-                                      return;
-                                    }
-                                  },
-                                  confirmText: 'Add',
-                                );
-                              },
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    WidgetStateProperty.all(Colors.blue[600]),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
+                                child: const Text(
+                                  'Previous payment',
+                                  style: TextStyle(
+                                    fontSize: 20.0,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),
-                              child: const Text(
-                                'Over Payment',
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                  color: Colors.white,
+                            )
+                          : SizedBox(
+                              width: double.infinity,
+                              height: 60.0,
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  final paymentController =
+                                      TextEditingController();
+                                  final formKey = GlobalKey<FormState>();
+                                  callBack(Balance selectedBalance) {}
+                                  confirm(
+                                    context,
+                                    title: 'Previous Invoices',
+                                    body: CustomerDepositePaid(
+                                      paymentController: paymentController,
+                                      formKey: formKey,
+                                      callBack: callBack,
+                                      balnce: currentBalance,
+                                    ),
+                                    onConfirm: () {
+                                      if (formKey.currentState!.validate()) {
+                                        paymentController.clear();
+                                        return;
+                                      }
+                                    },
+                                    confirmText: 'Add',
+                                  );
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      WidgetStateProperty.all(Colors.blue[600]),
+                                  shape: WidgetStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Over Payment',
+                                  style: TextStyle(
+                                    fontSize: 20.0,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                  },
-                ),
+                            );
+                    },
+                  ),
                 const SizedBox(
                   height: 10.0,
                 ),

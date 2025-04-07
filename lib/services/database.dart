@@ -646,7 +646,7 @@ Future<Respo> createInvoice(BuildContext context, {String? invoiceNu}) async {
           "creditValue":
               double.parse((dataProvider.grandTotal).toStringAsFixed(2)),
           "employeeId": dataProvider.currentEmployee!.employeeId,
-          "rep": dataProvider.currentEmployee!.employeeRegNo,
+          "rep": dataProvider.currentEmployee!.employeeId.toString(),
           "status": 1,
         },
         "invoiceItems": dataProvider.itemList
