@@ -76,7 +76,6 @@ class DataProvider extends ChangeNotifier {
       (getTotalAmount() + vat + nonVatItemTotal).toStringAsFixed(2));
 
   //! Calculate total payment amount
-   
 
   setCurrentEmployee(EmployeeModel currentEmployee) {
     _currentEmployee = currentEmployee;
@@ -198,14 +197,17 @@ class DataProvider extends ChangeNotifier {
     _paidBalanceList.clear();
   }
 
-  modifyItem(AddedItem item) {
-    removeItem(item);
-    addItem(item);
+  modifyItem(AddedItem item, double newQuantity) {
+    // removeItem(item);
+    // addItem(item);
+    item.quantity = newQuantity;
     notifyListeners();
   }
 
   removeItem(AddedItem item) {
-    _itemList.removeWhere((element) => element.item.id == item.item.id);
+    _itemList.removeWhere((element) =>
+        element.item.id == item.item.id &&
+        element.cylinderNo == item.cylinderNo);
     notifyListeners();
   }
 

@@ -353,9 +353,11 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                                       onConfirm: () {
                                         if (formKey.currentState!.validate()) {
                                           dataProvider.modifyItem(
-                                            addedItem.modifyAddedItem(
-                                                doub(quantityController.text)),
+                                            addedItem,
+                                            double.parse(
+                                                quantityController.text),
                                           );
+
                                           toast('Item modified successfully',
                                               toastState: TS.success);
                                           quantityController.clear();

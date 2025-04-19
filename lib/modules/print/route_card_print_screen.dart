@@ -131,18 +131,23 @@ class RouteCardPrintScreen extends StatelessWidget {
                   ),
 
                   // Footer
-                  pw.SizedBox(height: 10),
-                  _buildTableHeaderCell(
-                    'Printed By: ${dataProvider.currentEmployee?.firstName}',
-                    color: const PdfColor.fromInt(0xFF000000),
-                  ),
-                  _buildTableHeaderCell(
-                    'Date & Time: ${date(DateTime.now(), format: 'dd.MM.yyyy hh:mm a')}',
-                    color: const PdfColor.fromInt(0xFF000000),
-                  ),
-                  pw.SizedBox(height: 2),
-                  MessageConstants.signatureNotRequired,
-                  pw.SizedBox(height: 5),
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.SizedBox(height: 10),
+                      _buildTableHeaderCell(
+                        'Printed By: ${dataProvider.currentEmployee?.firstName}',
+                        color: const PdfColor.fromInt(0xFF000000),
+                      ),
+                      _buildTableHeaderCell(
+                        'Date & Time: ${date(DateTime.now(), format: 'dd.MM.yyyy hh:mm a')}',
+                        color: const PdfColor.fromInt(0xFF000000),
+                      ),
+                      pw.SizedBox(height: 2),
+                      MessageConstants.signatureNotRequired,
+                      pw.SizedBox(height: 5),
+                    ],
+                  )
                 ],
               ),
             ),
