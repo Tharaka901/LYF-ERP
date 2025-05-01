@@ -1,9 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:gsr/models/added_item.dart';
 import 'package:gsr/models/cheque.dart';
-import 'package:gsr/models/customer.dart';
 import 'package:gsr/models/customer_deposite.dart';
-import 'package:gsr/models/employee.dart';
 import 'package:gsr/models/invoice.dart';
 import 'package:gsr/models/issued_invoice.dart';
 import 'package:gsr/models/issued_invoice_paid.dart';
