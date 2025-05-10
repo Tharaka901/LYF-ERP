@@ -331,13 +331,6 @@ class _RCSummaryScreenState extends State<RCSummaryScreen> {
                               textAlign: TextAlign.center,
                             ),
                           ),
-                          // Padding(
-                          //   padding: const EdgeInsets.all(5.0),
-                          //   child: Text(
-                          //     (item.recivedQty! - item.issuedQty!).toString(),
-                          //     textAlign: TextAlign.center,
-                          //   ),
-                          // ),
                         ],
                       );
                     },
@@ -549,7 +542,7 @@ class _RCSummaryScreenState extends State<RCSummaryScreen> {
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
-                              (widget.itemSummaryCWLeak.indexOf(item) + 1)
+                              (widget.itemSummaryCWReturnC.indexOf(item) + 1)
                                   .toString(),
                               textAlign: TextAlign.start,
                             ),
