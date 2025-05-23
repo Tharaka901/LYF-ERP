@@ -78,7 +78,11 @@ class _AddItemsState extends State<AddItems> {
                     labelText: 'Select Issued/Recived',
                   ),
                   style: defaultTextFieldStyle,
-                  value: 'Leak Recive',
+                  value: dataProvider.itemList.isEmpty
+                      ? 'Leak Recive'
+                      : dataProvider.itemList[0].leakType == 2
+                          ? 'Leak Recive'
+                          : 'Leak Issue',
                   items: ['Leak Recive', 'Leak Issue'].map((element) {
                     return DropdownMenuItem(
                       value: element,

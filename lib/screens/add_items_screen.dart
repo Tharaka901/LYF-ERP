@@ -134,47 +134,51 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                   onConfirm: () {
                     if (formKey.currentState!.validate()) {
                       if (leakTypeController.text == 'Leak Issue') {
-                        if (dataProvider.selectedCylinderList.isNotEmpty &&
-                            dataProvider.itemList.isEmpty) {
+                        if (dataProvider.selectedCylinderList.isNotEmpty) {
                           for (var element
                               in dataProvider.selectedCylinderList) {
-                            dataProvider.addItem(
-                              AddedItem(
-                                loanType:
-                                    loanTypeController.text == 'Loan Recive'
-                                        ? 2
-                                        : 3,
-                                leakType:
-                                    leakTypeController.text == 'Leak Recive'
-                                        ? 2
-                                        : 3,
-                                item: Item(
-                                    id: item!.id,
-                                    itemRegNo: item!.itemRegNo,
-                                    itemName: item!.itemName,
-                                    costPrice: item!.costPrice,
-                                    salePrice: item!.salePrice,
-                                    openingQty: item!.openingQty,
-                                    vendorId: item!.vendorId,
-                                    priceLevelId: item!.priceLevelId,
-                                    itemTypeId: item!.itemTypeId,
-                                    stockId: item!.stockId,
-                                    costAccId: item!.costAccId,
-                                    incomeAccId: item!.incomeAccId,
-                                    isNew: item!.isNew,
-                                    status: item!.status,
-                                    cylinderNo: cylindserNumberController.text,
-                                    referenceNo:
-                                        referenceNumberController.text),
-                                cylinderNo: element.cylinderNo,
-                                referenceNo: referenceNumberController.text,
-                                quantity: 1,
-                                maxQuantity: maxQuantity ??
-                                    doub(
-                                      quantityControllerLeak.text,
-                                    ),
-                              ),
-                            );
+                            if (!dataProvider.itemList
+                                .map((e) => e.cylinderNo)
+                                .contains(element.cylinderNo)) {
+                              dataProvider.addItem(
+                                AddedItem(
+                                  loanType:
+                                      loanTypeController.text == 'Loan Recive'
+                                          ? 2
+                                          : 3,
+                                  leakType:
+                                      leakTypeController.text == 'Leak Recive'
+                                          ? 2
+                                          : 3,
+                                  item: Item(
+                                      id: item!.id,
+                                      itemRegNo: item!.itemRegNo,
+                                      itemName: item!.itemName,
+                                      costPrice: item!.costPrice,
+                                      salePrice: item!.salePrice,
+                                      openingQty: item!.openingQty,
+                                      vendorId: item!.vendorId,
+                                      priceLevelId: item!.priceLevelId,
+                                      itemTypeId: item!.itemTypeId,
+                                      stockId: item!.stockId,
+                                      costAccId: item!.costAccId,
+                                      incomeAccId: item!.incomeAccId,
+                                      isNew: item!.isNew,
+                                      status: item!.status,
+                                      cylinderNo:
+                                          cylindserNumberController.text,
+                                      referenceNo:
+                                          referenceNumberController.text),
+                                  cylinderNo: element.cylinderNo,
+                                  referenceNo: referenceNumberController.text,
+                                  quantity: 1,
+                                  maxQuantity: maxQuantity ??
+                                      doub(
+                                        quantityControllerLeak.text,
+                                      ),
+                                ),
+                              );
+                            }
                           }
 
                           toast('An item added successfully',

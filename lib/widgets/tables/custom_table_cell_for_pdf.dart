@@ -7,7 +7,7 @@ pw.Widget buildTableCell(String value, {pw.TextAlign? align, double? ph}) {
     child: pw.Text(
       value,
       textAlign: align ?? pw.TextAlign.center,
-      style: const pw.TextStyle(fontSize: 14),
+      style: const pw.TextStyle(fontSize: 22),
     ),
   );
 }
