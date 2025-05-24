@@ -6,7 +6,7 @@ import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
 
-import '../models/issued_invoice_paid.dart';
+import '../models/issued_invoice_paid_model/issued_invoice_paid.dart';
 
 class CustomerDepositePaid extends StatefulWidget {
   final double balnce;
@@ -103,8 +103,7 @@ class _CustomerDepositePaidState extends State<CustomerDepositePaid> {
                     return 'Maximum ${formatPrice(-widget.balnce)}';
                   }
                   data.addPaidDeposite(
-                    IssuedDepositePaid(
-                      status: data.selectedDeposite!.status,
+                    IssuedDepositePaidModel(
                       depositeValue: data.selectedDeposite!.value?.toDouble(),
                       issuedDeposite: data.selectedDeposite!,
                       paymentAmount: doub(

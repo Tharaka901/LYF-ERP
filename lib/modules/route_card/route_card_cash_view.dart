@@ -46,7 +46,7 @@ class _RouteCardCashViewState extends State<RouteCardCashView> {
             waiting(context, body: 'Finishing...');
             await cashProvider!.completeRC(context);
             await updateRouteCard(
-              routeCardId: dataProvider.currentRouteCard!.routeCardId,
+              routeCardId: dataProvider.currentRouteCard!.routeCardId!,
               status: 2,
             ).then((value) {
               pop(context);

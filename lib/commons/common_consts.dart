@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/models/item.dart';
+import 'package:money_formatter/money_formatter.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -146,4 +147,34 @@ class CompanyConstants {
             ],
           ),
       ];
+}
+
+class HiveBox {
+  static const data = 'Data';
+  static const employee = 'Employee';
+  static const routeCard = 'RouteCard';
+  static const customers = 'Customers';
+  static const routeCardBasicItems = 'RouteCardBasicItems';
+  static const routeCardNewItems = 'RouteCardNewItems';
+  static const routeCardOtherItems = 'RouteCardOtherItems';
+  static const invoice = "Invoicess";
+  static const customerDeposite = "CustomerDeposites";
+  static const customerCredit = "CustomerCredit";
+  static const paymentBox = "PaymentsBox";
+  static const creditInvoicePayFromDepositesDataBox = "CreditInvoicePayFromDepositesDataBox";
+}
+
+price(double price) {
+  final bool negative = price < 0;
+  return MoneyFormatter(
+    amount: negative ? -price : price,
+    settings: MoneyFormatterSettings(
+      symbol: negative ? '-Rs' : 'Rs',
+      thousandSeparator: ',',
+      decimalSeparator: '.',
+      symbolAndNumberSeparator: '.',
+      fractionDigits: 2,
+      compactFormatType: CompactFormatType.short,
+    ),
+  ).output.symbolOnLeft;
 }

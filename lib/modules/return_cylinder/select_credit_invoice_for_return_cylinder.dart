@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gsr/models/issued_invoice_paid_model/issued_invoice_paid.dart';
 import 'package:provider/provider.dart';
 import '../../commons/common_methods.dart';
-import '../../models/issued_invoice.dart';
-import '../../models/issued_invoice_paid.dart';
+import '../../models/invoice/invoice_model.dart';
 import '../../providers/data_provider.dart';
 import '../../services/database.dart';
 import '../../widgets/previous_invoice_form.dart';
@@ -50,11 +50,10 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
               const SizedBox(
                 height: 20,
               ),
-              FutureBuilder<List<IssuedInvoice>>(
+              FutureBuilder<List<InvoiceModel>>(
                 future: creditInvoices(context,
                     cId: selectedCustomer!.customerId, type: 'with-cheque'),
-                builder:
-                    (context, AsyncSnapshot<List<IssuedInvoice>> snapshot) {
+                builder: (context, AsyncSnapshot<List<InvoiceModel>> snapshot) {
                   return snapshot.connectionState == ConnectionState.waiting
                       ? const CircularProgressIndicator()
                       : SizedBox(
@@ -65,7 +64,7 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
                               children: [
                                 Expanded(
                                   flex: 3,
-                                  child: DropdownButtonFormField<IssuedInvoice>(
+                                  child: DropdownButtonFormField<InvoiceModel>(
                                     decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                         borderRadius:
@@ -99,7 +98,7 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
                                             return DropdownMenuItem(
                                               value: element,
                                               child: Text(
-                                                '${element.invoiceNo}  ${formatPrice(element.creditValue)}',
+                                                '${element.invoiceNo}  ${element.creditValue != null ? formatPrice(element.creditValue!) : ''}',
                                               ),
                                             );
                                           }).toList()
@@ -118,9 +117,13 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
                                             .validate()) {
                                           final amountController =
                                               TextEditingController(
-                                                  text: num(data
-                                                      .selectedInvoice!
-                                                      .creditValue));
+                                                  text: data.selectedInvoice!
+                                                              .creditValue !=
+                                                          null
+                                                      ? data.selectedInvoice!
+                                                          .creditValue!
+                                                          .toString()
+                                                      : '');
                                           final formKey =
                                               GlobalKey<FormState>();
 
@@ -140,7 +143,7 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
                                               if (formKey.currentState!
                                                   .validate()) {
                                                 data.addPaidIssuedInvoice(
-                                                  IssuedInvoicePaid(
+                                                  IssuedInvoicePaidModel(
                                                     chequeId: dataProvider
                                                         .selectedInvoice!
                                                         .chequeId,
@@ -229,8 +232,14 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
                                           align: TextAlign.start,
                                         ),
                                         cell(
-                                          date(invoice.issuedInvoice.createdAt,
-                                              format: 'dd-MM-yyyy'),
+                                          invoice.issuedInvoice.createdAt !=
+                                                  null
+                                              ? date(
+                                                  DateTime.parse(invoice
+                                                      .issuedInvoice
+                                                      .createdAt!),
+                                                  format: 'dd-MM-yyyy')
+                                              : '',
                                           align: TextAlign.center,
                                         ),
                                         cell(invoice.issuedInvoice.invoiceNo),

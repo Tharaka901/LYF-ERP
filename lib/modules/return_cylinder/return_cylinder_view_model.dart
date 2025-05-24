@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/models/customer/customer_model.dart';
+import 'package:gsr/models/route_card/route_card_model.dart';
 import 'package:gsr/screens/screens.dart';
 import 'package:provider/provider.dart';
 
@@ -18,7 +19,7 @@ class ReturnCylinderViewModel {
   CustomerService customerService = CustomerService();
 
   late DataProvider dataProvider;
-  late RouteCard routeCard;
+  late RouteCardModel routeCard;
   late CustomerModel selectedCustomer;
   final BuildContext context;
 
@@ -76,7 +77,7 @@ class ReturnCylinderViewModel {
         await paymentService.createOverPayment(
           overPayment: overPayment,
           paymentInvoiceId: invoiceRes.data["invoice"]["id"],
-          routecardId: dataProvider.currentRouteCard!.routeCardId,
+          routecardId: dataProvider.currentRouteCard!.routeCardId!,
           receiptNo: invoiceRes.data["invoice"]["invoiceNo"],
           customerId: selectedCustomer.customerId!,
         );

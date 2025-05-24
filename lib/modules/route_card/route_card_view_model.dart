@@ -19,7 +19,7 @@ class RouteCardViewModel {
       final dataProvider = Provider.of<DataProvider>(context, listen: false);
       waiting(context, body: 'Accepting Route Card...');
       await routeCardService.updateRouteCard(
-        routeCardId: dataProvider.currentRouteCard!.routeCardId,
+        routeCardId: dataProvider.currentRouteCard!.routeCardId!,
         status: 1,
       );
       if (context.mounted) {
@@ -49,12 +49,12 @@ class RouteCardViewModel {
       final dataProvider = Provider.of<DataProvider>(context, listen: false);
       final stockItems = dataProvider.rcItemList
           .map((e) => StockItemModel(
-              itemId: e.item!.id, quantity: e.transferQty.toInt()))
+              itemId: e.item!.id!, quantity: e.transferQty.toInt()))
           .toList();
       waiting(context, body: 'Rejecting Route Card...');
       await stockService.updateStock(stockItems);
       await routeCardService.updateRouteCard(
-        routeCardId: dataProvider.currentRouteCard!.routeCardId,
+        routeCardId: dataProvider.currentRouteCard!.routeCardId!,
         status: 4,
       );
       if (context.mounted) {

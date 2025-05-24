@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
-import 'package:gsr/models/item.dart';
-import 'package:gsr/models/routecard_item.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
+
+import '../models/item/item_model.dart';
+import '../models/route_card_item/route_card_item_model.dart';
 
 class AddItems extends StatefulWidget {
   final TextEditingController quantityController;
@@ -15,7 +16,7 @@ class AddItems extends StatefulWidget {
   final TextEditingController leakTypeController;
   final GlobalKey<FormState> formKey;
   final String? type;
-  final void Function({required Item selectedItem, required double maxQty})
+  final void Function({required ItemModel selectedItem, required double maxQty})
       callBack;
   const AddItems({
     Key? key,
@@ -36,7 +37,7 @@ class AddItems extends StatefulWidget {
 class _AddItemsState extends State<AddItems> {
   final quantityFocus = FocusNode();
   bool _switchValue = false;
-  RoutecardItem? selectedItem;
+  RouteCardItemModel? selectedItem;
 
   @override
   Widget build(BuildContext context) {
@@ -101,10 +102,10 @@ class _AddItemsState extends State<AddItems> {
               height: 10.0,
             ),
             if (widget.type == 'Loan')
-              FutureBuilder<List<RoutecardItem>>(
-                future: getLoanItems(routeCard.routeCardId),
+              FutureBuilder<List<RouteCardItemModel>>(
+                future: getLoanItems(routeCard.routeCardId!),
                 builder:
-                    (context, AsyncSnapshot<List<RoutecardItem>> snapshot) {
+                    (context, AsyncSnapshot<List<RouteCardItemModel>> snapshot) {
                   if (snapshot.hasData && snapshot.data![0].item != null) {
                     final routecardItem = snapshot.data![0];
                     widget.callBack(
@@ -113,7 +114,7 @@ class _AddItemsState extends State<AddItems> {
                     );
                     selectedItem = routecardItem;
                   }
-                  return DropdownButtonFormField<RoutecardItem>(
+                  return DropdownButtonFormField<RouteCardItemModel>(
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
@@ -137,10 +138,10 @@ class _AddItemsState extends State<AddItems> {
                     },
                     items: snapshot.hasData
                         ? snapshot.data!.toList().map((element) {
-                            final item = element.item ?? dummyItem;
+                            final item = element.item;
                             return DropdownMenuItem(
                               value: element,
-                              child: Text(item.itemName),
+                              child: Text(item?.itemName ?? ''),
                             );
                           }).toList()
                         : [],
@@ -158,17 +159,17 @@ class _AddItemsState extends State<AddItems> {
                 },
               ),
             if (widget.type == 'Leak')
-              FutureBuilder<List<RoutecardItem>>(
+              FutureBuilder<List<RouteCardItemModel>>(
                 future: widget.leakTypeController.text != 'Leak Recive'
                     ? getLeakIssueItems(
-                        dataProvider.currentRouteCard!.routeCardId,
+                        dataProvider.currentRouteCard!.routeCardId!,
                         dataProvider.selectedCustomer!.customerId!)
-                    : getLoanItems(routeCard.routeCardId,
+                    : getLoanItems(routeCard.routeCardId!,
                         status: widget.leakTypeController.text == 'Leak Recive'
                             ? 6
                             : 7),
                 builder:
-                    (context, AsyncSnapshot<List<RoutecardItem>> snapshot) {
+                    (context, AsyncSnapshot<List<RouteCardItemModel>> snapshot) {
                   if (snapshot.hasData) {
                     if (snapshot.data!.isNotEmpty) {
                       if (snapshot.hasData && snapshot.data?[0].item != null) {
@@ -182,7 +183,7 @@ class _AddItemsState extends State<AddItems> {
                       }
                     }
                   }
-                  return DropdownButtonFormField<RoutecardItem>(
+                  return DropdownButtonFormField<RouteCardItemModel>(
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
@@ -207,10 +208,10 @@ class _AddItemsState extends State<AddItems> {
                     },
                     items: snapshot.hasData && snapshot.data!.isNotEmpty
                         ? snapshot.data!.toList().map((element) {
-                            final item = element.item ?? dummyItem;
+                            final item = element.item;
                             return DropdownMenuItem(
                               value: element,
-                              child: Text(item.itemName),
+                              child: Text(item?.itemName ?? ''),
                             );
                           }).toList()
                         : [],
@@ -224,7 +225,7 @@ class _AddItemsState extends State<AddItems> {
                         quantityFocus.requestFocus();
                         dataProvider.getCylindersByItem(
                             dataProvider.selectedCustomer!.customerId!,
-                            selectedItem!.item!.id);
+                            selectedItem!.item!.id!);
                       }
                     },
                   );
@@ -280,20 +281,20 @@ class _AddItemsState extends State<AddItems> {
               })
             ],
             if (widget.type == 'Default' || widget.type == 'Return')
-              FutureBuilder<List<RoutecardItem>>(
+              FutureBuilder<List<RouteCardItemModel>>(
                 future: !_switchValue
                     ? getItemsByRoutecard(
-                        routeCardId: routeCard.routeCardId,
+                        routeCardId: routeCard.routeCardId!,
                         priceLevelId:
                             dataProvider.selectedCustomer?.priceLevelId ?? 0,
                         type: widget.type == 'Return' ? 'return' : '')
                     : getNewItems(
-                        routeCardId: routeCard.routeCardId,
+                        routeCardId: routeCard.routeCardId!,
                         priceLevelId:
                             dataProvider.selectedCustomer?.priceLevelId ?? 0,
                       ),
                 builder:
-                    (context, AsyncSnapshot<List<RoutecardItem>> snapshot) {
+                    (context, AsyncSnapshot<List<RouteCardItemModel>> snapshot) {
                   if (snapshot.hasData && snapshot.data![0].item != null) {
                     final routecardItem = snapshot.data![0];
                     widget.callBack(
@@ -302,7 +303,7 @@ class _AddItemsState extends State<AddItems> {
                     );
                     selectedItem = routecardItem;
                   }
-                  return DropdownButtonFormField<RoutecardItem>(
+                  return DropdownButtonFormField<RouteCardItemModel>(
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
@@ -326,11 +327,11 @@ class _AddItemsState extends State<AddItems> {
                     },
                     items: snapshot.hasData
                         ? snapshot.data!.toList().map((element) {
-                            final item = element.item ?? dummyItem;
+                            final item = element.item;
                             return DropdownMenuItem(
                               value: element,
                               child: Text(
-                                item.itemName,
+                                item?.itemName ?? '',
                                 style: const TextStyle(fontSize: 15),
                               ),
                             );

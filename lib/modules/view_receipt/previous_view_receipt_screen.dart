@@ -13,8 +13,8 @@ import '../print/print_invoice_view.dart';
 class PreviousViewReceiptScreen extends StatefulWidget {
   static const routeId = 'PREVIOUS_RECEIPT';
   const PreviousViewReceiptScreen({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<PreviousViewReceiptScreen> createState() =>

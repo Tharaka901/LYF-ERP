@@ -161,8 +161,12 @@ class PrintReturnNoteView extends StatelessWidget {
                                 align: pw.TextAlign.left,
                               ),
                               _buildTableCell(
-                                date(invoice.issuedInvoice.createdAt,
-                                    format: 'dd-MM-yyyy'),
+                                invoice.issuedInvoice.createdAt != null
+                                    ? date(
+                                        DateTime.parse(
+                                            invoice.issuedInvoice.createdAt!),
+                                        format: 'dd-MM-yyyy')
+                                    : '',
                               ),
                               _buildTableCell(invoice.issuedInvoice.invoiceNo),
                               _buildTableCell(

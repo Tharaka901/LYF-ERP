@@ -38,7 +38,7 @@ class EmployeeModel {
     this.contactNumber,
   });
 
-  factory EmployeeModel.fromJson(Map<String, dynamic> json) => EmployeeModel(
+  factory EmployeeModel.fromJson(Map<dynamic, dynamic> json) => EmployeeModel(
         employeeId: json["employeeId"],
         employeeRegNo: json["employeeRegNo"],
         appointmentDate: json["appointmentDate"] == null

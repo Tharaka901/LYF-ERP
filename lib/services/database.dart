@@ -2,32 +2,31 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/balance_payment.dart';
-import 'package:gsr/models/credit_payment.dart';
 import 'package:gsr/models/customer.dart';
 import 'package:gsr/models/customer_deposite.dart';
 import 'package:gsr/models/cylinder.dart';
-import 'package:gsr/models/issued_invoice.dart';
-import 'package:gsr/models/item.dart';
 import 'package:gsr/models/item_summary.dart' as it;
 import 'package:gsr/models/item_summary_customer_wise.dart' as itcw;
 import 'package:gsr/models/loanItem.dart';
 import 'package:gsr/models/loan_stock.dart' as ls;
-import 'package:gsr/models/payment.dart';
-import 'package:gsr/models/payments.dart';
 import 'package:gsr/models/rc_item_summary.dart';
 import 'package:gsr/models/response.dart';
-import 'package:gsr/models/route_card.dart';
-import 'package:gsr/models/routecard_item.dart';
 import 'package:gsr/models/voucher.dart';
 import 'package:gsr/modules/invoice/invoice_provider.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/modules/select_customer/select_customer_screen.dart';
-import 'package:gsr/screens/home_screen.dart';
+import 'package:gsr/modules/home/home_view.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/credit_payment/credit_payment_model.dart';
 import '../models/customer/customer_model.dart';
 import '../models/employee/employee_model.dart';
+import '../models/invoice/invoice_model.dart';
+import '../models/item/item_model.dart';
+import '../models/payment/payment_model.dart';
+import '../models/payments.dart';
+import '../models/route_card/route_card_model.dart';
+import '../models/route_card_item/route_card_item_model.dart';
 
 login(
   BuildContext context, {
@@ -97,21 +96,21 @@ Future<Respo> loginStart(
   return t;
 }
 
-Future<List<RoutecardItem>> getLoanItems(int routeCardId, {int? status}) async {
+Future<List<RouteCardItemModel>> getLoanItems(int routeCardId, {int? status}) async {
   try {
     final response = await respo(
         'items/get-loan?routecardId=$routeCardId&status=${status ?? 5}');
     List<dynamic> list = response.data;
     return list.map((element) {
       LoanItem loanItem = LoanItem.fromJson(element);
-      return RoutecardItem(
+      return RouteCardItemModel(
           routecardItemsId: loanItem.cardItem?.routecardItemsId ?? 0,
           itemId: loanItem.cardItem?.itemId ?? 0,
           transferQty: loanItem.cardItem?.transferQty?.toDouble() ?? 0,
           sellQty: loanItem.cardItem?.sellQty?.toDouble() ?? 0,
           routecardId: loanItem.cardItem?.routecardId ?? 0,
           status: loanItem.cardItem?.status ?? 0,
-          item: Item(
+          item: ItemModel(
               id: loanItem.id ?? 0,
               itemRegNo: loanItem.itemRegNo ?? '',
               itemName: loanItem.itemName ?? '',
@@ -133,7 +132,7 @@ Future<List<RoutecardItem>> getLoanItems(int routeCardId, {int? status}) async {
   }
 }
 
-Future<List<RoutecardItem>> getLeakIssueItems(int routeCardId, int customerId1,
+Future<List<RouteCardItemModel>> getLeakIssueItems(int routeCardId, int customerId1,
     {int? status}) async {
   try {
     final response = await respo(
@@ -151,14 +150,14 @@ Future<List<RoutecardItem>> getLeakIssueItems(int routeCardId, int customerId1,
     };
     return list.map((element) {
       LoanItem loanItem = LoanItem.fromJson(element);
-      return RoutecardItem(
+      return RouteCardItemModel(
           routecardItemsId: loanItem.cardItem?.routecardItemsId ?? 0,
           itemId: loanItem.cardItem?.itemId ?? 0,
           transferQty: loanItem.cardItem?.transferQty?.toDouble() ?? 0,
           sellQty: loanItem.cardItem?.sellQty?.toDouble() ?? 0,
           routecardId: loanItem.cardItem?.routecardId ?? 0,
           status: loanItem.cardItem?.status ?? 0,
-          item: Item(
+          item: ItemModel(
               id: loanItem.id ?? 0,
               itemRegNo: loanItem.itemRegNo ?? '',
               itemName: itemNameMap[loanItem.itemId.toString()] ?? '',
@@ -280,7 +279,7 @@ Future<List<itcw.ItemSummaryCustomerWise>>
   }
 }
 
-Future<List<RoutecardItem>> getItemsByRoutecard(
+Future<List<RouteCardItemModel>> getItemsByRoutecard(
     {required int routeCardId,
     required int priceLevelId,
     bool onlyDeposit = false,
@@ -291,14 +290,14 @@ Future<List<RoutecardItem>> getItemsByRoutecard(
         await respo('items/get-all-by-route-card?routecardId=$routeCardId');
     List<dynamic> list = response.data;
 
-    return list.map((element) => RoutecardItem.fromJson(element)).toList();
+    return list.map((element) => RouteCardItemModel.fromJson(element)).toList();
   } else if (type == 'return') {
-    List<RoutecardItem> returnItems = [];
+    List<RouteCardItemModel> returnItems = [];
     final response = await respo('items/get-return?priceLevelId=$priceLevelId');
     List<dynamic> list = response.data;
     for (var element in list) {
-      final item = Item.fromJson(element);
-      returnItems.add(RoutecardItem(
+      final item = ItemModel.fromJson(element);
+      returnItems.add(RouteCardItemModel(
         routecardItemsId: 0,
         itemId: item.id,
         transferQty: 1,
@@ -314,18 +313,18 @@ Future<List<RoutecardItem>> getItemsByRoutecard(
       'items/get-all-by-route-card?routecardId=$routeCardId&priceLevelId=$priceLevelId');
   List<dynamic> list = response.data ?? [];
 
-  List<RoutecardItem> allItems = [];
+  List<RouteCardItemModel> allItems = [];
   final items = onlyRefill
       ? list
-          .map((element) => RoutecardItem.fromJson(element))
+          .map((element) => RouteCardItemModel.fromJson(element))
           .where((rci) => rci.item!.itemTypeId != 3)
           .toList()
       : onlyDeposit
           ? list
-              .map((element) => RoutecardItem.fromJson(element))
+              .map((element) => RouteCardItemModel.fromJson(element))
               .where((rci) => rci.item!.itemTypeId == 3)
               .toList()
-          : list.map((element) => RoutecardItem.fromJson(element)).toList();
+          : list.map((element) => RouteCardItemModel.fromJson(element)).toList();
   for (var element in items) {
     if (!(allItems.map((e) => e.item?.itemName).toList())
         .contains(element.item?.itemName)) {
@@ -350,7 +349,7 @@ Future<List<RcItemsSummary>> getItemsSummaryByRoutecard({
   }
 }
 
-Future<List<RoutecardItem>> getNewItems({
+Future<List<RouteCardItemModel>> getNewItems({
   required int routeCardId,
   required int priceLevelId,
 }) async {
@@ -363,11 +362,11 @@ Future<List<RoutecardItem>> getNewItems({
   final newResponse = await respo(
       'items/get-new?priceLevelId=$priceLevelId&routecardId=$routeCardId');
   List<dynamic> newItemList = newResponse.data ?? [];
-  List<RoutecardItem> rcNewItems = [];
+  List<RouteCardItemModel> rcNewItems = [];
   final response = await respo(
       'items/get-all-by-route-card?routecardId=$routeCardId&priceLevelId=$priceLevelId');
   List<dynamic> list = response.data ?? [];
-  final list2 = list.map((element) => RoutecardItem.fromJson(element)).toList();
+    final list2 = list.map((element) => RouteCardItemModel.fromJson(element)).toList();
   for (var element in list2) {
     if (element.item?.itemTypeId == 3) {
       rcNewItems.add(element);
@@ -379,11 +378,11 @@ Future<List<RoutecardItem>> getNewItems({
     }
   }
   for (var element in newItemList) {
-    final item = Item.fromJson(element);
+    final item = ItemModel.fromJson(element);
     for (var element2 in refillItemsList) {
       if (item.itemName.replaceAll('Deposit', 'Refill') ==
           element2.item?.itemName) {
-        rcNewItems.add(RoutecardItem(
+        rcNewItems.add(RouteCardItemModel(
           routecardItemsId: 0,
           itemId: item.id,
           transferQty: element2.transferQty,
@@ -398,7 +397,7 @@ Future<List<RoutecardItem>> getNewItems({
   return rcNewItems;
 }
 
-Future<List<RouteCard>> getRouteCards(int uid,
+Future<List<RouteCardModel>> getRouteCards(int uid,
     {RC? rcStatus = RC.pending}) async {
   try {
     Respo response;
@@ -412,25 +411,25 @@ Future<List<RouteCard>> getRouteCards(int uid,
       response = await respo('route-card/get-by-uid/$uid?status=2,3,5');
     }
     List<dynamic> list = response.data;
-    return list.map((element) => RouteCard.fromJson(element)).toList();
+    return list.map((element) => RouteCardModel.fromJson(element)).toList();
   } catch (e) {
     print(e);
     rethrow;
   }
 }
 
-Future<List<RouteCard>> getPendingAndAcceptedRouteCards(int uid) async {
+Future<List<RouteCardModel>> getPendingAndAcceptedRouteCards(int uid) async {
   final response = await respo(
     'route-card/get-by-uid/$uid?status=10',
   );
   List<dynamic> list = response.data;
   return list
-      .map((element) => RouteCard.fromJson(element))
+      .map((element) => RouteCardModel.fromJson(element))
       .where((rc) => (rc.status == 0 || rc.status == 1))
       .toList();
 }
 
-Future<List<Payment>> getPayments(
+Future<List<PaymentModel>> getPayments(
   BuildContext context, {
   required int routecardId,
   required int paymentMethod,
@@ -438,7 +437,7 @@ Future<List<Payment>> getPayments(
   final response = await respo(
       'payment/get?routecardId=$routecardId&paymentMethod=$paymentMethod');
   List<dynamic> list = response.data;
-  return list.map((element) => Payment.fromJson(element)).toList();
+  return list.map((element) => PaymentModel.fromJson(element)).toList();
 }
 
 Future<List<CreditPaymentModel>> getCreditPayments({
@@ -463,12 +462,12 @@ Future<List<CreditPaymentModel>> getCreditPayments({
   return selectedReceiptList;
 }
 
-Future<List<CreditPayment>> getCreditPaymentsByReceipt({
+Future<List<CreditPaymentModel>> getCreditPaymentsByReceipt({
   required String receiptNo,
 }) async {
   final response = await respo('credit-payment/get?receiptNo=$receiptNo');
   List<dynamic> list = response.data;
-  return list.map((element) => CreditPayment.fromJson(element)).toList();
+  return list.map((element) => CreditPaymentModel.fromJson(element)).toList();
 }
 
 enum RC {
@@ -484,7 +483,7 @@ Future<Customer> getQRCustomer() async {
   return Customer.fromJson(response.data);
 }
 
-Future<List<IssuedInvoice>> creditInvoices(BuildContext context,
+Future<List<InvoiceModel>> creditInvoices(BuildContext context,
     {int? cId, String? type, int? invoiceId}) async {
   String url =
       'invoice/get?customerId=${cId ?? context.read<DataProvider>().selectedCustomer!.customerId}';
@@ -497,7 +496,7 @@ Future<List<IssuedInvoice>> creditInvoices(BuildContext context,
   return list
       .where((element) => element['status'] == 1 || element['status'] == 99)
       .map((e) {
-        return IssuedInvoice.fromJson(e);
+        return InvoiceModel.fromJson(e);
       })
       .where((ii) => ii.creditValue != 0 && ii.invoiceId != (invoiceId ?? 0))
       .toList();
@@ -507,7 +506,7 @@ Future<List<CustomerDeposite>> getCustomerDeposites(BuildContext context,
     {int? cId, int? routecardId}) async {
   try {
     final response = await respo(
-        'over-payment/get?customerId=${cId ?? context.read<DataProvider>().selectedCustomer!.customerId}&routecardId=${routecardId}');
+        'over-payment/get?customerId=${cId ?? context.read<DataProvider>().selectedCustomer!.customerId}&routecardId=$routecardId');
     List<dynamic> list = response.data;
     return list
         .where((element) => (element['status'] == 1 || element['status'] == 2))
@@ -520,19 +519,19 @@ Future<List<CustomerDeposite>> getCustomerDeposites(BuildContext context,
   }
 }
 
-Future<List<IssuedInvoice>> getIssuedInvoices(BuildContext context) async {
+Future<List<InvoiceModel>> getIssuedInvoices(BuildContext context) async {
   final response = await respo(
       'invoice/get?routecardId=${context.read<DataProvider>().currentRouteCard!.routeCardId}');
 
   List<dynamic> list = response.data ?? [];
-  List<IssuedInvoice> selectedInvoiceList = [];
-  final allInvoiceList = list.map((e) => IssuedInvoice.fromJson(e)).toList();
+  List<InvoiceModel> selectedInvoiceList = [];
+  final allInvoiceList = list.map((e) => InvoiceModel.fromJson(e)).toList();
   for (var element in allInvoiceList) {
     if (element.status != 3) {
       selectedInvoiceList.add(element);
     }
   }
-  selectedInvoiceList.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+  selectedInvoiceList.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
   return selectedInvoiceList;
 }
 
@@ -574,13 +573,13 @@ Future<String> getReceiptNumber(BuildContext context) async {
   return 'R/${routeCard.routeCardNo}/${count + 1}';
 }
 
-Future<List<Voucher>> getVouchers(BuildContext context) async {
+Future<List<VoucherModel>> getVouchers(BuildContext context) async {
   final response = await respo('voucher/all');
   List<dynamic> list = response.data;
-  List<Voucher> vouchers = list.map((e) => Voucher.fromJson(e)).toList();
+  List<VoucherModel> vouchers = list.map((e) => VoucherModel.fromJson(e)).toList();
   vouchers.insert(
     0,
-    Voucher(
+    VoucherModel(
       id: 0,
       code: 'None',
       value: 0.0,
@@ -735,7 +734,7 @@ Future<void> sendPaymentWithPrevious(BuildContext context, double total,
       data: Payments(
         payments: [
           if (cash > 0)
-            Payment(
+            PaymentModel(
               customerTypeId: selectedCustomer.customerTypeId,
               invoiceId: invoiceId,
               amount: cash,
@@ -750,7 +749,7 @@ Future<void> sendPaymentWithPrevious(BuildContext context, double total,
               status: 1,
             ).toJson(),
           ...dataProvider.chequeList.map(
-            (cheque) => Payment(
+            (cheque) => PaymentModel(
               customerTypeId: selectedCustomer.customerTypeId,
               invoiceId: invoiceId,
               amount: cheque.chequeAmount,
@@ -802,7 +801,7 @@ Future<void> sendPaymentWithPrevious(BuildContext context, double total,
         method: Method.post,
         data: Payments(
           payments: [
-            Payment(
+            PaymentModel(
               customerTypeId: selectedCustomer.customerTypeId,
               invoiceId: invoiceId,
               amount: dataProvider.selectedVoucher != null
@@ -986,7 +985,7 @@ Future<void> sendCreditPayment(BuildContext context, double total, double cash,
           data: Payments(
             payments: [
               if (cash > 0)
-                Payment(
+                PaymentModel(
                   customerTypeId: selectedCustomer.customerTypeId,
                   invoiceId: invoiceId,
                   amount: cash,
@@ -1001,7 +1000,7 @@ Future<void> sendCreditPayment(BuildContext context, double total, double cash,
                   status: 1,
                 ).toJson(),
               ...dataProvider.chequeList.map(
-                (cheque) => Payment(
+                (cheque) => PaymentModel(
                   customerTypeId: selectedCustomer.customerTypeId,
                   invoiceId: invoiceId,
                   amount: cheque.chequeAmount,
@@ -1175,7 +1174,7 @@ Future<void> sendPayment(BuildContext context,
         data: Payments(
           payments: [
             if (cash > 0)
-              Payment(
+              PaymentModel(
                 customerTypeId: selectedCustomer.customerTypeId,
                 invoiceId: invoiceId,
                 amount: cash,
@@ -1190,7 +1189,7 @@ Future<void> sendPayment(BuildContext context,
                 status: 1,
               ).toJson(),
             ...dataProvider.chequeList.map(
-              (cheque) => Payment(
+              (cheque) => PaymentModel(
                 customerTypeId: selectedCustomer.customerTypeId,
                 invoiceId: invoiceId,
                 amount: cheque.chequeAmount,
@@ -1218,7 +1217,7 @@ Future<void> sendPayment(BuildContext context,
           data: Payments(
             payments: [
               if (cash > 0)
-                Payment(
+                PaymentModel(
                   customerTypeId: selectedCustomer.customerTypeId,
                   invoiceId: invoiceId,
                   amount: dataProvider.selectedVoucher != null

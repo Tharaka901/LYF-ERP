@@ -27,7 +27,7 @@ class CustomerDeposite {
     this.createdAt,
   });
 
-  factory CustomerDeposite.fromJson(Map<String, dynamic> json) =>
+  factory CustomerDeposite.fromJson(Map<dynamic, dynamic> json) =>
       CustomerDeposite(
         id: json["id"],
         value: double.parse(json["value"].toString()),

@@ -11,6 +11,7 @@ import 'package:gsr/widgets/detail_card.dart';
 import 'package:pattern_formatter/pattern_formatter.dart';
 import 'package:provider/provider.dart';
 
+import '../models/cheque/cheque.dart';
 import '../modules/view_receipt/previous_view_receipt_screen.dart';
 
 class PreviousAddPaymentScreen extends StatefulWidget {
@@ -147,7 +148,7 @@ class _PreviousAddPaymentScreenState extends State<PreviousAddPaymentScreen> {
                         onConfirm: () {
                           if (formKey.currentState!.validate()) {
                             dataProvider.addCheque(
-                              Cheque(
+                              ChequeModel(
                                 chequeNumber:
                                     chequeNumberController.text.trim(),
                                 chequeAmount: doub(chequeAmountController.text
@@ -220,12 +221,12 @@ class _PreviousAddPaymentScreenState extends State<PreviousAddPaymentScreen> {
                       : dummy,
                 ),
                 const Divider(),
-                FutureBuilder<List<Voucher>>(
+                FutureBuilder<List<VoucherModel>>(
                   future: getVouchers(context),
-                  builder: (context, AsyncSnapshot<List<Voucher>> snapshot) =>
+                  builder: (context, AsyncSnapshot<List<VoucherModel>> snapshot) =>
                       snapshot.connectionState == ConnectionState.waiting
                           ? const CircularProgressIndicator()
-                          : DropdownButtonFormField<Voucher>(
+                          : DropdownButtonFormField<VoucherModel>(
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10.0),

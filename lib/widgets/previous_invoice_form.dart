@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
-import 'package:gsr/models/issued_invoice.dart';
-import 'package:pattern_formatter/pattern_formatter.dart';
+
+import '../models/invoice/invoice_model.dart';
 
 class PreviousInvoiceForm extends StatefulWidget {
-  final IssuedInvoice issuedInvoice;
+  final InvoiceModel issuedInvoice;
   final TextEditingController amountController;
   final GlobalKey<FormState> formKey;
   const PreviousInvoiceForm({
-    Key? key,
+    super.key,
     required this.issuedInvoice,
     required this.amountController,
     required this.formKey,
-  }) : super(key: key);
+  });
 
   @override
   State<PreviousInvoiceForm> createState() => _PreviousInvoiceFormState();
@@ -28,7 +28,7 @@ class _PreviousInvoiceFormState extends State<PreviousInvoiceForm> {
         child: Column(
           children: [
             Text(
-              formatPrice(widget.issuedInvoice.creditValue),
+              formatPrice(widget.issuedInvoice.creditValue ?? 0),
               style: const TextStyle(fontSize: 20.0),
             ),
             const SizedBox(
@@ -53,7 +53,7 @@ class _PreviousInvoiceFormState extends State<PreviousInvoiceForm> {
                   } else if (double.parse(chequeAmount) <= 0) {
                     return 'Invalid payment amount!';
                   } else if (double.parse(chequeAmount) >
-                      widget.issuedInvoice.creditValue) {
+                      (widget.issuedInvoice.creditValue ?? 0)) {
                     return 'Maximam payment amount is ${widget.issuedInvoice.creditValue}';
                   } else {
                     return null;

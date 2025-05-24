@@ -30,7 +30,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '${routeCard.route.routeName} -${routeCard.date}',
+          '${routeCard.route?.routeName} - ${date(routeCard.date!, format: 'dd.MM.yyyy')}',
         ),
       ),
       floatingActionButton: Consumer<DataProvider>(
@@ -67,7 +67,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                     );
                     data.clearRCItems();
                     await getItemsByRoutecard(
-                            routeCardId: routeCard.routeCardId,
+                            routeCardId: routeCard.routeCardId!,
                             onlyRefill: false,
                             priceLevelId: 1,
                             type: data.currentRouteCard!.status == 0
@@ -89,7 +89,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                             if (!context.mounted) return;
                             waiting(context, body: 'Accepting Route Card...');
                             updateRouteCard(
-                              routeCardId: data.currentRouteCard!.routeCardId,
+                              routeCardId: data.currentRouteCard!.routeCardId!,
                               status: 1,
                             ).then((value) {
                               if (!context.mounted) return;
@@ -263,15 +263,15 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                         body: 'Receiving data...',
                       );
                       final itemSummary =
-                          await getItemSummary(routeCard.routeCardId);
+                          await getItemSummary(routeCard.routeCardId!);
                       final itemSummaryCW = await getItemSummaryCustomerWise(
-                          routeCard.routeCardId);
+                          routeCard.routeCardId!);
                       final itemSummaryCWLeak =
                           await getItemSummaryCustomerWiseLeak(
-                              routeCard.routeCardId);
+                                routeCard.routeCardId!);
                       final itemSummaryCWReturnC =
                           await getReturnCylinderSummaryCustomerWiseLeak(
-                              routeCard.routeCardId,
+                              routeCard.routeCardId!,
                               isCustomerWise: true);
                       if (!context.mounted) return;
                       pop(context);
@@ -378,7 +378,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                       data.clearRCItems();
 
                       final rcItems = await getItemsByRoutecard(
-                        routeCardId: routeCard.routeCardId,
+                        routeCardId: routeCard.routeCardId!,
                         onlyRefill: false,
                         priceLevelId: 1,
                         type: data.currentRouteCard!.status == 0
@@ -395,7 +395,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                       }
 
                       final rcItemSummary = await getItemsSummaryByRoutecard(
-                        routeCardId: routeCard.routeCardId,
+                        routeCardId: routeCard.routeCardId!,
                       );
 
                       if (!context.mounted) return;

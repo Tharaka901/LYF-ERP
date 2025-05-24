@@ -4,6 +4,7 @@ import 'package:gsr/models/rc_item_summary.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../commons/common_methods.dart';
 import '../models/item_summary_customer_wise.dart' as itcw;
 import '../services/database.dart';
 
@@ -45,7 +46,8 @@ class StockScreen extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(5.0),
                         child: Text(
-                          dataProvider.currentRouteCard!.date!,
+                          date(dataProvider.currentRouteCard!.date!,
+                              format: 'dd.MM.yyyy'),
                           //date(dataProvider.currentRouteCard!.date as DateTime, format: 'dd.MM.yyyy'),
                           textAlign: TextAlign.center,
                           style: const TextStyle(
@@ -70,7 +72,7 @@ class StockScreen extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(5.0),
                         child: Text(
-                          dataProvider.currentRouteCard?.route.routeName ?? '',
+                          dataProvider.currentRouteCard?.route?.routeName ?? '',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 18.0,

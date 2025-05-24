@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
-import 'package:gsr/models/credit_payment.dart';
 import 'package:gsr/models/credit_payment/credit_payment_model.dart';
 import 'package:gsr/modules/receipt_summary/receipt_summary_provider.dart';
 import 'package:gsr/screens/select_previous_invoice_screen.dart';
@@ -43,11 +42,10 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
           builder: (context, rsp, _) => receiptSummaryProvider!.receiptModel ==
                   null
               ? Center(child: CircularProgressIndicator())
-              : FutureBuilder<List<CreditPayment>>(
+              : FutureBuilder<List<CreditPaymentModel>>(
                   future: getCreditPaymentsByReceipt(
                       receiptNo: widget.creditPayment.receiptNo!),
-                  builder:
-                      (context, AsyncSnapshot<List<CreditPayment>> snapshot) {
+                  builder: (context, AsyncSnapshot<List<CreditPaymentModel>> snapshot) {
                     return snapshot.hasData
                         ? Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -71,7 +69,7 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
                                     Padding(
                                       padding: const EdgeInsets.all(5.0),
                                       child: Text(
-                                        snapshot.data![0].receiptNo,
+                                        snapshot.data![0].receiptNo ?? '',
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(fontSize: 18.0),
                                       ),
@@ -152,16 +150,19 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
                                                       null
                                                   ? '-'
                                                   : date(
-                                                      invoice.creditInvoice!
-                                                          .createdAt!,
+                                                      DateTime.parse(
+                                                          invoice.creditInvoice!
+                                                              .createdAt!),
                                                       format: 'dd-MM-yyyy'),
                                               align: TextAlign.center,
                                             ),
                                             cell(invoice
                                                 .creditInvoice!.invoiceNo),
                                             cell(
-                                              formatPrice(invoice.value)
-                                                  .replaceAll('Rs.', ''),
+                                              invoice.value != null
+                                                  ? formatPrice(invoice.value!)
+                                                      .replaceAll('Rs.', '')
+                                                  : '',
                                               align: TextAlign.center,
                                             ),
                                           ],
@@ -222,8 +223,10 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
                                               padding:
                                                   const EdgeInsets.all(5.0),
                                               child: Text(
-                                                formatPrice(payment.amount)
-                                                    .replaceAll('Rs.', ''),
+                                                payment.amount != null
+                                                    ? formatPrice(payment.amount!)
+                                                        .replaceAll('Rs.', '')
+                                                    : '',
                                                 textAlign: TextAlign.end,
                                               ),
                                             ),
@@ -248,10 +251,10 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
                                           ),
                                           const Spacer(),
                                           text(formatPrice(snapshot.data!
-                                              .map((e) => e.value)
+                                              .map((e) => e.value!)
                                               .toList()
                                               .reduce((value, current) =>
-                                                  value + current))),
+                                                  value! + current!))),
                                         ],
                                       ),
                                     ],

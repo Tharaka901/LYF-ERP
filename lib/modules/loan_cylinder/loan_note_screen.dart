@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
-import 'package:gsr/models/invoice.dart';
 import 'package:gsr/models/invoice_item.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/invoice/invoice_model.dart';
+import '../../models/invoice_item/invoice_item_model.dart';
 import '../../widgets/buttons/custom_outline_button.dart';
 import 'loan_cylinder_view_model.dart';
 
@@ -133,10 +134,10 @@ class _LoanNoteScreenState extends State<LoanNoteScreen> {
                       future: loanInvoiceNumber(context),
                       builder: (context, AsyncSnapshot<String> snapshot) {
                         if (snapshot.hasData) {
-                          dataProvider.setCurrentInvoice(Invoice(
+                          dataProvider.setCurrentInvoice(InvoiceModel(
                             invoiceItems: dataProvider.itemList
                                 .map(
-                                  (addedItem) => InvoiceItem(
+                                  (addedItem) => InvoiceItemModel(
                                     item: addedItem.item,
                                     itemPrice:
                                         addedItem.item.hasSpecialPrice != null
@@ -150,7 +151,7 @@ class _LoanNoteScreenState extends State<LoanNoteScreen> {
                                 .toList(),
                             invoiceNo: snapshot.data!,
                             routecardId:
-                                dataProvider.currentRouteCard!.routeCardId,
+                                dataProvider.currentRouteCard!.routeCardId!,
                             amount: dataProvider.getTotalAmount(),
                             customerId:
                                 dataProvider.selectedCustomer?.customerId ?? 0,

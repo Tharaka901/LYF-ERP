@@ -1,3 +1,4 @@
+import '../invoice/invoice_model.dart';
 import '../payment_method/payment_method.dart';
 
 class PaymentModel {
@@ -15,6 +16,7 @@ class PaymentModel {
   final int? employeeId;
   final int? status;
   final PaymentMethodModel? paymentMethods;
+  final InvoiceModel? invoice;
 
   PaymentModel({
     this.paymentId,
@@ -31,6 +33,7 @@ class PaymentModel {
     this.employeeId,
     this.status,
     this.paymentMethods,
+    this.invoice,
   });
 
   factory PaymentModel.fromJson(Map<String, dynamic> json) => PaymentModel(
@@ -51,6 +54,9 @@ class PaymentModel {
         paymentMethods: json["paymentMethods"] == null
             ? null
             : PaymentMethodModel.fromJson(json["paymentMethods"]),
+        invoice: json["invoice"] == null
+            ? null
+            : InvoiceModel.fromJson(json["invoice"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -68,5 +74,6 @@ class PaymentModel {
         "employeeId": employeeId,
         "status": status,
         "paymentMethods": paymentMethods?.toJson(),
+        "invoice": invoice?.toJson(),
       };
 }

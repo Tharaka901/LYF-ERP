@@ -7,6 +7,9 @@ import 'package:gsr/services/database.dart';
 import 'package:gsr/widgets/option_card.dart';
 import 'package:provider/provider.dart';
 
+import '../commons/common_methods.dart';
+import '../models/route_card/route_card_model.dart';
+
 class CompletedRCScreen extends StatefulWidget {
   static const routeId = 'COMPLETED_RC';
   const CompletedRCScreen({super.key});
@@ -91,12 +94,12 @@ class _CompletedRCScreenState extends State<CompletedRCScreen> {
       appBar: AppBar(
         title: const Text('Completed Route Cards'),
       ),
-      body: FutureBuilder<List<RouteCard>>(
+      body: FutureBuilder<List<RouteCardModel>>(
         future: getRouteCards(
           dataProvider.currentEmployee!.employeeId!,
           rcStatus: RC.completed,
         ),
-        builder: (context, AsyncSnapshot<List<RouteCard>> snapshot) {
+        builder: (context, AsyncSnapshot<List<RouteCardModel>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
@@ -106,7 +109,8 @@ class _CompletedRCScreenState extends State<CompletedRCScreen> {
 
             // Sort the list by date in descending order
             routeCards.sort((a, b) =>
-                DateTime.parse(a.date!).compareTo(DateTime.parse(b.date!)));
+                DateTime.parse(date(a.date!, format: 'yyyy-MM-dd')).compareTo(
+                    DateTime.parse(date(b.date!, format: 'yyyy-MM-dd'))));
 
             return routeCards.isNotEmpty
                 ? ListView.builder(

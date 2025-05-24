@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 import '../commons/common_methods.dart';
 import '../models/balance.dart';
 import '../models/customer.dart';
-import '../models/issued_invoice.dart';
-import '../models/issued_invoice_paid.dart';
+import '../models/invoice/invoice_model.dart';
+import '../models/issued_invoice_paid_model/issued_invoice_paid.dart';
 import '../providers/data_provider.dart';
 import '../services/database.dart';
 import '../widgets/customer_deposite_paid_for_prevoius_invoice.dart';
@@ -80,11 +80,11 @@ class _SelectPreviousInvoiceScreenState
                     const SizedBox(
                       height: 15,
                     ),
-                  FutureBuilder<List<IssuedInvoice>>(
+                  FutureBuilder<List<InvoiceModel>>(
                     future: creditInvoices(context,
                         cId: selectedCustomer.customerId, type: 'with-cheque'),
                     builder:
-                        (context, AsyncSnapshot<List<IssuedInvoice>> snapshot) {
+                          (context, AsyncSnapshot<List<InvoiceModel>> snapshot) {
                       return snapshot.connectionState == ConnectionState.waiting
                           ? const CircularProgressIndicator()
                           : SizedBox(
@@ -96,7 +96,7 @@ class _SelectPreviousInvoiceScreenState
                                     Expanded(
                                       flex: 3,
                                       child: DropdownButtonFormField<
-                                          IssuedInvoice>(
+                                          InvoiceModel>(
                                         decoration: InputDecoration(
                                           border: OutlineInputBorder(
                                             borderRadius:
@@ -131,7 +131,7 @@ class _SelectPreviousInvoiceScreenState
                                                 return DropdownMenuItem(
                                                   value: element,
                                                   child: Text(
-                                                    '${element.invoiceNo}  ${formatPrice(element.creditValue)}',
+                                                    '${element.invoiceNo}  ${element.creditValue != null ? formatPrice(element.creditValue!) : ''}',
                                                   ),
                                                 );
                                               }).toList()
@@ -152,9 +152,15 @@ class _SelectPreviousInvoiceScreenState
                                                 .validate()) {
                                               final amountController =
                                                   TextEditingController(
-                                                      text: num(data
+                                                      text: data
                                                           .selectedInvoice!
-                                                          .creditValue));
+                                                          .creditValue !=
+                                                          null
+                                                      ? data
+                                                          .selectedInvoice!
+                                                          .creditValue!
+                                                          .toString()
+                                                      : '');
                                               final formKey =
                                                   GlobalKey<FormState>();
 
@@ -174,7 +180,7 @@ class _SelectPreviousInvoiceScreenState
                                                   if (formKey.currentState!
                                                       .validate()) {
                                                     data.addPaidIssuedInvoice(
-                                                      IssuedInvoicePaid(
+                                                        IssuedInvoicePaidModel(
                                                         chequeId: dataProvider
                                                             .selectedInvoice!
                                                             .chequeId,
@@ -316,7 +322,8 @@ class _SelectPreviousInvoiceScreenState
                                 await respo('credit-payment/create',
                                     method: Method.post, data: data);
 
-                                if (dataProvider.selectedInvoice!.creditValue <=
+                                if (dataProvider.selectedInvoice!.creditValue != null &&
+                                        dataProvider.selectedInvoice!.creditValue! <=
                                         double.parse(paymentController.text) &&
                                     dataProvider.selectedInvoice?.chequeId ==
                                         null) {
@@ -331,7 +338,9 @@ class _SelectPreviousInvoiceScreenState
                                 if (dataProvider.selectedInvoice!.chequeId !=
                                     null) {
                                   if (dataProvider
-                                          .selectedInvoice!.creditValue <=
+                                          .selectedInvoice!.creditValue != null &&
+                                          dataProvider
+                                                  .selectedInvoice!.creditValue! <=
                                       double.parse(paymentController.text)) {
                                     await respo('cheque/update',
                                         method: Method.put,
@@ -349,9 +358,13 @@ class _SelectPreviousInvoiceScreenState
                                               .selectedInvoice!.chequeId,
                                           "balance": dataProvider
                                                   .selectedInvoice!
-                                                  .creditValue -
-                                              double.parse(
-                                                  paymentController.text)
+                                                  .creditValue != null
+                                                      ? dataProvider
+                                                          .selectedInvoice!
+                                                          .creditValue! -
+                                                        double.parse(
+                                                            paymentController.text)
+                                                      : 0
                                         });
                                   }
                                 }
@@ -468,10 +481,16 @@ class _SelectPreviousInvoiceScreenState
                                                   align: TextAlign.start,
                                                 ),
                                                 cell(
-                                                  date(
-                                                      invoice.issuedInvoice
-                                                          .createdAt,
-                                                      format: 'dd-MM-yyyy'),
+                                                  invoice.issuedInvoice
+                                                      .createdAt !=
+                                                  null
+                                                      ? date(
+                                                          DateTime.parse(
+                                                              invoice
+                                                                  .issuedInvoice
+                                                                  .createdAt!),
+                                                          format: 'dd-MM-yyyy')
+                                                      : '',
                                                   align: TextAlign.center,
                                                 ),
                                                 cell(invoice

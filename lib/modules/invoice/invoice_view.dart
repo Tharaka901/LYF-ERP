@@ -11,7 +11,7 @@ import '../../commons/common_consts.dart';
 class ViewInvoiceScreen extends StatefulWidget {
   static const routeId = 'INVOICE';
   final bool? isManual;
-  const ViewInvoiceScreen({Key? key, this.isManual}) : super(key: key);
+  const ViewInvoiceScreen({super.key, this.isManual});
 
   @override
   State<ViewInvoiceScreen> createState() => _ViewInvoiceScreenState();
@@ -25,8 +25,8 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
   void initState() {
     final invoiceProvider =
         Provider.of<InvoiceProvider>(context, listen: false);
-    if (invoiceProvider.invoiceNu == null)
-      invoiceProvider.getInvoiceNu(context);
+    invoiceProvider.invoiceNu == null;
+    invoiceProvider.getInvoiceNu(context);
     super.initState();
   }
 
@@ -45,7 +45,7 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
       ),
       floatingActionButton: Consumer<InvoiceProvider>(
         builder: ((context, ip, child) => ip.invoiceNu == null
-            ? CircularProgressIndicator()
+            ? const CircularProgressIndicator()
             : FloatingActionButton(
                 onPressed: () async {
                   if (isManual ?? false) {
@@ -53,20 +53,25 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                       waiting(context, body: 'Sending...');
                       await invoiceProvider.createInvoiceDB(
                           context, invoiceNoController.text.trim());
-                      pop(context);
-                      Navigator.pushNamed(context, AddPaymentScreen.routeId,
-                          arguments: {
-                            'invoiceRes': invoiceProvider.invoiceRes,
-                            'isManual': isManual
-                          });
+                      if (context.mounted) {
+                        pop(context);
+                        Navigator.pushNamed(context, AddPaymentScreen.routeId,
+                            arguments: {
+                              'invoiceRes': invoiceProvider.invoiceRes,
+                              'isManual': isManual
+                            });
+                      }
                     }
                   } else {
                     waiting(context, body: 'Sending...');
                     await invoiceProvider.createInvoiceDB(context, null);
-                    pop(context);
-                    print(invoiceProvider.invoiceRes);
-                    Navigator.pushNamed(context, AddPaymentScreen.routeId,
-                        arguments: {'invoiceRes': invoiceProvider.invoiceRes});
+                    if (context.mounted) {
+                      pop(context);
+                      Navigator.pushNamed(context, AddPaymentScreen.routeId,
+                          arguments: {
+                            'invoiceRes': invoiceProvider.invoiceRes
+                          });
+                    }
                   }
                 },
                 child: const Icon(
@@ -256,7 +261,7 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                   width: double.infinity,
                   child: Consumer<DataProvider>(
                     builder: (context, data, _) => Table(
-                      border: TableBorder.symmetric(),
+                      border: const TableBorder.symmetric(),
                       defaultColumnWidth: const IntrinsicColumnWidth(),
                       children: [
                         const TableRow(
@@ -324,58 +329,52 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                             ),
                           ],
                         ),
-                        ...data.itemList
-                            .map(
-                              (item) => TableRow(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(
-                                      (data.itemList.indexOf(item) + 1)
-                                          .toString(),
-                                      textAlign: TextAlign.start,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(
-                                      item.item.itemName,
-                                      textAlign: TextAlign.start,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(
-                                      num(item.quantity),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(
-                                      formatPrice(item.item.hasSpecialPrice !=
-                                              null
-                                          ? item.item.hasSpecialPrice!.itemPrice
-                                          : item.item.salePrice),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(
-                                      formatPrice(
-                                          (item.item.hasSpecialPrice != null
-                                                  ? item.item.hasSpecialPrice!
-                                                      .itemPrice
-                                                  : item.item.salePrice) *
-                                              item.quantity),
-                                      textAlign: TextAlign.end,
-                                    ),
-                                  ),
-                                ],
+                        ...data.itemList.map(
+                          (item) => TableRow(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  (data.itemList.indexOf(item) + 1).toString(),
+                                  textAlign: TextAlign.start,
+                                ),
                               ),
-                            )
-                            .toList(),
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  item.item.itemName,
+                                  textAlign: TextAlign.start,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  num(item.quantity),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  formatPrice(item.item.hasSpecialPrice != null
+                                      ? item.item.hasSpecialPrice!.itemPrice
+                                      : item.item.salePrice),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text(
+                                  formatPrice((item.item.hasSpecialPrice != null
+                                          ? item.item.hasSpecialPrice!.itemPrice
+                                          : item.item.salePrice) *
+                                      item.quantity),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -442,7 +441,7 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 if (isManual ?? false)
                   TextFormField(
                     controller: invoiceNoController,

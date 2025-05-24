@@ -45,7 +45,7 @@ class CustomerModel {
     this.vat,
   });
 
-  factory CustomerModel.fromJson(Map<String, dynamic> json) => CustomerModel(
+  factory CustomerModel.fromJson(Map<dynamic, dynamic> json) => CustomerModel(
         customerId: json["customerId"],
         registrationId: json["registrationId"],
         regDate:

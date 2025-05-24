@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
-import 'package:gsr/models/cheque.dart';
-import 'package:gsr/models/response.dart';
 import 'package:gsr/models/voucher.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/modules/view_receipt/invoice_receipt_screen.dart';
@@ -11,6 +9,10 @@ import 'package:gsr/widgets/cheque_card.dart';
 import 'package:gsr/widgets/cheque_form.dart';
 import 'package:gsr/widgets/detail_card.dart';
 import 'package:provider/provider.dart';
+
+import '../models/cheque/cheque.dart';
+import '../modules/invoice/invoice_provider.dart';
+import '../providers/hive_db_provider.dart';
 
 class AddPaymentScreen extends StatefulWidget {
   static const routeId = 'PAYMENT';
@@ -31,8 +33,11 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    final Respo invoiceRes = (ModalRoute.of(context)!.settings.arguments
-        as Map<String, dynamic>)['invoiceRes'];
+    final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
+    final invoiceProvider =
+        Provider.of<InvoiceProvider>(context, listen: false);
+    // final Respo invoiceRes = (ModalRoute.of(context)!.settings.arguments
+    //     as Map<String, dynamic>)['invoiceRes'];
     final isManual = (ModalRoute.of(context)!.settings.arguments
         as Map<String, dynamic>)['isManual'];
     return Scaffold(
@@ -53,7 +58,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                 'cash': doub(cashController.text.trim().isEmpty
                     ? '0.0'
                     : cashController.text.trim().replaceAll(',', '')),
-                'invoiceRes': invoiceRes,
+                // 'invoiceRes': invoiceRes,
                 'isManual': isManual
               });
         },
@@ -80,7 +85,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                 ),
                 DetailCard(
                   detailKey: 'Invoice No',
-                  detailvalue: invoiceRes.data['invoice']['invoiceNo'],
+                  detailvalue: invoiceProvider.invoiceNu ?? '',
                 ),
                 DetailCard(
                   detailKey: 'Total amount',
@@ -141,7 +146,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                           onConfirm: () {
                             if (formKey.currentState!.validate()) {
                               dataProvider.addCheque(
-                                Cheque(
+                                ChequeModel(
                                   chequeNumber:
                                       chequeNumberController.text.trim(),
                                   chequeAmount: doub(chequeAmountController.text
@@ -215,40 +220,42 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                         : dummy,
                   ),
                   const Divider(),
-                  FutureBuilder<List<Voucher>>(
-                    future: getVouchers(context),
-                    builder: (context, AsyncSnapshot<List<Voucher>> snapshot) =>
-                        snapshot.connectionState == ConnectionState.waiting
-                            ? const CircularProgressIndicator()
-                            : DropdownButtonFormField<Voucher>(
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
+                  if (hiveDBProvider.isInternetConnected)
+                    FutureBuilder<List<VoucherModel>>(
+                      future: getVouchers(context),
+                      builder: (context,
+                              AsyncSnapshot<List<VoucherModel>> snapshot) =>
+                          snapshot.connectionState == ConnectionState.waiting
+                              ? const CircularProgressIndicator()
+                              : DropdownButtonFormField<VoucherModel>(
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    labelText: snapshot.hasData &&
+                                            snapshot.data!.isNotEmpty
+                                        ? 'Select voucher'
+                                        : 'No vouchers available',
                                   ),
-                                  labelText: snapshot.hasData &&
-                                          snapshot.data!.isNotEmpty
-                                      ? 'Select voucher'
-                                      : 'No vouchers available',
+                                  value: null,
+                                  items: snapshot.hasData
+                                      ? snapshot.data!.map((element) {
+                                          return DropdownMenuItem(
+                                            value: element,
+                                            child: Text(
+                                                '${element.code} ${element.id != 0 ? formatPrice(element.value) : ''}'),
+                                          );
+                                        }).toList()
+                                      : [],
+                                  onChanged: (voucher) {
+                                    if (voucher != null && voucher.id != 0) {
+                                      dataProvider.setSelectedVoucher(voucher);
+                                    } else {
+                                      dataProvider.setSelectedVoucher(null);
+                                    }
+                                  },
                                 ),
-                                value: null,
-                                items: snapshot.hasData
-                                    ? snapshot.data!.map((element) {
-                                        return DropdownMenuItem(
-                                          value: element,
-                                          child: Text(
-                                              '${element.code} ${element.id != 0 ? formatPrice(element.value) : ''}'),
-                                        );
-                                      }).toList()
-                                    : [],
-                                onChanged: (voucher) {
-                                  if (voucher != null && voucher.id != 0) {
-                                    dataProvider.setSelectedVoucher(voucher);
-                                  } else {
-                                    dataProvider.setSelectedVoucher(null);
-                                  }
-                                },
-                              ),
-                  ),
+                    ),
                 ]
               ],
             ),

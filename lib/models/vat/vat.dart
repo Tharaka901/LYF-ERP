@@ -12,7 +12,7 @@ class Vat {
   });
 
   // Factory constructor to create a Vat instance from JSON
-  factory Vat.fromJson(Map<String, dynamic> json) {
+  factory Vat.fromJson(Map<dynamic, dynamic> json) {
     return Vat(
       id: json['id'] as int,
       vatAmount: json['vat_amount'] as String,

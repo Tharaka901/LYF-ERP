@@ -5,11 +5,12 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../commons/common_methods.dart';
 import '../../models/customer/customer_model.dart';
 import '../../models/route_card.dart';
+import '../../models/route_card/route_card_model.dart';
 import '../../providers/data_provider.dart';
-import '../../services/database.dart';
 import '../../screens/add_items_screen.dart';
 import '../../screens/qr_scan_screen.dart';
 import '../../config/styles.dart';
+import 'select_customer_view_model.dart';
 
 class SelectCustomerScreen extends StatefulWidget {
   static const routeId = 'BILLING';
@@ -32,7 +33,7 @@ class SelectCustomerScreen extends StatefulWidget {
 class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
   DataProvider? dataProvider;
   CustomerModel? selectedCustomer;
-  RouteCard? routeCard;
+  RouteCardModel? routeCard;
   bool? _isManual;
 
   final TextEditingController _qrController = TextEditingController();
@@ -103,7 +104,7 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
   AppBar _buildAppBar() {
     return AppBar(
       title: Text(
-        '${routeCard!.route.routeName} - ${routeCard!.date}',
+        '${routeCard!.route?.routeName} - ${routeCard!.date}',
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
     );
@@ -167,6 +168,7 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
   }
 
   Widget _buildCustomerSearch() {
+    final selectCustomerViewModel = SelectCustomerViewModel();
     return TypeAheadField<CustomerModel>(
       direction: VerticalDirection.up,
       onSelected: (customer) =>
@@ -181,7 +183,10 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
       ),
       loadingBuilder: (context) =>
           const Center(child: CircularProgressIndicator()),
-      suggestionsCallback: getCustomers,
+      suggestionsCallback: (pattern) async {
+        return await selectCustomerViewModel.onPressedSearchCustomerTextField(
+            pattern, context);
+      },
       builder: _buildSearchField,
     );
   }

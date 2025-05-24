@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/balance.dart';
-import 'package:gsr/models/issued_invoice.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
-
-import '../models/issued_invoice_paid.dart';
+import '../models/invoice/invoice_model.dart';
+import '../models/issued_invoice_paid_model/issued_invoice_paid.dart';
 
 class CreditInvoice extends StatefulWidget {
   final TextEditingController paymentController;
@@ -15,13 +14,13 @@ class CreditInvoice extends StatefulWidget {
   final int? invoiceId;
   final void Function(Balance selectedBalance) callBack;
   const CreditInvoice({
-    Key? key,
+    super.key,
     required this.paymentController,
     required this.formKey,
     required this.callBack,
     required this.balance,
     this.invoiceId,
-  }) : super(key: key);
+  });
 
   @override
   State<CreditInvoice> createState() => _CreditInvoiceState();
@@ -39,15 +38,15 @@ class _CreditInvoiceState extends State<CreditInvoice> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            FutureBuilder<List<IssuedInvoice>>(
+            FutureBuilder<List<InvoiceModel>>(
               future: creditInvoices(
                 context,
                 cId: dataProvider.selectedCustomer!.customerId,
                 type: 'with-cheque',
                 invoiceId: widget.invoiceId,
               ),
-              builder: (context, AsyncSnapshot<List<IssuedInvoice>> snapshot) {
-                return DropdownButtonFormField<IssuedInvoice>(
+              builder: (context, AsyncSnapshot<List<InvoiceModel>> snapshot) {
+                return DropdownButtonFormField<InvoiceModel>(
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
@@ -67,7 +66,7 @@ class _CreditInvoiceState extends State<CreditInvoice> {
                           return DropdownMenuItem(
                             value: element,
                             child: Text(
-                              '${element.invoiceNo}  ${formatPrice(element.creditValue)}',
+                              '${element.invoiceNo}  ${formatPrice(element.creditValue ?? 0)}',
                             ),
                           );
                         }).toList()
@@ -108,7 +107,7 @@ class _CreditInvoiceState extends State<CreditInvoice> {
                     return 'Maximum ${formatPrice(widget.balance - data.getTotalCreditPaymentAmount())}';
                   }
                   data.addPaidIssuedInvoice(
-                    IssuedInvoicePaid(
+                    IssuedInvoicePaidModel(
                       creditAmount: data.selectedInvoice!.creditValue,
                       issuedInvoice: data.selectedInvoice!,
                       chequeId: data.selectedInvoice?.chequeId,
