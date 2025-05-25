@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:gsr/models/customer.dart';
 import 'package:gsr/modules/select_customer/select_customer_screen.dart';
-import 'package:gsr/screens/previous_screen.dart';
+import 'package:gsr/modules/previous_customer_select/previous_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../commons/common_methods.dart';

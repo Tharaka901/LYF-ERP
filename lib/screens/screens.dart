@@ -9,6 +9,6 @@ export 'login_screen.dart';
 export 'overall_summary_screen.dart';
 export 'pending_rc_screen.dart';
 export 'previous_add_payment_screen.dart';
-export 'previous_screen.dart';
+export '../modules/previous_customer_select/previous_screen.dart';
 export 'route_card_screen.dart';
 export '../modules/start/start_view.dart';

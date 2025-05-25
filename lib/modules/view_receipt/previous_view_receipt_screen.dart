@@ -7,7 +7,7 @@ import 'package:gsr/services/database.dart';
 import 'package:gsr/widgets/confirm_for_save_and_print.dart';
 import 'package:provider/provider.dart';
 
-import '../../screens/previous_screen.dart';
+import '../previous_customer_select/previous_screen.dart';
 import '../print/print_invoice_view.dart';
 
 class PreviousViewReceiptScreen extends StatefulWidget {

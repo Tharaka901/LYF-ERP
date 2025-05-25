@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../commons/common_methods.dart';
 import '../../models/customer/customer_model.dart';
-import '../../models/route_card.dart';
 import '../../models/route_card/route_card_model.dart';
 import '../../providers/data_provider.dart';
 import '../../screens/add_items_screen.dart';

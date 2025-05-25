@@ -6,7 +6,7 @@ import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/modules/route_card/about_rc_screen.dart';
 import 'package:gsr/screens/invoice_summary_screen.dart';
 import 'package:gsr/screens/overall_summary_screen.dart';
-import 'package:gsr/screens/previous_screen.dart';
+import 'package:gsr/modules/previous_customer_select/previous_screen.dart';
 import 'package:gsr/screens/rc_summary_screen.dart';
 import 'package:gsr/modules/select_customer/select_customer_screen.dart';
 import 'package:gsr/screens/stock_screen.dart';

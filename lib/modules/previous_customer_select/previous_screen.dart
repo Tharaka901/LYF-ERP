@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
-import 'package:gsr/models/customer.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/screens/qr_scan_screen.dart';
 import 'package:gsr/screens/select_previous_invoice_screen.dart';
@@ -10,7 +9,7 @@ import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-import '../models/customer/customer_model.dart';
+import '../../models/customer/customer_model.dart';
 
 class PreviousScreen extends StatefulWidget {
   static const routeId = 'PREVIOUS';
