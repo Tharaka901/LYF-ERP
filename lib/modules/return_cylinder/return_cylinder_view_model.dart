@@ -140,9 +140,7 @@ class ReturnCylinderViewModel {
             "withoutVat": dataProvider.getTotalAmount(),
             "vatAmount": dataProvider.vat,
             "total": dataProvider.grandTotal,
-            "balance": (dataProvider.itemList
-                        .map((e) => e.item.salePrice * e.quantity)
-                        .reduce((value, element) => value + element) -
+            "balance": (dataProvider.grandTotal -
                     dataProvider.getTotalInvoicePaymentAmount())
                 .toStringAsFixed(2)
           },
