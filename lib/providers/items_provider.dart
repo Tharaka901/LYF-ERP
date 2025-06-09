@@ -27,7 +27,6 @@ class ItemsProvider extends ChangeNotifier {
       ))
           .where((element) => (element.transferQty - element.sellQty) != 0)
           .toList();
-
       final newItemsList = await getNewItems(
         routeCardId: routeCardId,
         priceLevelId: priceLevelId,
@@ -38,8 +37,6 @@ class ItemsProvider extends ChangeNotifier {
       isLoadingItems = false;
       notifyListeners();
     } else {
-      print("priceLevelId" + priceLevelId.toString());
-      print(hiveDBProvider.routeCardBasicItemBox!.get(priceLevelId));
       basicItems =
           hiveDBProvider.routeCardBasicItemBox!.get(priceLevelId)!.toList();
       newItems =

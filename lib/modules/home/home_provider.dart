@@ -7,11 +7,13 @@ import 'package:gsr/services/route_card_service.dart';
 import 'package:provider/provider.dart';
 
 import '../../commons/common_methods.dart';
+import '../../models/customer/customer_model.dart';
 import '../../models/local_db_models/6_customer_deposites_adapter.dart';
 import '../../providers/data_provider.dart';
 import '../../providers/hive_db_provider.dart';
 import '../../screens/pending_rc_screen.dart';
 import '../../services/customer_service.dart';
+import '../../services/item_service.dart';
 import '../../services/payment_service.dart';
 
 class HomeProvider extends ChangeNotifier {
@@ -19,6 +21,7 @@ class HomeProvider extends ChangeNotifier {
   final customerService = CustomerService();
   final paymentService = PaymentService();
   final invoiceService = InvoiceService();
+  final itemService = ItemService();
 
   List<RouteCardModel>? pendingRouteCards;
 
@@ -35,12 +38,6 @@ class HomeProvider extends ChangeNotifier {
       pendingRouteCards =
           await routeCardService.getPendingAndAcceptedRouteCards(
               dataProvider.currentEmployee!.employeeId!);
-      //! Save route card data in local DB
-      final routeCardDataMap = {
-        for (var e in pendingRouteCards!) e.routeCardId: e
-      };
-      await hiveDBProvider.routeCardBox!.clear();
-      await hiveDBProvider.routeCardBox!.putAll(routeCardDataMap);
     } else {
       pendingRouteCards = hiveDBProvider.routeCardBox?.values.toList() ?? [];
     }
@@ -73,19 +70,27 @@ class HomeProvider extends ChangeNotifier {
         //! Clear data
         await hiveDBProvider.customerDepositeBox!.clear();
         await hiveDBProvider.customerCreditBox!.clear();
+
         //! Get pending route cards
         final pendingRouteCards =
             await routeCardService.getPendingAndAcceptedRouteCards(
                 dataProvider.currentEmployee!.employeeId!);
-        //!Get invoice count and save to local DB
-        int invoiceCount = await invoiceService
-            .invoiceCount(pendingRouteCards[0].routeCardId!);
-        int invoiceCountLocalDb = hiveDBProvider.invoiceBox!.length;
-        await hiveDBProvider.dataBox!.put(
-            'invoiceCount', (invoiceCount + invoiceCountLocalDb).toString());
-        //!Get Customers
-        final customers = await customerService.getCustomers('',
+        //! Save route card data in local DB
+        final routeCardDataMap = {
+          for (var e in pendingRouteCards) e.routeCardId: e
+        };
+        await hiveDBProvider.routeCardBox!.clear();
+        await hiveDBProvider.routeCardBox!.putAll(routeCardDataMap);
+
+        //! Get customers
+        List<CustomerModel>? customers;
+        customers = await customerService.getCustomers("",
             routeId: pendingRouteCards[0].routeId);
+        //! Save customers data in local DB
+        final customersDataMap = {for (var e in customers) e.customerId: e};
+        await hiveDBProvider.customersBox!.clear();
+        await hiveDBProvider.customersBox!.putAll(customersDataMap);
+
         for (final customer in customers) {
           //!Save customer deposites data in local DB
           if (context.mounted) {
@@ -107,10 +112,54 @@ class HomeProvider extends ChangeNotifier {
                 .put(customer.customerId, credits);
           }
         }
+
+        //! Save route card items in local DB
+        final List<int> priceLevelIdList = [];
+        customers
+            .map((c) => c.priceLevelId)
+            .where((id) => id != null)
+            .forEach((id) {
+          if (!priceLevelIdList.contains(id)) {
+            priceLevelIdList.add(id!);
+          }
+        });
+        for (final id in priceLevelIdList) {
+          final basicItemList = (await itemService.getItemsByRoutecard(
+            routeCardId: pendingRouteCards[0].routeCardId!,
+            priceLevelId: id,
+            type: '',
+          ))
+              .where((element) => (element.transferQty - element.sellQty) != 0)
+              .toList();
+          final newItemsList = await itemService.getNewItems(
+            routeCardId: routeCardId,
+            priceLevelId: id,
+          );
+          final newItems =
+              newItemsList.where((i) => i.item?.itemTypeId != 3).toList();
+          final otherItems =
+              newItemsList.where((i) => i.item?.itemTypeId == 3).toList();
+          try {
+            await hiveDBProvider.routeCardBasicItemBox!.put(id, basicItemList);
+            await hiveDBProvider.routeCardNewItemBox!.put(id, newItems);
+            await hiveDBProvider.routeCardOtherItemBox!.put(id, otherItems);
+          } catch (e) {
+            if (kDebugMode) {
+              print(e.toString());
+            }
+          }
+        }
+
+        //!Get invoice count and save to local DB
+        int invoiceCount = await invoiceService
+            .invoiceCount(pendingRouteCards[0].routeCardId!);
+        int invoiceCountLocalDb = hiveDBProvider.invoiceBox!.length;
+        await hiveDBProvider.dataBox!.put(
+            'invoiceCount', (invoiceCount + invoiceCountLocalDb).toString());
+
         if (context.mounted) {
           pop(context);
         }
-
         toast(
           'Success',
           toastState: TS.success,

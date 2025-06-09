@@ -16,8 +16,9 @@ class PaymentProvider extends ChangeNotifier {
     final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
     if (hiveDBProvider.isInternetConnected) {
       final receiptCount = await paymentService.getReceiptCount(context);
+      int localDBReceiptCount = hiveDBProvider.dataBox!.length;
       receiptNumber =
-          'R/${dataProvider.currentRouteCard!.routeCardNo}/${receiptCount + 1}';
+          'R/${dataProvider.currentRouteCard!.routeCardNo}/${receiptCount + localDBReceiptCount + 1}';
       //!Save receipt count in local DB
       await hiveDBProvider.dataBox!
           .put('receiptCount', receiptCount.toString());
