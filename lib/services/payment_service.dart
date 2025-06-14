@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../commons/common_methods.dart';
+import '../models/credit_invoice_pay_from_diposites/credit_invoice_pay_from_diposites_data_model.dart';
 import '../models/credit_payment/credit_payment_model.dart';
 import '../models/payment/payment_model.dart';
 import '../models/payment_data/payment_data_model.dart';
@@ -11,7 +12,6 @@ import '../modules/invoice/invoice_provider.dart';
 import '../providers/data_provider.dart';
 
 class PaymentService {
-
   Future<int> getReceiptCount(BuildContext context) async {
     final routeCard = context.read<DataProvider>().currentRouteCard!;
     final response = await respo('payment/count/?id=${routeCard.routeCardId}');
@@ -72,14 +72,11 @@ class PaymentService {
           method: Method.put,
           data: {
             "overPaymentsPayList": [
-              ...paymentDataModel.issuedDepositePaidList
-                  .map((e) => {
-                        "value": (e.depositeValue! - e.paymentAmount).toInt(),
-                        "customerId":
-                            paymentDataModel.selectedCustomer.customerId,
-                        "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
-                      })
-                  
+              ...paymentDataModel.issuedDepositePaidList.map((e) => {
+                    "value": (e.depositeValue! - e.paymentAmount).toInt(),
+                    "customerId": paymentDataModel.selectedCustomer.customerId,
+                    "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
+                  })
             ]
           },
         );
@@ -288,49 +285,51 @@ class PaymentService {
     }).then((invoiceResponse) async {
       final invoiceId = invoiceResponse.data['invoiceId'] as int;
       final rn = paymentDataModel.receiptNo;
-      //await getReceiptNumber(context).then((rn) async {
-      for (var invoice in paymentDataModel.issuedInvoicePaidList ?? []) {
-        final data = {
-          "value": invoice.paymentAmount,
-          "paymentInvoiceId": invoiceId,
-          "routecardId": paymentDataModel.currentRouteCard.routeCardId,
-          "creditInvoiceId": invoice.chequeId ?? invoice.issuedInvoice.invoiceId,
-          "receiptNo": rn,
-          "status": invoice.chequeId != null ? 3 : 1,
-          "type": invoice.chequeId != null ? "return-cheque" : 'default'
-        };
-        await respo('credit-payment/create', method: Method.post, data: data);
-        if (invoice.creditAmount! <= invoice.paymentAmount &&
-            invoice.chequeId == null) {
-          await respo('invoice/update', method: Method.put, data: {
-            "invoiceId": invoice.issuedInvoice.invoiceId,
-            "status": 2
-          });
-        } else {
-          try {
-            if (kDebugMode) {
-              print(invoice.issuedInvoice.toJsonWithId());
-            }
+      if ((paymentDataModel.issuedInvoicePaidList ?? []).isNotEmpty) {
+        for (var invoice in paymentDataModel.issuedInvoicePaidList!) {
+          final data = {
+            "value": invoice.paymentAmount,
+            "paymentInvoiceId": invoiceId,
+            "routecardId": paymentDataModel.currentRouteCard.routeCardId,
+            "creditInvoiceId":
+                invoice.chequeId ?? invoice.invoiceId,
+            "receiptNo": rn,
+            "status": invoice.chequeId != null ? 3 : 1,
+            "type": invoice.chequeId != null ? "return-cheque" : 'default'
+          };
+          await respo('credit-payment/create', method: Method.post, data: data);
+          if (invoice.creditAmount! <= invoice.paymentAmount &&
+              invoice.chequeId == null) {
             await respo('invoice/update', method: Method.put, data: {
               "invoiceId": invoice.issuedInvoice.invoiceId,
-              "creditValue": invoice.creditAmount - invoice.paymentAmount
+              "status": 2
             });
-          } catch (e) {
-            if (kDebugMode) {
-              print(e);
+          } else {
+            try {
+              if (kDebugMode) {
+                print(invoice.issuedInvoice.toJsonWithId());
+              }
+              await respo('invoice/update', method: Method.put, data: {
+                "invoiceId": invoice.issuedInvoice.invoiceId,
+                "creditValue": invoice.creditAmount! - invoice.paymentAmount
+              });
+            } catch (e) {
+              if (kDebugMode) {
+                print(e);
+              }
             }
           }
-        }
-        if (invoice.chequeId != null) {
-          if (invoice.creditAmount! <= invoice.paymentAmount) {
-            await respo('cheque/update',
-                method: Method.put,
-                data: {"id": invoice.chequeId, "isActive": 2, "balance": 0});
-          } else {
-            await respo('cheque/update', method: Method.put, data: {
-              "id": invoice.chequeId,
-              "balance": invoice.creditAmount! - invoice.paymentAmount
-            });
+          if (invoice.chequeId != null) {
+            if (invoice.creditAmount! <= invoice.paymentAmount) {
+              await respo('cheque/update',
+                  method: Method.put,
+                  data: {"id": invoice.chequeId, "isActive": 2, "balance": 0});
+            } else {
+              await respo('cheque/update', method: Method.put, data: {
+                "id": invoice.chequeId,
+                "balance": invoice.creditAmount! - invoice.paymentAmount
+              });
+            }
           }
         }
       }
@@ -448,14 +447,11 @@ class PaymentService {
           method: Method.put,
           data: {
             "overPaymentsPayList": [
-              ...paymentDataModel.issuedDepositePaidList
-                  .map((e) => {
-                        "value": (e.depositeValue! - e.paymentAmount).toInt(),
-                        "customerId":
-                            paymentDataModel.selectedCustomer.customerId,
-                        "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
-                      })
-                  
+              ...paymentDataModel.issuedDepositePaidList.map((e) => {
+                    "value": (e.depositeValue! - e.paymentAmount).toInt(),
+                    "customerId": paymentDataModel.selectedCustomer.customerId,
+                    "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
+                  })
             ]
           },
         );
@@ -475,10 +471,11 @@ class PaymentService {
           method: Method.put,
           data: {
             "customerId": paymentDataModel.selectedCustomer.customerId,
-            "depositBalance": paymentDataModel.selectedCustomer.depositBalance! -
-                paymentDataModel.issuedDepositePaidList
-                    .map((e) => e.paymentAmount)
-                    .reduce((value, element) => value + element),
+            "depositBalance":
+                paymentDataModel.selectedCustomer.depositBalance! -
+                    paymentDataModel.issuedDepositePaidList
+                        .map((e) => e.paymentAmount)
+                        .reduce((value, element) => value + element),
           },
         );
       }
@@ -600,8 +597,9 @@ class PaymentService {
           method: Method.put,
           data: {
             "customerId": paymentDataModel.selectedCustomer.customerId,
-            "depositBalance": paymentDataModel.selectedCustomer.depositBalance! +
-                paymentDataModel.balance,
+            "depositBalance":
+                paymentDataModel.selectedCustomer.depositBalance! +
+                    paymentDataModel.balance,
           },
         );
         await respo(
@@ -627,6 +625,111 @@ class PaymentService {
       if (kDebugMode) {
         print(e.toString());
       }
+      rethrow;
+    }
+  }
+
+  //! Pay credit invoice from customer deposites
+  Future<void> payFromDeposite(
+      CreditInvoicePayFromDipositesDataModel
+          creditInvoicePayFromDipositesDataModel) async {
+    try {
+      await respo(
+        'over-payment/update',
+        method: Method.put,
+        data: {
+          "overPaymentsPayList": [
+            {
+              "value": creditInvoicePayFromDipositesDataModel.depositeValue -
+                  creditInvoicePayFromDipositesDataModel.payValue,
+              "customerId": creditInvoicePayFromDipositesDataModel.customerId,
+              "paymentInvoiceId":
+                  creditInvoicePayFromDipositesDataModel.paymentInvoiceId,
+              "receiptNo":
+                  creditInvoicePayFromDipositesDataModel.depositeReceiptNo
+            }
+          ]
+        },
+      );
+
+      await respo(
+        'customers/update',
+        method: Method.put,
+        data: {
+          "customerId": creditInvoicePayFromDipositesDataModel.customerId,
+          "depositBalance":
+              creditInvoicePayFromDipositesDataModel.customerDepositeValue -
+                  creditInvoicePayFromDipositesDataModel.payValue,
+        },
+      );
+
+      final data = {
+        "value": creditInvoicePayFromDipositesDataModel.payValue,
+        "paymentInvoiceId":
+            creditInvoicePayFromDipositesDataModel.depositeStatus == 2
+                ? creditInvoicePayFromDipositesDataModel.paymentInvoiceId
+                : creditInvoicePayFromDipositesDataModel.depositeId,
+        "routecardId": creditInvoicePayFromDipositesDataModel.routeCardId,
+        "creditInvoiceId": creditInvoicePayFromDipositesDataModel.chequeId ??
+            creditInvoicePayFromDipositesDataModel.creditInvoiceId,
+        "receiptNo": creditInvoicePayFromDipositesDataModel.depositeReceiptNo,
+        "status": creditInvoicePayFromDipositesDataModel.chequeId != null
+            ? 5
+            : creditInvoicePayFromDipositesDataModel.depositeStatus == 2
+                ? 6
+                : 1,
+        "createdAt": creditInvoicePayFromDipositesDataModel.depositeCreatedDate,
+        "type": creditInvoicePayFromDipositesDataModel.chequeId != null
+            ? "return-cheque"
+            : 'default'
+      };
+      await respo('credit-payment/create', method: Method.post, data: data);
+
+      if (creditInvoicePayFromDipositesDataModel.crediteInvoiceValue <=
+              creditInvoicePayFromDipositesDataModel.payValue &&
+          creditInvoicePayFromDipositesDataModel.chequeId == null) {
+        await respo('invoice/update', method: Method.put, data: {
+          "invoiceId": creditInvoicePayFromDipositesDataModel.creditInvoiceId,
+          "status": 2
+        });
+      }
+
+      if (creditInvoicePayFromDipositesDataModel.chequeId != null) {
+        if (creditInvoicePayFromDipositesDataModel.crediteInvoiceValue <=
+            creditInvoicePayFromDipositesDataModel.payValue) {
+          await respo('cheque/update', method: Method.put, data: {
+            "id": creditInvoicePayFromDipositesDataModel.chequeId,
+            "isActive": 2,
+            "balance": 0
+          });
+        } else {
+          await respo('cheque/update', method: Method.put, data: {
+            "id": creditInvoicePayFromDipositesDataModel.chequeId,
+            "balance":
+                creditInvoicePayFromDipositesDataModel.crediteInvoiceValue -
+                    creditInvoicePayFromDipositesDataModel.payValue
+          });
+        }
+      }
+
+      //! Update return cylinder invoice balance
+      if (creditInvoicePayFromDipositesDataModel.depositeStatus == 2) {
+        await respo('return-cylinder-invoice/update',
+            method: Method.put,
+            data: {
+              "invoiceNo":
+                  creditInvoicePayFromDipositesDataModel.depositeReceiptNo,
+              "balance":
+                  creditInvoicePayFromDipositesDataModel.crediteInvoiceValue -
+                      creditInvoicePayFromDipositesDataModel.payValue,
+              "status": creditInvoicePayFromDipositesDataModel.depositeValue -
+                          creditInvoicePayFromDipositesDataModel.payValue ==
+                      0
+                  ? 2
+                  : 1
+            });
+      }
+    } catch (e) {
       rethrow;
     }
   }

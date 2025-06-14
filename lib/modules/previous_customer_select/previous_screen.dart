@@ -4,12 +4,12 @@ import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/screens/qr_scan_screen.dart';
-import 'package:gsr/screens/select_previous_invoice_screen.dart';
-import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../models/customer/customer_model.dart';
+import '../select_customer/select_customer_view_model.dart';
+import '../select_previous_invoice/select_previous_invoice_screen.dart';
 
 class PreviousScreen extends StatefulWidget {
   static const routeId = 'PREVIOUS';
@@ -34,6 +34,7 @@ class _PreviousScreenState extends State<PreviousScreen> {
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
+    final selectCustomerViewModel = SelectCustomerViewModel();
     final selectedCustomer = dataProvider.selectedCustomer;
     return Scaffold(
       appBar: AppBar(
@@ -85,7 +86,10 @@ class _PreviousScreenState extends State<PreviousScreen> {
                   ),
                   loadingBuilder: (context) =>
                       const Center(child: CircularProgressIndicator()),
-                  suggestionsCallback: (pattern) => getCustomers(pattern),
+                  suggestionsCallback: (pattern) async {
+                    return await selectCustomerViewModel
+                        .onPressedSearchCustomerTextField(pattern, context);
+                  },
                   builder: (context, controller, focusNode) {
                     return TextField(
                       controller: controller,
@@ -126,7 +130,7 @@ class _PreviousScreenState extends State<PreviousScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
                 const SizedBox(
                   height: 10.0,
                 ),
@@ -143,8 +147,8 @@ class _PreviousScreenState extends State<PreviousScreen> {
                       ),
                       style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.all(Colors.blue[800]),
-                        shape: MaterialStateProperty.all(
+                            WidgetStateProperty.all(Colors.blue[800]),
+                        shape: WidgetStateProperty.all(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
                           ),

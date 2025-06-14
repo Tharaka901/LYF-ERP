@@ -23,7 +23,7 @@ Future confirmForSaveAndPrint(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               IconButton(
-                icon: Icon(Icons.cancel),
+                icon: const Icon(Icons.cancel),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -39,14 +39,14 @@ Future confirmForSaveAndPrint(
                   height: 55,
                   width: 55,
                 ),
-                Text(
+                const Text(
                   'Save',
                   style: style,
                 ),
               ],
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           TextButton(
             onPressed: onSaveAndPrint,
             child: Column(
@@ -56,7 +56,7 @@ Future confirmForSaveAndPrint(
                   height: 55,
                   width: 55,
                 ),
-                Text(
+                const Text(
                   'Save And Print',
                   style: style,
                 ),

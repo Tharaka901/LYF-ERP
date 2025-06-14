@@ -24,7 +24,8 @@ class DataProvider extends ChangeNotifier {
   final _rcItemList = <RouteCardItemModel>[];
   final _paidBalanceList = <PaidBalance>[];
   final _issuedInvoicePaidList = <IssuedInvoicePaidModel>[];
-  List<IssuedDepositePaidModel> issuedDepositePaidList = <IssuedDepositePaidModel>[];
+  List<IssuedDepositePaidModel> issuedDepositePaidList =
+      <IssuedDepositePaidModel>[];
   InvoiceModel? _currentInvoice;
   CustomerDeposite? selectedDeposite;
   VoucherModel? _selectedVoucher;
@@ -43,7 +44,8 @@ class DataProvider extends ChangeNotifier {
   List<ChequeModel> get chequeList => _chequeList;
   List<RouteCardItemModel> get rcItemList => _rcItemList;
   List<PaidBalance> get paidBalanceList => _paidBalanceList;
-  List<IssuedInvoicePaidModel> get issuedInvoicePaidList => _issuedInvoicePaidList;
+  List<IssuedInvoicePaidModel> get issuedInvoicePaidList =>
+      _issuedInvoicePaidList;
 
   //! Calculate total amount of non-VAT items
   double get nonVatItemTotal => itemList.isEmpty

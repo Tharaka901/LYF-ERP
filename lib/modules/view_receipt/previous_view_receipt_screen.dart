@@ -3,18 +3,19 @@ import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/providers/payment_provider.dart';
-import 'package:gsr/services/database.dart';
 import 'package:gsr/widgets/confirm_for_save_and_print.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/database.dart';
 import '../previous_customer_select/previous_screen.dart';
 import '../print/print_invoice_view.dart';
+import 'invoice_receipt_view_model.dart';
 
 class PreviousViewReceiptScreen extends StatefulWidget {
   static const routeId = 'PREVIOUS_RECEIPT';
   const PreviousViewReceiptScreen({
-    super.key,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<PreviousViewReceiptScreen> createState() =>
@@ -35,6 +36,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final invoiceReceiptViewModel = InvoiceReceiptViewModel();
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     final double cash = (ModalRoute.of(context)!.settings.arguments
         as Map<String, dynamic>)['cash'];
@@ -96,7 +98,8 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                               ),
                               Expanded(
                                 child: Text(
-                                    dataProvider.selectedCustomer!.businessName ?? '',
+                                    dataProvider
+                                        .selectedCustomer!.businessName!,
                                     // textAlign: TextAlign.,
                                     style: const TextStyle(fontSize: 18.0),
                                     maxLines: 2,
@@ -196,7 +199,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
-                              formatPrice(invoice.paymentAmount)
+                              price(invoice.paymentAmount)
                                   .replaceAll('Rs.', ''),
                               textAlign: TextAlign.end,
                               style: const TextStyle(fontSize: 16.0),
@@ -278,7 +281,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                         Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: Text(
-                            formatPrice(cash).replaceAll('Rs.', ''),
+                            price(cash).replaceAll('Rs.', ''),
                             textAlign: TextAlign.end,
                             style: const TextStyle(fontSize: 16.0),
                           ),
@@ -306,7 +309,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
-                              formatPrice(dataProvider
+                              price(dataProvider
                                       .getTotalDepositePaymentAmount())
                                   .replaceAll('Rs.', ''),
                               textAlign: TextAlign.end,
@@ -336,8 +339,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
-                              formatPrice(cheque.chequeAmount)
-                                  .replaceAll('Rs.', ''),
+                              price(cheque.chequeAmount).replaceAll('Rs.', ''),
                               textAlign: TextAlign.end,
                               style: const TextStyle(fontSize: 16.0),
                             ),
@@ -374,7 +376,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                                           dataProvider.selectedVoucher!.value ==
                                               0)
                                       ? '0.00'
-                                      : formatPrice(dataProvider
+                                      : price(dataProvider
                                               .selectedVoucher!.value)
                                           .replaceAll('Rs.', ''),
                                   textAlign: TextAlign.end,
@@ -412,7 +414,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                           ),
                           const Spacer(),
                           Text(
-                            formatPrice(dataProvider.getTotalChequeAmount() +
+                            price(dataProvider.getTotalChequeAmount() +
                                 dataProvider.getTotalDepositePaymentAmount() +
                                 cash +
                                 (dataProvider.selectedVoucher != null
@@ -441,8 +443,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                           ),
                           const Spacer(),
                           Text(
-                            formatPrice(
-                                dataProvider.getTotalInvoicePaymentAmount()),
+                            price(dataProvider.getTotalInvoicePaymentAmount()),
                             textAlign: TextAlign.end,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
@@ -485,14 +486,14 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                   ),
                 );
               }),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 height: 60.0,
                 child: Consumer<PaymentProvider>(
                     builder: (context, paymentProvider, _) {
                   return paymentProvider.receiptNumber == null
-                      ? CircularProgressIndicator(
+                      ? const CircularProgressIndicator(
                           value: 10,
                         )
                       : OutlinedButton(
@@ -508,20 +509,17 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                               return;
                             }
                             waiting(context, body: 'Sending...');
-                            await sendCreditPayment(
-                              context,
-                              dataProvider.getTotalChequeAmount() +
-                                  cash +
-                                  (dataProvider.selectedVoucher != null
-                                      ? dataProvider.selectedVoucher!.value
-                                      : 0.0),
-                              cash,
-                              false,
-                              0,
+                            await invoiceReceiptViewModel
+                                .pay(
+                              context: context,
+                              cash: cash,
+                              isDirectPrevious: false,
+                              balance: 0,
                               receiptNo: dataProvider.isManualReceipt
                                   ? _usernameController.text
                                   : null,
-                            ).then((value) {
+                            )
+                                .then((value) {
                               Navigator.popUntil(context,
                                   ModalRoute.withName(PreviousScreen.routeId));
                               toast(
@@ -542,19 +540,28 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
 
                             Future<void> onSaveData() async {
                               waiting(context, body: 'Sending...');
-                              await sendCreditPayment(
-                                  context,
-                                  dataProvider.getTotalChequeAmount() +
-                                      cash +
-                                      (dataProvider.selectedVoucher != null
-                                          ? dataProvider.selectedVoucher!.value
-                                          : 0.0),
-                                  cash,
-                                  false,
-                                  0,
-                                  receiptNo: dataProvider.isManualReceipt
-                                      ? _usernameController.text
-                                      : null);
+                              await invoiceReceiptViewModel.pay(
+                                context: context,
+                                cash: cash,
+                                isDirectPrevious: false,
+                                balance: 0,
+                                receiptNo: dataProvider.isManualReceipt
+                                    ? _usernameController.text
+                                    : null,
+                              );
+                              // await sendCreditPayment(
+                              //     context,
+                              //     dataProvider.getTotalChequeAmount() +
+                              //         cash +
+                              //         (dataProvider.selectedVoucher != null
+                              //             ? dataProvider.selectedVoucher!.value
+                              //             : 0.0),
+                              //     cash,
+                              //     false,
+                              //     0,
+                              //     receiptNo: dataProvider.isManualReceipt
+                              //         ? _usernameController.text
+                              //         : null);
 
                               dataProvider.issuedDepositePaidList.clear();
                               dataProvider.chequeList.clear();
@@ -583,8 +590,8 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                           }),
                           style: ButtonStyle(
                             backgroundColor:
-                                MaterialStateProperty.all(Colors.green[700]),
-                            shape: MaterialStateProperty.all(
+                                WidgetStateProperty.all(Colors.green[700]),
+                            shape: WidgetStateProperty.all(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                               ),

@@ -183,6 +183,8 @@ class HomeProvider extends ChangeNotifier {
     waiting(context, body: 'Sync...');
     final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
     if (hiveDBProvider.isInternetConnected) {
+        //   await hiveDBProvider.invoiceBox!.clear();
+        // await hiveDBProvider.paymentsBox!.clear();
       try {
         for (final invoice in hiveDBProvider.invoiceBox!.values) {
           final invoiceRes = await invoiceService.createInvoice({
@@ -203,21 +205,32 @@ class HomeProvider extends ChangeNotifier {
               }
             } else if (!paymentData.isDirectPrevoius!) {
               paymentData.invoiceNo = invoiceRes.data['invoice']['invoiceNo'];
-              await paymentService.sendCreditPayment(context, paymentData);
+              print('Payment Data: ${paymentData.issuedInvoicePaidList![0].invoiceId}');
+              if (context.mounted) {
+                await paymentService.sendCreditPayment(context, paymentData);
+              }
             } else {
-              await paymentService.pay(
-                context: context,
-                paymentDataModel: paymentData,
-              );
+              if (context.mounted) {
+                await paymentService.pay(
+                  context: context,
+                  paymentDataModel: paymentData,
+                );
+              }
             }
           }
         }
         await hiveDBProvider.invoiceBox!.clear();
         await hiveDBProvider.paymentsBox!.clear();
-        pop(context);
+        if (context.mounted) {
+          pop(context);
+        }
       } catch (e) {
-        pop(context);
-        print(e);
+        if (context.mounted) {
+          pop(context);
+        }
+        if (kDebugMode) {
+          print(e);
+        }
       }
     } else {
       pop(context);

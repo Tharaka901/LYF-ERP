@@ -16,7 +16,7 @@ class SelectPreviousInvoiceScreen extends StatefulWidget {
   final bool? isDirectPrevoius;
   final String? overPaymentAmount;
   const SelectPreviousInvoiceScreen(
-      {Key? key, this.isDirectPrevoius = true, this.overPaymentAmount = '0'});
+      {super.key, this.isDirectPrevoius = true, this.overPaymentAmount = '0'});
 
   @override
   State<SelectPreviousInvoiceScreen> createState() =>
@@ -84,7 +84,7 @@ class _SelectPreviousInvoiceScreenState
                     future: creditInvoices(context,
                         cId: selectedCustomer.customerId, type: 'with-cheque'),
                     builder:
-                          (context, AsyncSnapshot<List<InvoiceModel>> snapshot) {
+                        (context, AsyncSnapshot<List<InvoiceModel>> snapshot) {
                       return snapshot.connectionState == ConnectionState.waiting
                           ? const CircularProgressIndicator()
                           : SizedBox(
@@ -95,8 +95,8 @@ class _SelectPreviousInvoiceScreenState
                                   children: [
                                     Expanded(
                                       flex: 3,
-                                      child: DropdownButtonFormField<
-                                          InvoiceModel>(
+                                      child:
+                                          DropdownButtonFormField<InvoiceModel>(
                                         decoration: InputDecoration(
                                           border: OutlineInputBorder(
                                             borderRadius:
@@ -152,15 +152,14 @@ class _SelectPreviousInvoiceScreenState
                                                 .validate()) {
                                               final amountController =
                                                   TextEditingController(
-                                                      text: data
-                                                          .selectedInvoice!
-                                                          .creditValue !=
-                                                          null
-                                                      ? data
-                                                          .selectedInvoice!
-                                                          .creditValue!
-                                                          .toString()
-                                                      : '');
+                                                      text: data.selectedInvoice!
+                                                                  .creditValue !=
+                                                              null
+                                                          ? data
+                                                              .selectedInvoice!
+                                                              .creditValue!
+                                                              .toString()
+                                                          : '');
                                               final formKey =
                                                   GlobalKey<FormState>();
 
@@ -180,7 +179,7 @@ class _SelectPreviousInvoiceScreenState
                                                   if (formKey.currentState!
                                                       .validate()) {
                                                     data.addPaidIssuedInvoice(
-                                                        IssuedInvoicePaidModel(
+                                                      IssuedInvoicePaidModel(
                                                         chequeId: dataProvider
                                                             .selectedInvoice!
                                                             .chequeId,
@@ -322,8 +321,10 @@ class _SelectPreviousInvoiceScreenState
                                 await respo('credit-payment/create',
                                     method: Method.post, data: data);
 
-                                if (dataProvider.selectedInvoice!.creditValue != null &&
-                                        dataProvider.selectedInvoice!.creditValue! <=
+                                if (dataProvider.selectedInvoice!.creditValue !=
+                                        null &&
+                                    dataProvider
+                                            .selectedInvoice!.creditValue! <=
                                         double.parse(paymentController.text) &&
                                     dataProvider.selectedInvoice?.chequeId ==
                                         null) {
@@ -338,10 +339,12 @@ class _SelectPreviousInvoiceScreenState
                                 if (dataProvider.selectedInvoice!.chequeId !=
                                     null) {
                                   if (dataProvider
-                                          .selectedInvoice!.creditValue != null &&
-                                          dataProvider
-                                                  .selectedInvoice!.creditValue! <=
-                                      double.parse(paymentController.text)) {
+                                              .selectedInvoice!.creditValue !=
+                                          null &&
+                                      dataProvider
+                                              .selectedInvoice!.creditValue! <=
+                                          double.parse(
+                                              paymentController.text)) {
                                     await respo('cheque/update',
                                         method: Method.put,
                                         data: {
@@ -357,14 +360,14 @@ class _SelectPreviousInvoiceScreenState
                                           "id": dataProvider
                                               .selectedInvoice!.chequeId,
                                           "balance": dataProvider
-                                                  .selectedInvoice!
-                                                  .creditValue != null
-                                                      ? dataProvider
-                                                          .selectedInvoice!
-                                                          .creditValue! -
-                                                        double.parse(
-                                                            paymentController.text)
-                                                      : 0
+                                                      .selectedInvoice!
+                                                      .creditValue !=
+                                                  null
+                                              ? dataProvider.selectedInvoice!
+                                                      .creditValue! -
+                                                  double.parse(
+                                                      paymentController.text)
+                                              : 0
                                         });
                                   }
                                 }
@@ -482,13 +485,12 @@ class _SelectPreviousInvoiceScreenState
                                                 ),
                                                 cell(
                                                   invoice.issuedInvoice
-                                                      .createdAt !=
-                                                  null
+                                                              .createdAt !=
+                                                          null
                                                       ? date(
-                                                          DateTime.parse(
-                                                              invoice
-                                                                  .issuedInvoice
-                                                                  .createdAt!),
+                                                          DateTime.parse(invoice
+                                                              .issuedInvoice
+                                                              .createdAt!),
                                                           format: 'dd-MM-yyyy')
                                                       : '',
                                                   align: TextAlign.center,

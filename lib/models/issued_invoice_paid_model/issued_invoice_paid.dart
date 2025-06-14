@@ -7,21 +7,23 @@ class IssuedInvoicePaidModel {
   final double paymentAmount;
   final double? creditAmount;
   final int? chequeId;
+  final int? invoiceId;
 
   IssuedInvoicePaidModel({
     required this.issuedInvoice,
     required this.paymentAmount,
     this.creditAmount,
     this.chequeId,
+    this.invoiceId,
   });
 
   factory IssuedInvoicePaidModel.fromJson(Map<dynamic, dynamic> json) {
     return IssuedInvoicePaidModel(
-      issuedInvoice:  InvoiceModel.fromJson(json['issuedInvoice']),
-      paymentAmount: json['paymentAmount'],
-      creditAmount: json['creditAmount'],
-      chequeId: json['chequeId'],
-    );
+        issuedInvoice: InvoiceModel.fromJson(json['issuedInvoice']),
+        paymentAmount: json['paymentAmount'],
+        creditAmount: json['creditAmount'],
+        chequeId: json['chequeId'],
+        invoiceId: json['invoiceId']);
   }
 
   Map<dynamic, dynamic> toJson() {
@@ -31,6 +33,7 @@ class IssuedInvoicePaidModel {
     };
     if (creditAmount != null) data['creditAmount'] = creditAmount;
     if (chequeId != null) data['chequeId'] = chequeId;
+    if (invoiceId != null) data['invoiceId'] = invoiceId;
     return data;
   }
 }

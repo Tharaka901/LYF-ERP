@@ -598,28 +598,6 @@ Future<void> updateRouteCard({
   });
 }
 
-Future<List<CustomerModel>> getCustomers(String pattern) async {
-  try {
-    final response = await respo('customers/get-all');
-    List<dynamic> list = response.data;
-    return list
-        .map((element) => CustomerModel.fromJson(element))
-        .where((element) =>
-            element.businessName!
-                .toLowerCase()
-                .contains(pattern.toLowerCase()) ||
-            element.registrationId!
-                .toLowerCase()
-                .contains(pattern.toLowerCase()))
-        .toList();
-  } on Exception {
-    toast(
-      'Connection error',
-      toastState: TS.error,
-    );
-    return [];
-  }
-}
 
 Future<Respo> createInvoice(BuildContext context, {String? invoiceNu}) async {
   try {
