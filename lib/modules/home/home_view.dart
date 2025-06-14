@@ -22,6 +22,27 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'sync_from_db') {
+                homeProvider.onPreesedSyncDataFromDBButton(context);
+              } else if (value == 'sync_to_db') {
+                homeProvider.onPressedSyncDataToDBButton(context);
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'sync_from_db',
+                child: Text('Sync Data From DB'),
+              ),
+              const PopupMenuItem(
+                value: 'sync_to_db',
+                child: Text('Sync Data To DB'),
+              ),
+            ],
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -87,26 +108,6 @@ class HomeScreen extends StatelessWidget {
                       height: 50.0,
                     ),
                     CustomOutlineButton(
-                      text: 'Sync Data From DB',
-                      onPressed: () {
-                        homeProvider.onPreesedSyncDataFromDBButton(context);
-                      },
-                      color: Colors.blue[600],
-                    ),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                    CustomOutlineButton(
-                      text: 'Sync Data To DB',
-                      onPressed: () {
-                        homeProvider.onPressedSyncDataToDBButton(context);
-                      },
-                      color: Colors.blue[600],
-                    ),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                    CustomOutlineButton(
                       text: 'Change password',
                       onPressed: () {},
                       color: Colors.blue[600],
@@ -116,6 +117,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     CustomOutlineButton(
                       text: 'Logout',
+                      color: Colors.blue[600],
                       onPressed: () => confirm(
                         context,
                         title: 'Logout',
