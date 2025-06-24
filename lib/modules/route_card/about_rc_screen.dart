@@ -26,6 +26,16 @@ class AboutRCScreen extends StatelessWidget {
         child: ListView(
           children: [
             DetailCard(
+              detailKey: 'Route',
+              detailvalue:
+                  dataProvider.currentRouteCard?.route?.routeName ?? "",
+            ),
+            DetailCard(
+              detailKey: 'Vehicle Number',
+              detailvalue:
+                  dataProvider.currentRouteCard?.vehicle?.registrationNumber ?? "",
+            ),
+            DetailCard(
               detailKey: 'Driver',
               detailvalue:
                   '${dataProvider.currentEmployee!.firstName} ${dataProvider.currentEmployee!.lastName}',

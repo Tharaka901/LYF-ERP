@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:gsr/models/related_employee/related_employee_model.dart';
 import 'package:gsr/models/route/route_model.dart';
 
+import '../vehicle/vehicle.dart';
+
 RouteCardModel routeCardModelFromJson(String str) =>
     RouteCardModel.fromJson(json.decode(str));
 
@@ -14,6 +16,7 @@ class RouteCardModel {
   final DateTime? date;
   final int? routeId;
   final int? vehicleId;
+  final Vehicle? vehicle;
   int? status;
   final RouteModel? route;
   final List<RelatedEmployeeModel>? relatedEmployees;
@@ -27,6 +30,7 @@ class RouteCardModel {
     this.status,
     this.route,
     this.relatedEmployees,
+    this.vehicle,
   });
 
   RouteCardModel acceptedRouteCard() {
@@ -45,6 +49,9 @@ class RouteCardModel {
         date: json["date"] == null ? null : DateTime.parse(json["date"]),
         routeId: json["routeId"],
         vehicleId: json["vehicleId"],
+        vehicle: json["vehicle"] == null
+            ? null
+            : Vehicle.fromJson(json["vehicle"]),
         status: json["status"],
         route:
             json["route"] == null ? null : RouteModel.fromJson(json["route"]),
@@ -61,6 +68,7 @@ class RouteCardModel {
             "${date?.year.toString().padLeft(4, '0')}-${date?.month.toString().padLeft(2, '0')}-${date?.day.toString().padLeft(2, '0')}",
         "routeId": routeId,
         "vehicleId": vehicleId,
+        "vehicle": vehicle?.toJson(),
         "status": status,
         "route": route?.toJson(),
         "relatedEmployees": relatedEmployees == null

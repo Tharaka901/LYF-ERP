@@ -27,7 +27,10 @@ class StartViewModel {
           pop(context);
           if (respo.success) {
             final employee = EmployeeModel.fromJson(respo.data);
-            hiveDBProvider.employeeBox?.put(employee.employeeId, employee);
+            await hiveDBProvider.employeeBox
+                ?.clear(); // Clear previous employee data
+            await hiveDBProvider.employeeBox
+                ?.put(employee.employeeId, employee);
             dataProvider.setCurrentEmployee(EmployeeModel.fromJson(respo.data));
             Navigator.pushReplacementNamed(
               context,
@@ -41,7 +44,6 @@ class StartViewModel {
           }
         });
       } else {
-        print("hiveDBProvider.employeeBox!.values.first: ${hiveDBProvider.employeeBox!.values}");
         dataProvider
             .setCurrentEmployee(hiveDBProvider.employeeBox!.values.first);
         Navigator.pushReplacementNamed(

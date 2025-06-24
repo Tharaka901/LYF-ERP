@@ -73,6 +73,14 @@ class RouteCardPrintScreen extends StatelessWidget {
                             style: const pw.TextStyle(fontSize: 22.0),
                           ),
                           pw.Text(
+                            'Route: ${dataProvider.currentRouteCard?.route?.routeName ?? ""}',
+                            style: const pw.TextStyle(fontSize: 22.0),
+                          ),
+                          pw.Text(
+                            'Vehicle Nu: ${dataProvider.currentRouteCard?.vehicle?.registrationNumber ?? ""}',
+                            style: const pw.TextStyle(fontSize: 22.0),
+                          ),
+                          pw.Text(
                             'Driver: ${dataProvider.currentEmployee?.firstName} ${dataProvider.currentEmployee?.lastName}',
                             style: const pw.TextStyle(fontSize: 22.0),
                           ),
