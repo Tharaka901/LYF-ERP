@@ -26,20 +26,30 @@ class AboutRCScreen extends StatelessWidget {
         child: ListView(
           children: [
             DetailCard(
+              detailKey: 'Route',
+              detailvalue:
+                  dataProvider.currentRouteCard?.route.routeName ?? "",
+            ),
+            DetailCard(
+              detailKey: 'Vehicle Number',
+              detailvalue:
+                  dataProvider.currentRouteCard?.vehicle?.registrationNumber ?? "",
+            ),
+            DetailCard(
               detailKey: 'Driver',
               detailvalue:
                   '${dataProvider.currentEmployee!.firstName} ${dataProvider.currentEmployee!.lastName}',
             ),
             const Divider(),
-            ...routeCard.relatedEmployees
+            ...routeCard.relatedEmployees!
                 .where((re) =>
-                    re.employee.employeeId !=
+                    re.employee?.employeeId !=
                     dataProvider.currentEmployee!.employeeId)
                 .map(
                   (re) => DetailCard(
                     detailKey: 'Helper',
                     detailvalue:
-                        '${re.employee.firstName} ${re.employee.lastName}',
+                        '${re.employee?.firstName} ${re.employee?.lastName}',
                   ),
                 ),
             const Divider(),
@@ -47,7 +57,7 @@ class AboutRCScreen extends StatelessWidget {
               (rci) {
                 return OptionCard(
                   height: 20,
-                  title: (rci.item ?? dummyItem).itemName,
+                  title: rci.item?.itemName ?? '',
                   titleFontSize: 20.0,
                   trailing: Text(
                     num(rci.transferQty),

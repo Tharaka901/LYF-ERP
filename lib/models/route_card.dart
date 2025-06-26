@@ -1,5 +1,6 @@
 import 'package:gsr/models/related_employee.dart';
 import 'package:gsr/models/route.dart';
+import 'package:gsr/models/vehicle/vehicle.dart';
 // ignore: depend_on_referenced_packages
 import 'package:json_annotation/json_annotation.dart';
 
@@ -13,6 +14,7 @@ class RouteCard {
   final int vehicleId;
   final String? date;
   final Route route;
+  final Vehicle? vehicle;
   final List<RelatedEmployee> relatedEmployees;
   int status;
 
@@ -21,6 +23,7 @@ class RouteCard {
     required this.routeCardNo,
     required this.routeId,
     required this.vehicleId,
+    this.vehicle,
     required this.date,
     required this.route,
     required this.relatedEmployees,
