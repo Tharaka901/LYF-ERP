@@ -155,6 +155,7 @@ class HiveBox {
   static const routeCard = 'RouteCard';
   static const customers = 'Customers';
   static const routeCardBasicItems = 'RouteCardBasicItems';
+  static const routeCardItemSummary = 'RouteCardItemSummary';
   static const routeCardNewItems = 'RouteCardNewItems';
   static const routeCardOtherItems = 'RouteCardOtherItems';
   static const invoice = "Invoicess";
@@ -162,6 +163,8 @@ class HiveBox {
   static const customerCredit = "CustomerCredit";
   static const paymentBox = "PaymentsBox";
   static const creditInvoicePayFromDepositesDataBox = "CreditInvoicePayFromDepositesDataBox";
+  static const routeCardSoldItems = "RouteCardSoldItems";
+  static const routeCardSoldLoanItems = "RouteCardSoldLoanItems";
 }
 
 price(double price) {

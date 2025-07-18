@@ -9,7 +9,7 @@ import 'package:gsr/models/item_summary.dart' as it;
 import 'package:gsr/models/item_summary_customer_wise.dart' as itcw;
 import 'package:gsr/models/loanItem.dart';
 import 'package:gsr/models/loan_stock.dart' as ls;
-import 'package:gsr/models/rc_item_summary.dart';
+import 'package:gsr/models/route_card_item/rc_sold_items_model.dart';
 import 'package:gsr/models/response.dart';
 import 'package:gsr/models/voucher.dart';
 import 'package:gsr/modules/invoice/invoice_provider.dart';
@@ -181,19 +181,7 @@ Future<List<RouteCardItemModel>> getLeakIssueItems(int routeCardId, int customer
   }
 }
 
-Future<List<ls.LoanStock>> getLoanStock(int routeCardId) async {
-  try {
-    final response = await respo('route-card/get-summary-with-loan-items',
-        method: Method.post, data: {"routecardId": routeCardId});
-    List<dynamic> list = response.data;
-    return list.map((e) => ls.LoanStock.fromJson(e)).toList();
-  } catch (e) {
-    if (kDebugMode) {
-      print(e);
-    }
-    rethrow;
-  }
-}
+
 
 Future<List<ls.LoanStock>> getLeakStock(int routeCardId) async {
   try {
@@ -334,20 +322,7 @@ Future<List<RouteCardItemModel>> getItemsByRoutecard(
   return allItems.where((element) => element.item?.itemTypeId != 5).toList();
 }
 
-Future<List<RcItemsSummary>> getItemsSummaryByRoutecard({
-  required int routeCardId,
-}) async {
-  try {
-    final rcItemSumary = await respo('route-card/get-item-summary',
-        data: {'routecardId': routeCardId.toString()}, method: Method.post);
-    return (rcItemSumary.data as List)
-        .map((i) => RcItemsSummary.fromJson(i))
-        .toList();
-  } catch (e) {
-    print(e.toString());
-    rethrow;
-  }
-}
+
 
 Future<List<RouteCardItemModel>> getNewItems({
   required int routeCardId,

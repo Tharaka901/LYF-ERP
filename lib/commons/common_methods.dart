@@ -234,7 +234,7 @@ pwtitleCell(String value,
             style: pw.TextStyle(
                 fontWeight: pw.FontWeight.bold,
                 fontSize: 22.0,
-                color: color ?? PdfColor.fromInt(0xFF000000)),
+                color: color ?? const PdfColor.fromInt(0xFF000000)),
           ),
         ]));
 

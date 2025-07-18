@@ -5,7 +5,7 @@ class Vehicle {
 
   Vehicle({this.vehicleId, this.vehicleRegId, this.registrationNumber});
 
-  factory Vehicle.fromJson(Map<String, dynamic> json) {
+  factory Vehicle.fromJson(Map<dynamic, dynamic> json) {
     return Vehicle(
       vehicleId: json['vehicleId'],
       vehicleRegId: json['vehicleRegId'],

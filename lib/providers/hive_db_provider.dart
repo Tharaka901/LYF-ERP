@@ -19,6 +19,7 @@ class HiveDBProvider extends ChangeNotifier {
   Box<RouteCardModel>? routeCardBox;
   Box<CustomerModel>? customersBox;
   Box<List<dynamic>>? routeCardBasicItemBox;
+  Box<List<dynamic>>? routeCardIssuedItemsBox;
   Box<List<dynamic>>? routeCardNewItemBox;
   Box<List<dynamic>>? routeCardOtherItemBox;
   Box<InvoiceModel>? invoiceBox;
@@ -27,6 +28,8 @@ class HiveDBProvider extends ChangeNotifier {
   Box<PaymentDataModel>? paymentsBox;
   Box<CreditInvoicePayFromDipositesDataModel>?
       creditInvoicePayFromDepositesDataBox;
+  Box<List<dynamic>>? routeCardSoldItemsBox;
+  Box<List<dynamic>>? routeCardSoldLoanItemsBox;
 
   SharedPreferences? sharedPreferences;
   bool isInternetConnected = true;
@@ -40,6 +43,8 @@ class HiveDBProvider extends ChangeNotifier {
     invoiceBox = await Hive.openBox<InvoiceModel>(HiveBox.invoice);
     routeCardBasicItemBox =
         (await Hive.openBox<List<dynamic>>(HiveBox.routeCardBasicItems));
+    routeCardIssuedItemsBox =
+        (await Hive.openBox<List<dynamic>>(HiveBox.routeCardItemSummary));
     routeCardNewItemBox =
         (await Hive.openBox<List<dynamic>>(HiveBox.routeCardNewItems));
     routeCardOtherItemBox =
@@ -51,6 +56,10 @@ class HiveDBProvider extends ChangeNotifier {
     paymentsBox = await Hive.openBox<PaymentDataModel>(HiveBox.paymentBox);
     creditInvoicePayFromDepositesDataBox =
         await Hive.openBox(HiveBox.creditInvoicePayFromDepositesDataBox);
+    routeCardSoldItemsBox =
+        await Hive.openBox<List<dynamic>>(HiveBox.routeCardSoldItems);
+    routeCardSoldLoanItemsBox =
+        await Hive.openBox<List<dynamic>>(HiveBox.routeCardSoldLoanItems);
 
     sharedPreferences = await SharedPreferences.getInstance();
   }

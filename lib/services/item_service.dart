@@ -11,7 +11,7 @@ class ItemService {
       String? type}) async {
     if (type == 'rc-summary') {
       final response =
-          await respo('items/get-all-by-route-card?routecardId=$routeCardId');
+          await respo('route-card/$routeCardId/items');
       List<dynamic> list = response.data;
 
       return list

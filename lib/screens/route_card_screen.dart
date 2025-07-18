@@ -9,7 +9,7 @@ import 'package:gsr/screens/overall_summary_screen.dart';
 import 'package:gsr/modules/previous_customer_select/previous_screen.dart';
 import 'package:gsr/screens/rc_summary_screen.dart';
 import 'package:gsr/modules/select_customer/select_customer_screen.dart';
-import 'package:gsr/screens/stock_screen.dart';
+import 'package:gsr/modules/stock/stock_screen.dart';
 import 'package:gsr/services/database.dart';
 import 'package:gsr/widgets/option_card.dart';
 import 'package:provider/provider.dart';
@@ -268,7 +268,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                           routeCard.routeCardId!);
                       final itemSummaryCWLeak =
                           await getItemSummaryCustomerWiseLeak(
-                                routeCard.routeCardId!);
+                              routeCard.routeCardId!);
                       final itemSummaryCWReturnC =
                           await getReturnCylinderSummaryCustomerWiseLeak(
                               routeCard.routeCardId!,
@@ -377,26 +377,26 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
 
                       data.clearRCItems();
 
-                      final rcItems = await getItemsByRoutecard(
-                        routeCardId: routeCard.routeCardId!,
-                        onlyRefill: false,
-                        priceLevelId: 1,
-                        type: data.currentRouteCard!.status == 0
-                            ? ''
-                            : 'rc-summary',
-                      );
+                      // final rcItems = await getItemsByRoutecard(
+                      //   routeCardId: routeCard.routeCardId!,
+                      //   onlyRefill: false,
+                      //   priceLevelId: 1,
+                      //   type: data.currentRouteCard!.status == 0
+                      //       ? ''
+                      //       : 'rc-summary',
+                      // );
 
-                      if (!context.mounted) return;
+                      // if (!context.mounted) return;
 
-                      for (var element in rcItems) {
-                        if (element.item?.itemTypeId != 5) {
-                          data.addRCItem(element);
-                        }
-                      }
+                      // for (var element in rcItems) {
+                      //   if (element.item?.itemTypeId != 5) {
+                      //     data.addRCItem(element);
+                      //   }
+                      // }
 
-                      final rcItemSummary = await getItemsSummaryByRoutecard(
-                        routeCardId: routeCard.routeCardId!,
-                      );
+                      // final rcItemSummary = await getItemsSummaryByRoutecard(
+                      //   routeCardId: routeCard.routeCardId!,
+                      // );
 
                       if (!context.mounted) return;
 
@@ -405,8 +405,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              StockScreen(rcItemSummary: rcItemSummary),
+                          builder: (context) => StockScreen(),
                         ),
                       );
                     },

@@ -15,6 +15,7 @@ import '../../screens/pending_rc_screen.dart';
 import '../../services/customer_service.dart';
 import '../../services/item_service.dart';
 import '../../services/payment_service.dart';
+import '../stock/enum.dart';
 
 class HomeProvider extends ChangeNotifier {
   final RouteCardService routeCardService;
@@ -63,7 +64,7 @@ class HomeProvider extends ChangeNotifier {
     waiting(context, body: 'Sync...');
     final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    const routeCardId = 0;
+    int currentRouteCardId = 0;
 
     if (hiveDBProvider.isInternetConnected) {
       try {
@@ -76,9 +77,11 @@ class HomeProvider extends ChangeNotifier {
             await routeCardService.getPendingAndAcceptedRouteCards(
                 dataProvider.currentEmployee!.employeeId!);
         //! Save route card data in local DB
+        currentRouteCardId = pendingRouteCards[0].routeCardId!;
         final routeCardDataMap = {
           for (var e in pendingRouteCards) e.routeCardId: e
         };
+
         await hiveDBProvider.routeCardBox!.clear();
         await hiveDBProvider.routeCardBox!.putAll(routeCardDataMap);
 
@@ -96,7 +99,7 @@ class HomeProvider extends ChangeNotifier {
           if (context.mounted) {
             final deposites = await customerService.getCustomerDeposites(
               context,
-              routecardId: routeCardId,
+              routecardId: currentRouteCardId,
               cId: customer.customerId,
             );
             final customerDeposites =
@@ -132,7 +135,7 @@ class HomeProvider extends ChangeNotifier {
               .where((element) => (element.transferQty - element.sellQty) != 0)
               .toList();
           final newItemsList = await itemService.getNewItems(
-            routeCardId: routeCardId,
+            routeCardId: currentRouteCardId,
             priceLevelId: id,
           );
           final newItems =
@@ -149,6 +152,22 @@ class HomeProvider extends ChangeNotifier {
             }
           }
         }
+
+        //! Save route card item in local DB
+        final routeCardItemsSummary = await routeCardService.getRouteCardItems(
+          currentRouteCardId,
+        );
+        await hiveDBProvider.routeCardIssuedItemsBox!.clear();
+        await hiveDBProvider.routeCardIssuedItemsBox!
+            .put(currentRouteCardId, routeCardItemsSummary);
+
+        //! Save route card sold items in local DB
+        final routeCardSoldItems = await routeCardService.getRouteCardSoldItems(
+          routeCardId: currentRouteCardId,
+        );
+        await hiveDBProvider.routeCardSoldItemsBox!.clear();
+        await hiveDBProvider.routeCardSoldItemsBox!
+            .put(currentRouteCardId, routeCardSoldItems); 
 
         //!Get invoice count and save to local DB
         int invoiceCount = await invoiceService
@@ -183,8 +202,8 @@ class HomeProvider extends ChangeNotifier {
     waiting(context, body: 'Sync...');
     final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
     if (hiveDBProvider.isInternetConnected) {
-        //   await hiveDBProvider.invoiceBox!.clear();
-        // await hiveDBProvider.paymentsBox!.clear();
+      //   await hiveDBProvider.invoiceBox!.clear();
+      // await hiveDBProvider.paymentsBox!.clear();
       try {
         for (final invoice in hiveDBProvider.invoiceBox!.values) {
           final invoiceRes = await invoiceService.createInvoice({
@@ -205,7 +224,6 @@ class HomeProvider extends ChangeNotifier {
               }
             } else if (!paymentData.isDirectPrevoius!) {
               paymentData.invoiceNo = invoiceRes.data['invoice']['invoiceNo'];
-              print('Payment Data: ${paymentData.issuedInvoicePaidList![0].invoiceId}');
               if (context.mounted) {
                 await paymentService.sendCreditPayment(context, paymentData);
               }

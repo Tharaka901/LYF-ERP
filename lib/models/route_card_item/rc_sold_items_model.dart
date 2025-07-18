@@ -1,4 +1,4 @@
-class RcItemsSummary {
+class RouteCardSoldItemsModel {
   int id;
   String name;
   int refill;
@@ -16,7 +16,7 @@ class RcItemsSummary {
   int? returnCylinderFull;
   int? returnCylinderEmpty;
 
-  RcItemsSummary(
+  RouteCardSoldItemsModel(
       {required this.id,
       required this.name,
       required this.refill,
@@ -34,25 +34,26 @@ class RcItemsSummary {
       this.returnCylinderFull,
       this.returnCylinderEmpty});
 
-  factory RcItemsSummary.fromJson(Map<String, dynamic> json) => RcItemsSummary(
-      id: json["id"],
-      name: json["name"],
-      refill: json["refill"],
-      deposite: json["deposite"],
-      empty: json["empty"],
-      freeEmpty: json["freeEmpty"],
-      leak: json["leak"],
-      damage: json["damage"],
-      free: json["free"],
-      total: json["total"],
-      loanIssued: json["loanIssued"],
-      loanReceived: json["loanReceived"],
-      returnRefillCount: json["returnRefillCount"],
-      returnEmptyCount: json["returnEmptyCount"],
-      returnCylinderFull: json["returnCylinderFull"],
-      returnCylinderEmpty: json["returnCylinderEmpty"]);
+  factory RouteCardSoldItemsModel.fromJson(Map<dynamic, dynamic> json) =>
+      RouteCardSoldItemsModel(
+          id: json["id"],
+          name: json["name"],
+          refill: json["refill"],
+          deposite: json["deposite"],
+          empty: json["empty"],
+          freeEmpty: json["freeEmpty"],
+          leak: json["leak"],
+          damage: json["damage"],
+          free: json["free"],
+          total: json["total"],
+          loanIssued: json["loanIssued"],
+          loanReceived: json["loanReceived"],
+          returnRefillCount: json["returnRefillCount"],
+          returnEmptyCount: json["returnEmptyCount"],
+          returnCylinderFull: json["returnCylinderFull"],
+          returnCylinderEmpty: json["returnCylinderEmpty"]);
 
-  Map<String, dynamic> toJson() => {
+  Map<dynamic, dynamic> toJson() => {
         "id": id,
         "name": name,
         "refill": refill,

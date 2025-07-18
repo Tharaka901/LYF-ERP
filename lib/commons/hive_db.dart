@@ -1,6 +1,8 @@
+import 'package:gsr/models/local_db_models/12_route_card_sold_items_adapter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../models/local_db_models/0_employee_adapter.dart';
+import '../models/local_db_models/13_route_card_sold_loan_items_adapter.dart';
 import '../models/local_db_models/1_route_card_adapter.dart';
 import '../models/local_db_models/2_customer_adapter.dart';
 import '../models/local_db_models/3_route_card_item_adapter.dart';
@@ -27,4 +29,6 @@ registerHiveModels() async {
   Hive.registerAdapter(IssuedInvoicePaidAdapter());
   Hive.registerAdapter(ChequeAdapter());
   Hive.registerAdapter(CreditInvoicePayFromDepositesDataAdapter());
+  Hive.registerAdapter(RouteCardSoldItemsAdapter());
+  Hive.registerAdapter(RouteCardSoldLoanItemsAdapter());
 }
