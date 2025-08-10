@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:gsr/models/cylinder.dart';
+
 LoanItem loanItemFromJson(String str) => LoanItem.fromJson(json.decode(str));
 
 String loanItemToJson(LoanItem data) => json.encode(data.toJson());
@@ -21,6 +23,7 @@ class LoanItem {
   final int? isNew;
   final int? itemId;
   final CardItem? cardItem;
+  final Cylinder? leakItem;
 
   LoanItem({
     this.id,
@@ -39,6 +42,7 @@ class LoanItem {
     this.isNew,
     this.itemId,
     this.cardItem,
+    this.leakItem,
   });
 
   factory LoanItem.fromJson(Map<String, dynamic> json) => LoanItem(
@@ -60,6 +64,9 @@ class LoanItem {
         cardItem: json["cardItem"] == null
             ? null
             : CardItem.fromJson(json["cardItem"]),
+        leakItem: json["leakItem"] == null
+            ? null
+            : Cylinder.fromJson(json["leakItem"][0]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -79,6 +86,7 @@ class LoanItem {
         "isNew": isNew,
         "itemId": itemId,
         "cardItem": cardItem?.toJson(),
+        "leakItem": leakItem?.toJson(),
       };
 }
 

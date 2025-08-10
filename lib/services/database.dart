@@ -6,7 +6,8 @@ import 'package:gsr/models/customer.dart';
 import 'package:gsr/models/customer_deposite.dart';
 import 'package:gsr/models/cylinder.dart';
 import 'package:gsr/models/item_summary.dart' as it;
-import 'package:gsr/models/item_summary_customer_wise/item_summary_customer_wise.dart' as itcw;
+import 'package:gsr/models/item_summary_customer_wise/item_summary_customer_wise.dart'
+    as itcw;
 import 'package:gsr/models/loanItem.dart';
 import 'package:gsr/models/loan_stock/loan_stock.dart' as ls;
 import 'package:gsr/models/route_card_item/rc_sold_items_model.dart';
@@ -97,7 +98,8 @@ Future<Respo> loginStart(
   return t;
 }
 
-Future<List<RouteCardItemModel>> getLoanItems(int routeCardId, {int? status}) async {
+Future<List<RouteCardItemModel>> getLoanItems(int routeCardId,
+    {int? status}) async {
   try {
     final response = await respo(
         'items/get-loan?routecardId=$routeCardId&status=${status ?? 5}');
@@ -133,7 +135,8 @@ Future<List<RouteCardItemModel>> getLoanItems(int routeCardId, {int? status}) as
   }
 }
 
-Future<List<RouteCardItemModel>> getLeakIssueItems(int routeCardId, int customerId1,
+Future<List<RouteCardItemModel>> getLeakIssueItems(
+    int routeCardId, int customerId1,
     {int? status}) async {
   try {
     final response = await respo(
@@ -161,7 +164,9 @@ Future<List<RouteCardItemModel>> getLeakIssueItems(int routeCardId, int customer
           item: ItemModel(
               id: loanItem.id ?? 0,
               itemRegNo: loanItem.itemRegNo ?? '',
-              itemName: itemNameMap[loanItem.itemId.toString()] ?? '',
+              itemName: loanItem.leakItem?.freeCylinderId == 0
+                  ? itemNameMap[loanItem.itemId.toString()] ?? ""
+                  : loanItem.itemName ?? "",
               costPrice: loanItem.costPrice?.toDouble() ?? 0,
               salePrice: loanItem.salePrice?.toDouble() ?? 0,
               openingQty: loanItem.openingQty?.toDouble() ?? 0,
@@ -181,8 +186,6 @@ Future<List<RouteCardItemModel>> getLeakIssueItems(int routeCardId, int customer
     rethrow;
   }
 }
-
-
 
 Future<List<ls.LoanStockModel>> getLeakStock(int routeCardId) async {
   try {
@@ -313,7 +316,9 @@ Future<List<RouteCardItemModel>> getItemsByRoutecard(
               .map((element) => RouteCardItemModel.fromJson(element))
               .where((rci) => rci.item!.itemTypeId == 3)
               .toList()
-          : list.map((element) => RouteCardItemModel.fromJson(element)).toList();
+          : list
+              .map((element) => RouteCardItemModel.fromJson(element))
+              .toList();
   for (var element in items) {
     if (!(allItems.map((e) => e.item?.itemName).toList())
         .contains(element.item?.itemName)) {
@@ -322,8 +327,6 @@ Future<List<RouteCardItemModel>> getItemsByRoutecard(
   }
   return allItems.where((element) => element.item?.itemTypeId != 5).toList();
 }
-
-
 
 Future<List<RouteCardItemModel>> getNewItems({
   required int routeCardId,
@@ -342,7 +345,8 @@ Future<List<RouteCardItemModel>> getNewItems({
   final response = await respo(
       'items/get-all-by-route-card?routecardId=$routeCardId&priceLevelId=$priceLevelId');
   List<dynamic> list = response.data ?? [];
-    final list2 = list.map((element) => RouteCardItemModel.fromJson(element)).toList();
+  final list2 =
+      list.map((element) => RouteCardItemModel.fromJson(element)).toList();
   for (var element in list2) {
     if (element.item?.itemTypeId == 3) {
       rcNewItems.add(element);
@@ -552,7 +556,8 @@ Future<String> getReceiptNumber(BuildContext context) async {
 Future<List<VoucherModel>> getVouchers(BuildContext context) async {
   final response = await respo('voucher/all');
   List<dynamic> list = response.data;
-  List<VoucherModel> vouchers = list.map((e) => VoucherModel.fromJson(e)).toList();
+  List<VoucherModel> vouchers =
+      list.map((e) => VoucherModel.fromJson(e)).toList();
   vouchers.insert(
     0,
     VoucherModel(
@@ -573,7 +578,6 @@ Future<void> updateRouteCard({
     'status': status,
   });
 }
-
 
 Future<Respo> createInvoice(BuildContext context, {String? invoiceNu}) async {
   try {
