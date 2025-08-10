@@ -43,6 +43,7 @@ class StockViewModel extends ChangeNotifier {
       routeCardId: routeCardId,
       hiveDBProvider: hiveDBProvider,
     );
+    
     //! Get route card sold leak items from the server or local DB
     routeCardSoldLeakItems = await getRouteCardSoldLeakItems(
       routeCardId: routeCardId,
