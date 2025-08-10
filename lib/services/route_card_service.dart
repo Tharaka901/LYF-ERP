@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 
 import '../commons/common_methods.dart';
 import '../models/cash_settle/cash_settle.dart';
+import '../models/item_summary_customer_wise/item_summary_customer_wise.dart';
+import '../models/loan_stock/loan_stock.dart';
 import '../models/route_card_item/rc_sold_items_model.dart';
 import '../models/route_card/route_card_model.dart';
 import '../models/route_card_item/rc_sold_loan_items_model.dart';
@@ -68,6 +70,7 @@ class RouteCardService {
   }) async {
     try {
       final response = await respo('route-card/$routeCardId/sold-items');
+      print(response.error);
       return (response.data as List)
           .map((i) => RouteCardSoldItemsModel.fromJson(i))
           .toList();
@@ -87,6 +90,39 @@ class RouteCardService {
       );
       List<dynamic> list = response.data;
       return list.map((e) => RouteCardSoldLoanItemModel.fromJson(e)).toList();
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      rethrow;
+    }
+  }
+
+  Future<List<LoanStockModel>> getRouteCardSoldLeakItems(
+      int routeCardId) async {
+    try {
+      final response = await respo('route-card/get-summary-with-leak-items',
+          method: Method.post, data: {"routecardId": routeCardId});
+      List<dynamic> list = response.data;
+      return list.map((e) => LoanStockModel.fromJson(e)).toList();
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      rethrow;
+    }
+  }
+
+  Future<List<ItemSummaryCustomerWise>>
+      getReturnCylinderSummaryCustomerWiseLeak(int routeCardId,
+          {bool isCustomerWise = true}) async {
+    try {
+      final response = await respo(
+          'route-card/get-summary-return-cylinder-customer-wise',
+          method: Method.post,
+          data: {"routecardId": routeCardId, "isCustomerWise": isCustomerWise});
+      List<dynamic> list = response.data ?? [];
+      return list.map((e) => ItemSummaryCustomerWise.fromJson(e)).toList();
     } catch (e) {
       if (kDebugMode) {
         print(e);

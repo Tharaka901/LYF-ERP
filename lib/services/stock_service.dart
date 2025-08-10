@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
+
 import '../commons/common_methods.dart';
+import '../models/loan_stock/loan_stock.dart';
 import '../models/stock_item/stock_item_model.dart';
 
 class StockService {
@@ -11,4 +14,6 @@ class StockService {
       rethrow;
     }
   }
+
+  
 }

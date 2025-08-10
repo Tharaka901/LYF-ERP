@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>orivetbreederapp.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>buildNumber</key>
+			<string>304</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>E1211D7174EE1ECB1FF697F3C5E0036EDA46C16A</string>
+				<key>dateExpires</key>
+				<string>2025-10-22</string>
+				<key>type</key>
+				<string>Cloud Managed Apple Distribution</string>
+			</dict>
+			<key>embeddedBinaries</key>
+			<array>
+				<dict>
+					<key>architectures</key>
+					<array>
+						<string>arm64</string>
+					</array>
+					<key>buildNumber</key>
+					<string>0.12.0</string>
+					<key>certificate</key>
+					<dict>
+						<key>SHA1</key>
+						<string>E1211D7174EE1ECB1FF697F3C5E0036EDA46C16A</string>
+						<key>dateExpires</key>
+						<string>2025-10-22</string>
+						<key>type</key>
+						<string>Cloud Managed Apple Distribution</string>
+					</dict>
+					<key>name</key>
+					<string>hermes.framework</string>
+					<key>symbols</key>
+					<true/>
+					<key>team</key>
+					<dict>
+						<key>id</key>
+						<string>8X836ZWS2M</string>
+						<key>name</key>
+						<string>Orivet Genetic Pet Care PTY LTD</string>
+					</dict>
+					<key>versionNumber</key>
+					<string>0.12.0</string>
+				</dict>
+			</array>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>8X836ZWS2M.com.orivet.OrivetApp</string>
+				<key>beta-reports-active</key>
+				<true/>
+				<key>com.apple.developer.team-identifier</key>
+				<string>8X836ZWS2M</string>
+				<key>get-task-allow</key>
+				<false/>
+			</dict>
+			<key>name</key>
+			<string>orivetbreederapp.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>d120323c-c215-41fb-97a0-6f192a2f1173</string>
+				<key>dateExpires</key>
+				<string>2025-10-22</string>
+				<key>name</key>
+				<string>iOS Team Store Provisioning Profile: com.orivet.OrivetApp</string>
+			</dict>
+			<key>symbols</key>
+			<true/>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>8X836ZWS2M</string>
+				<key>name</key>
+				<string>Orivet Genetic Pet Care PTY LTD</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>3.0.2</string>
+		</dict>
+	</array>
+</dict>
+</plist>

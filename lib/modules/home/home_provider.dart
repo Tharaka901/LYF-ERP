@@ -15,7 +15,7 @@ import '../../screens/pending_rc_screen.dart';
 import '../../services/customer_service.dart';
 import '../../services/item_service.dart';
 import '../../services/payment_service.dart';
-import '../stock/enum.dart';
+import '../../services/stock_service.dart';
 
 class HomeProvider extends ChangeNotifier {
   final RouteCardService routeCardService;
@@ -23,6 +23,7 @@ class HomeProvider extends ChangeNotifier {
   final paymentService = PaymentService();
   final invoiceService = InvoiceService();
   final itemService = ItemService();
+  final stockService = StockService();
 
   List<RouteCardModel>? pendingRouteCards;
 
@@ -74,8 +75,10 @@ class HomeProvider extends ChangeNotifier {
 
         //! Get pending route cards
         final pendingRouteCards =
-            await routeCardService.getPendingAndAcceptedRouteCards(
-                dataProvider.currentEmployee!.employeeId!);
+            (await routeCardService.getPendingAndAcceptedRouteCards(
+                    dataProvider.currentEmployee!.employeeId!))
+                .where((r) => r.status == 1)
+                .toList();
         //! Save route card data in local DB
         currentRouteCardId = pendingRouteCards[0].routeCardId!;
         final routeCardDataMap = {
@@ -167,7 +170,7 @@ class HomeProvider extends ChangeNotifier {
         );
         await hiveDBProvider.routeCardSoldItemsBox!.clear();
         await hiveDBProvider.routeCardSoldItemsBox!
-            .put(currentRouteCardId, routeCardSoldItems); 
+            .put(currentRouteCardId, routeCardSoldItems);
 
         //!Get invoice count and save to local DB
         int invoiceCount = await invoiceService
@@ -175,6 +178,28 @@ class HomeProvider extends ChangeNotifier {
         int invoiceCountLocalDb = hiveDBProvider.invoiceBox!.length;
         await hiveDBProvider.dataBox!.put(
             'invoiceCount', (invoiceCount + invoiceCountLocalDb).toString());
+
+        //! Save loan items to local DB
+        final loanItems = await routeCardService
+            .getRouteCardSoldLoanItems(pendingRouteCards[0].routeCardId!);
+        await hiveDBProvider.routeCardSoldLoanItemsBox!.clear();
+        await hiveDBProvider.routeCardSoldLoanItemsBox!
+            .put(currentRouteCardId, loanItems);
+
+        //! Save sold leak items to local DB
+        final soldLeakItems = await routeCardService
+            .getRouteCardSoldLeakItems(pendingRouteCards[0].routeCardId!);
+        await hiveDBProvider.routeCardSoldLeakItemsBox!.clear();
+        await hiveDBProvider.routeCardSoldLeakItemsBox!
+            .put(currentRouteCardId, soldLeakItems);
+
+        //! Save return cylinder summary customer wise leak to local DB
+        final returnCylinderSummaryCustomerWiseLeak =
+            await routeCardService.getReturnCylinderSummaryCustomerWiseLeak(
+                pendingRouteCards[0].routeCardId!);
+        await hiveDBProvider.returnCylinderSummaryCustomerWiseLeakBox!.clear();
+        await hiveDBProvider.returnCylinderSummaryCustomerWiseLeakBox!
+            .put(currentRouteCardId, returnCylinderSummaryCustomerWiseLeak);
 
         if (context.mounted) {
           pop(context);

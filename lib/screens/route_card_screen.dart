@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
-import 'package:gsr/models/item_summary_customer_wise.dart';
+import 'package:gsr/models/item_summary_customer_wise/item_summary_customer_wise.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/modules/route_card/about_rc_screen.dart';
 import 'package:gsr/screens/invoice_summary_screen.dart';

@@ -30,6 +30,8 @@ class HiveDBProvider extends ChangeNotifier {
       creditInvoicePayFromDepositesDataBox;
   Box<List<dynamic>>? routeCardSoldItemsBox;
   Box<List<dynamic>>? routeCardSoldLoanItemsBox;
+  Box<List<dynamic>>? routeCardSoldLeakItemsBox;
+  Box<List<dynamic>>? returnCylinderSummaryCustomerWiseLeakBox;
 
   SharedPreferences? sharedPreferences;
   bool isInternetConnected = true;
@@ -60,7 +62,10 @@ class HiveDBProvider extends ChangeNotifier {
         await Hive.openBox<List<dynamic>>(HiveBox.routeCardSoldItems);
     routeCardSoldLoanItemsBox =
         await Hive.openBox<List<dynamic>>(HiveBox.routeCardSoldLoanItems);
-
+    routeCardSoldLeakItemsBox =
+        await Hive.openBox<List<dynamic>>(HiveBox.routeCardSoldLeakItems);
+    returnCylinderSummaryCustomerWiseLeakBox =
+        await Hive.openBox<List<dynamic>>(HiveBox.returnCylinderSummaryCustomerWiseLeak);
     sharedPreferences = await SharedPreferences.getInstance();
   }
 

@@ -165,6 +165,8 @@ class HiveBox {
   static const creditInvoicePayFromDepositesDataBox = "CreditInvoicePayFromDepositesDataBox";
   static const routeCardSoldItems = "RouteCardSoldItems";
   static const routeCardSoldLoanItems = "RouteCardSoldLoanItems";
+  static const routeCardSoldLeakItems = "RouteCardSoldLeakItems";
+  static const returnCylinderSummaryCustomerWiseLeak = "ReturnCylinderSummaryCustomerWiseLeak";
 }
 
 price(double price) {

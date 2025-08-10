@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:gsr/models/loan_stock/loan_stock.dart';
+import 'package:gsr/services/stock_service.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/invoice_item/invoice_item_model.dart';
+import '../../models/item_summary_customer_wise/item_summary_customer_wise.dart';
 import '../../models/route_card_item/rc_sold_items_model.dart';
 import '../../models/route_card_item/rc_sold_loan_items_model.dart';
 import '../../models/route_card_item/route_card_item_model.dart';
@@ -12,11 +15,14 @@ import 'constants.dart';
 
 class StockViewModel extends ChangeNotifier {
   final routeCardService = RouteCardService();
+  final stockService = StockService();
 
   bool isLoading = false;
   List<RouteCardItemModel> routeCardItems = [];
   List<RouteCardSoldItemsModel> routeCardSoldItems = [];
   List<RouteCardSoldLoanItemModel> routeCardSoldLoanItems = [];
+  List<LoanStockModel> routeCardSoldLeakItems = [];
+  List<ItemSummaryCustomerWise> returnCylinderSummaryCustomerWiseLeak = [];
 
   void loadStockData({required BuildContext context}) async {
     final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
@@ -37,6 +43,16 @@ class StockViewModel extends ChangeNotifier {
       routeCardId: routeCardId,
       hiveDBProvider: hiveDBProvider,
     );
+    //! Get route card sold leak items from the server or local DB
+    routeCardSoldLeakItems = await getRouteCardSoldLeakItems(
+      routeCardId: routeCardId,
+      hiveDBProvider: hiveDBProvider,
+    );
+    //! Get return cylinder summary customer wise leak from the server or local DB
+    returnCylinderSummaryCustomerWiseLeak = await getReturnCylinderSummaryCustomerWiseLeak(
+      routeCardId: routeCardId,
+      hiveDBProvider: hiveDBProvider,
+    );
     isLoading = false;
     notifyListeners();
   }
@@ -51,9 +67,9 @@ class StockViewModel extends ChangeNotifier {
       );
     } else {
       final box = hiveDBProvider.routeCardIssuedItemsBox;
-      final raw = box?.get(routeCardId);
+      final raw = box?.get(routeCardId) ?? [];
       final List<RouteCardItemModel> items =
-          (raw as List).map((e) => e as RouteCardItemModel).toList();
+          (raw).map((e) => e as RouteCardItemModel).toList();
       return items;
     }
   }
@@ -67,9 +83,9 @@ class StockViewModel extends ChangeNotifier {
           routeCardId: routeCardId);
     } else {
       final box = hiveDBProvider.routeCardSoldItemsBox;
-      final raw = box?.get(routeCardId);
+      final raw = box?.get(routeCardId) ?? [];
       final List<RouteCardSoldItemsModel> items =
-          (raw as List).map((e) => e as RouteCardSoldItemsModel).toList();
+          (raw).map((e) => e as RouteCardSoldItemsModel).toList();
       return items;
     }
   }
@@ -81,10 +97,42 @@ class StockViewModel extends ChangeNotifier {
     if (hiveDBProvider.isInternetConnected) {
       return await routeCardService.getRouteCardSoldLoanItems(routeCardId);
     } else {
-      final box = hiveDBProvider.routeCardSoldItemsBox;
-      final raw = box?.get(routeCardId);
+      final box = hiveDBProvider.routeCardSoldLoanItemsBox;
+      final raw = box?.get(routeCardId) ?? [];
       final List<RouteCardSoldLoanItemModel> items =
-          (raw as List).map((e) => e as RouteCardSoldLoanItemModel).toList();
+          (raw).map((e) => e as RouteCardSoldLoanItemModel).toList();
+      return items;
+    }
+  }
+
+  Future<List<LoanStockModel>> getRouteCardSoldLeakItems({
+    required HiveDBProvider hiveDBProvider,
+    required int routeCardId,
+  }) async {
+    if (hiveDBProvider.isInternetConnected) {
+      return routeCardService.getRouteCardSoldLeakItems(routeCardId);
+    } else {
+      final box = hiveDBProvider.routeCardSoldLeakItemsBox;
+      final raw = box?.get(routeCardId) ?? [];
+      final List<LoanStockModel> items =
+          (raw).map((e) => e as LoanStockModel).toList();
+      return items;
+    }
+  }
+
+  Future<List<ItemSummaryCustomerWise>>
+      getReturnCylinderSummaryCustomerWiseLeak({
+    required HiveDBProvider hiveDBProvider,
+    required int routeCardId,
+  }) async {
+    if (hiveDBProvider.isInternetConnected) {
+      return await routeCardService
+          .getReturnCylinderSummaryCustomerWiseLeak(routeCardId);
+    } else {
+      final box = hiveDBProvider.returnCylinderSummaryCustomerWiseLeakBox;
+      final raw = box?.get(routeCardId) ?? [];
+      final List<ItemSummaryCustomerWise> items =
+          (raw).map((e) => e as ItemSummaryCustomerWise).toList();
       return items;
     }
   }

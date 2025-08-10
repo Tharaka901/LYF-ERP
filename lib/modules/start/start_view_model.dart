@@ -28,9 +28,10 @@ class StartViewModel {
           if (respo.success) {
             final employee = EmployeeModel.fromJson(respo.data);
             await hiveDBProvider.employeeBox
-                ?.clear(); // Clear previous employee data
+                ?.clear();
             await hiveDBProvider.employeeBox
                 ?.put(employee.employeeId, employee);
+            print(hiveDBProvider.employeeBox!.values.first);
             dataProvider.setCurrentEmployee(EmployeeModel.fromJson(respo.data));
             Navigator.pushReplacementNamed(
               context,
