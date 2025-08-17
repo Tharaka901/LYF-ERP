@@ -10,7 +10,6 @@ import 'package:gsr/models/item_summary_customer_wise/item_summary_customer_wise
     as itcw;
 import 'package:gsr/models/loanItem.dart';
 import 'package:gsr/models/loan_stock/loan_stock.dart' as ls;
-import 'package:gsr/models/route_card_item/rc_sold_items_model.dart';
 import 'package:gsr/models/response.dart';
 import 'package:gsr/models/voucher.dart';
 import 'package:gsr/modules/invoice/invoice_provider.dart';
@@ -20,7 +19,6 @@ import 'package:gsr/modules/home/home_view.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/credit_payment/credit_payment_model.dart';
-import '../models/customer/customer_model.dart';
 import '../models/employee/employee_model.dart';
 import '../models/invoice/invoice_model.dart';
 import '../models/item/item_model.dart';
