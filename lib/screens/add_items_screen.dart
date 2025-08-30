@@ -84,6 +84,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
       ),
       appBar: AppBar(
         title: const Text('Add Items'),
+        backgroundColor: Colors.blueAccent,
         elevation: 1,
         leading: IconButton(
             onPressed: () {

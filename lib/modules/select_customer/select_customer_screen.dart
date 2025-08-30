@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+// ignore: unused_import
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/customer/customer_model.dart';
@@ -31,6 +32,7 @@ class SelectCustomerView extends StatefulWidget {
 
 class _SelectCustomerViewState extends State<SelectCustomerView> {
   TextEditingController qrController = TextEditingController();
+  TextEditingController searchController = TextEditingController();
   bool? isManual;
   @override
   void initState() {
@@ -45,8 +47,10 @@ class _SelectCustomerViewState extends State<SelectCustomerView> {
     final routeCard = dataProvider.currentRouteCard!;
     final selectedCustomer = dataProvider.selectedCustomer;
     if (ModalRoute.of(context)!.settings.arguments != null) {
-      isManual = (ModalRoute.of(context)!.settings.arguments
-          as Map<String, dynamic>)['isManual'];
+      final arguments = ModalRoute.of(context)!.settings.arguments;
+      if (arguments is Map) {
+        isManual = arguments['isManual'] as bool?;
+      }
     }
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus!.unfocus(),
@@ -116,9 +120,9 @@ class _SelectCustomerViewState extends State<SelectCustomerView> {
                   TypeAheadField<CustomerModel>(
                     direction: VerticalDirection.up,
                     onSelected: (customer) => setState(() {
+                      searchController.text = customer.businessName ?? '';
                       qrController.text = customer.registrationId ?? '';
                       dataProvider.setSelectedCustomer(customer);
-                      setState(() {});
                     }),
                     itemBuilder: (context, customer) => ListTile(
                       title: Text(customer.businessName ?? ''),
@@ -134,14 +138,61 @@ class _SelectCustomerViewState extends State<SelectCustomerView> {
                         .onPressedSearchCustomerTextField(pattern, context),
                     builder: (context, controller, focusNode) {
                       return TextField(
-                        controller: controller,
+                        controller: searchController,
                         focusNode: focusNode,
-                        obscureText: true,
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w500,
+                        ),
                         decoration: InputDecoration(
                           labelText: 'Search customer',
-                          fillColor: Colors.grey,
+                          hintText: 'Enter customer name or ID',
+                          prefixIcon: const Icon(
+                            Icons.search_rounded,
+                            color: Colors.grey,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
                           border: OutlineInputBorder(
-                            borderRadius: defaultBorderRadius,
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade300,
+                              width: 1.0,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade300,
+                              width: 1.0,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.blue.shade600,
+                              width: 2.0,
+                            ),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.red.shade400,
+                              width: 1.0,
+                            ),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 16.0,
+                          ),
+                          labelStyle: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade400,
+                            fontSize: 14.0,
                           ),
                         ),
                         onTap: () => qrController.clear(),
@@ -187,6 +238,7 @@ class _SelectCustomerViewState extends State<SelectCustomerView> {
   @override
   void dispose() {
     qrController.dispose();
+    searchController.dispose();
     super.dispose();
   }
 }

@@ -51,11 +51,11 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(
                 height: 50.0,
               ),
-              // CircleAvatar(
-              //   backgroundImage: const NetworkImage(
-              //       'https://learn.microsoft.com/answers/storage/attachments/209536-360-f-364211147-1qglvxv1tcq0ohz3fawufrtonzz8nq3e.jpg'),
-              //   radius: width * 0.2,
-              // ),
+              CircleAvatar(
+                backgroundImage: const NetworkImage(
+                    'https://learn.microsoft.com/answers/storage/attachments/209536-360-f-364211147-1qglvxv1tcq0ohz3fawufrtonzz8nq3e.jpg'),
+                radius: width * 0.2,
+              ),
               Text(
                 '${dataProvider.currentEmployee!.firstName} ${dataProvider.currentEmployee!.lastName}',
                 textAlign: TextAlign.center,
@@ -117,7 +117,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     CustomOutlineButton(
                       text: 'Logout',
-                      color: Colors.blue[600],
+                      color: Colors.red,
                       onPressed: () => confirm(
                         context,
                         title: 'Logout',

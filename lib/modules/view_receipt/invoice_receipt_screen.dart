@@ -60,7 +60,6 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
             as Map<String, dynamic>)['isManual'] ??
         false;
     return Scaffold(
-      backgroundColor: defaultBackgroundColor,
       appBar: AppBar(
         title: const Text('Receipt'),
       ),
