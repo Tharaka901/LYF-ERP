@@ -58,12 +58,16 @@ class ReturnCylinderInvoiceItem {
   final int itemQty;
   final int routecardId;
   final int customerId1;
+  final double price;
+  final double nonVatAmount;
 
   ReturnCylinderInvoiceItem({
     required this.itemId,
     required this.itemQty,
     required this.routecardId,
     required this.customerId1,
+    required this.price,
+    required this.nonVatAmount,
   });
 
   Map<String, dynamic> toJson() {
@@ -72,6 +76,8 @@ class ReturnCylinderInvoiceItem {
       'itemQty': itemQty,
       'routecardId': routecardId,
       'customerId1': customerId1,
+      'price': price,
+      'nonVatAmount': nonVatAmount,
     };
   }
 }
