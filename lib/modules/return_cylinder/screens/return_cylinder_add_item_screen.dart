@@ -66,7 +66,7 @@ class _ReturnCylinderAddItemScreenState
             },
             itemBuilder: (context) => [
               PopupMenuItem(
-                enabled: returnCylinderProvider.selectedReturnCylinderItems.isNotEmpty,
+                enabled: returnCylinderProvider.selectedItems.isNotEmpty,
                 value: 1,
                 child: const Text('Remove all items'),
               ),
@@ -84,7 +84,7 @@ class _ReturnCylinderAddItemScreenState
       ),
       floatingActionButton: Consumer<ReturnCylinderProvider>(
         builder: (context, returnCylinderProvider, _) =>
-            returnCylinderProvider.selectedReturnCylinderItems.isNotEmpty
+            returnCylinderProvider.selectedItems.isNotEmpty
                 ? FloatingActionButton(
                     onPressed: () {
                       Navigator.push(

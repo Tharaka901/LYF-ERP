@@ -213,13 +213,13 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
                           ),
                         ],
                       ),
-                      ...returnCylinderProvider.selectedReturnCylinderItems.map(
+                      ...returnCylinderProvider.selectedItems.map(
                         (item) => TableRow(
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(5.0),
                               child: Text(
-                                (returnCylinderProvider.selectedReturnCylinderItems
+                                (returnCylinderProvider.selectedItems
                                             .indexOf(item) +
                                         1)
                                     .toString(),
