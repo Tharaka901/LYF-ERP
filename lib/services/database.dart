@@ -512,13 +512,7 @@ Future<String> loanInvoiceNumber(BuildContext context) async {
   return '${routeCard.routeCardNo}/${count + 1}';
 }
 
-Future<String> returnCylinderInvoiceNumber(BuildContext context) async {
-  final routeCard = context.read<DataProvider>().currentRouteCard!;
-  final response = await respo(
-      'return-cylinder-invoice/count-by-routecard?id=${routeCard.routeCardId}');
-  final int count = response.data;
-  return '${routeCard.routeCardNo}/${count + 1}';
-}
+
 
 Future<String> leakInvoiceNumber(BuildContext context) async {
   final routeCard = context.read<DataProvider>().currentRouteCard!;
@@ -646,53 +640,7 @@ Future<Respo> createLoanInvoice(BuildContext context) async {
   }
 }
 
-Future<Respo> createReturnCylinderInvoice(BuildContext context) async {
-  try {
-    final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    final selectedCustomer = dataProvider.selectedCustomer!;
-    final invoiceNo = await returnCylinderInvoiceNumber(context);
-    //! Create invoice
-    final invoiceResponse = await respo(
-      'return-cylinder-invoice/create',
-      method: Method.post,
-      data: {
-        "invoice": {
-          "invoiceNo": 'GRN/' + invoiceNo,
-          "routecardId": dataProvider.currentRouteCard!.routeCardId,
-          "customerId": selectedCustomer.customerId,
-          "employeeId": dataProvider.currentEmployee!.employeeId,
-          "status": dataProvider.itemList
-                          .map((e) => e.item.salePrice * e.quantity)
-                          .reduce((value, element) => value + element) -
-                      dataProvider.getTotalInvoicePaymentAmount() ==
-                  0
-              ? 2
-              : 1,
-          "total": dataProvider.itemList
-              .map((e) => e.item.salePrice * e.quantity)
-              .reduce((value, element) => value + element),
-          "balance": (dataProvider.itemList
-                      .map((e) => e.item.salePrice * e.quantity)
-                      .reduce((value, element) => value + element) -
-                  dataProvider.getTotalInvoicePaymentAmount())
-              .toStringAsFixed(2)
-        },
-        "invoiceItems": dataProvider.itemList
-            .map((invoiceItem) => {
-                  "itemId": invoiceItem.item.id,
-                  "itemQty": invoiceItem.quantity,
-                  "routecardId": dataProvider.currentRouteCard!.routeCardId,
-                  "customerId1": selectedCustomer.customerId,
-                })
-            .toList()
-      },
-    );
-    return invoiceResponse;
-  } catch (e) {
-    toast(e.toString());
-    rethrow;
-  }
-}
+
 
 Future<Respo> createLeakInvoice(BuildContext context) async {
   try {
