@@ -11,7 +11,7 @@ class CustomerService {
       {int? routeId}) async {
     try {
       final response = await respo(
-          'customers/get-all${routeId != null ? '?routeId=${routeId}' : ''}');
+          'customers/get-all${routeId != null ? '?routeId=$routeId' : ''}');
       List<dynamic> list = response.data;
       return list
           .map((element) => CustomerModel.fromJson(element))
@@ -36,7 +36,7 @@ class CustomerService {
       {int? cId, int? routecardId}) async {
     try {
       final response = await respo(
-          'over-payment/get?customerId=${cId ?? context.read<DataProvider>().selectedCustomer!.customerId}&routecardId=${routecardId}');
+          'over-payment/get?customerId=${cId ?? context.read<DataProvider>().selectedCustomer!.customerId}&routecardId=$routecardId');
       List<dynamic> list = response.data;
       return list
           .where(
@@ -45,8 +45,18 @@ class CustomerService {
         return CustomerDeposite.fromJson(e);
       }).toList();
     } catch (e) {
-      print(e);
       rethrow;
     }
+  }
+
+  static Future<void> updateCustomerDepositBalance(
+      {required BuildContext context,
+      required int customerId,
+      required double depositBalance}) async {
+    await respo(
+      'customers/update',
+      method: Method.put,
+      data: {"customerId": customerId, "depositBalance": depositBalance},
+    );
   }
 }
