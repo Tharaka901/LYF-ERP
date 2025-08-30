@@ -16,40 +16,40 @@ import 'package:gsr/providers/data_provider.dart';
 import 'package:provider/provider.dart';
 
 class ReturnCylinderProvider extends ChangeNotifier {
-  List<ItemModel> selectedItems = [];
+  List<ItemModel> selectedReturnCylinderItems = [];
   String returnCylinderInvoiceNumber = '';
 
-  double get totalPrice => selectedItems
+  double get totalPrice => selectedReturnCylinderItems
       .map((e) => e.salePrice * e.itemQty!)
       .reduce((value, element) => value + element);
-  double get nonVatAmount => selectedItems
+  double get nonVatAmount => selectedReturnCylinderItems
       .map((e) => e.nonVatAmount! * e.itemQty!)
       .reduce((value, element) => value + element);
 
   void addSelectedItem(ItemModel item) {
-    if (selectedItems.any((element) => element.id == item.id)) {
+    if (selectedReturnCylinderItems.any((element) => element.id == item.id)) {
       toast('Item already added', toastState: TS.error);
       return;
     }
-    selectedItems.add(item);
+    selectedReturnCylinderItems.add(item);
     notifyListeners();
   }
 
   void removeSelectedItem(ItemModel item) {
-    selectedItems.remove(item);
+    selectedReturnCylinderItems.remove(item);
     notifyListeners();
   }
 
   void clearSelectedItems() {
-    selectedItems.clear();
+    selectedReturnCylinderItems.clear();
     notifyListeners();
   }
 
   void updateItemQuantity(ItemModel item) {
     // Find the item in the list and update it
-    final index = selectedItems.indexWhere((element) => element.id == item.id);
+    final index = selectedReturnCylinderItems.indexWhere((element) => element.id == item.id);
     if (index != -1) {
-      selectedItems[index] = item;
+      selectedReturnCylinderItems[index] = item;
       notifyListeners();
     }
   }
@@ -87,12 +87,14 @@ class ReturnCylinderProvider extends ChangeNotifier {
                     selectCreditInvoiceProvider.totalInvoicePaymentAmount)
                 .toStringAsFixed(2),
           ),
-          invoiceItems: selectedItems
+          invoiceItems: selectedReturnCylinderItems
               .map((item) => ReturnCylinderInvoiceItem(
                     itemId: item.id!,
                     itemQty: item.itemQty!,
                     routecardId: dataProvider.currentRouteCard!.routeCardId!,
                     customerId1: dataProvider.selectedCustomer!.customerId!,
+                    price: item.salePrice,
+                    nonVatAmount: item.nonVatAmount ?? 0,
                   ))
               .toList(),
         );

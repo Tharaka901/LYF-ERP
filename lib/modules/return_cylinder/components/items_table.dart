@@ -12,7 +12,7 @@ class ItemsTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ReturnCylinderProvider>(
       builder: (context, data, _) {
-        if (data.selectedItems.isEmpty) {
+        if (data.selectedReturnCylinderItems.isEmpty) {
           return const Center(
             child: Text(
               'No items found',
@@ -43,7 +43,7 @@ class ItemsTable extends StatelessWidget {
                 ],
               ),
               // Data Rows
-              ...data.selectedItems.asMap().entries.map((entry) {
+              ...data.selectedReturnCylinderItems.asMap().entries.map((entry) {
                 final index = entry.key;
                 final item = entry.value;
                 return TableRow(
