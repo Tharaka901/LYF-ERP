@@ -5,12 +5,10 @@ import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/customer/customer_model.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/screens/add_items_screen.dart';
-import 'package:gsr/modules/return_cylinder/screens/return_cylinder_add_item_screen.dart';
-import 'package:gsr/screens/leak_note_screen.dart';
+import 'package:gsr/screens/qr_scan_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-import '../../commons/enums.dart';
 import 'select_customer_view_model.dart';
 
 class SelectCustomerView extends StatefulWidget {
@@ -18,13 +16,8 @@ class SelectCustomerView extends StatefulWidget {
   final String? qrText;
   final String? type;
   final bool? isManual;
-  final AppFeatureType? featureType;
   const SelectCustomerView(
-      {super.key,
-      this.qrText,
-      this.type = "Default",
-      this.isManual = false,
-      this.featureType = AppFeatureType.default_});
+      {super.key, this.qrText, this.type = "Default", this.isManual = false});
 
   @override
   State<SelectCustomerView> createState() => _SelectCustomerViewState();
@@ -60,25 +53,14 @@ class _SelectCustomerViewState extends State<SelectCustomerView> {
         ),
         floatingActionButton: selectedCustomer != null
             ? FloatingActionButton(
-                onPressed: () {
-                  if (widget.featureType == AppFeatureType.returnCylinder) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const ReturnCylinderAddItemScreen()),
-                    );
-                  } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AddItemsScreen(
-                                type: widget.type,
-                                isManual: isManual,
-                              )),
-                    );
-                  }
-                },
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AddItemsScreen(
+                            type: widget.type,
+                            isManual: isManual,
+                          )),
+                ),
                 child: const Icon(
                   Icons.arrow_forward_rounded,
                   size: 40,

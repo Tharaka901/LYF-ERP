@@ -39,8 +39,6 @@ import 'package:provider/provider.dart';
 import 'commons/locator.dart';
 import 'models/local_db_models/11_credit_invoice_pay_from_deposites_data_adapter.dart';
 import 'models/local_db_models/7_customer_deposite_adapter.dart';
-import 'modules/return_cylinder/providers/select_credit_invoice_provider.dart';
-import 'modules/return_cylinder/providers/return_cylinder_provider.dart';
 import 'modules/receipt_summary/receipt_summary_provider.dart';
 import 'modules/receipt_summary/receipt_summary_view_model.dart';
 import 'providers/hive_db_provider.dart';
@@ -83,8 +81,6 @@ main() async {
       ChangeNotifierProvider(
           create: (_) =>
               PaymentProvider(paymentService: locator<PaymentService>())),
-      ChangeNotifierProvider(create: (_) => ReturnCylinderProvider()),
-      ChangeNotifierProvider(create: (_) => SelectCreditInvoiceProvider()),
     ],
     child: const Main(),
   ));

@@ -21,7 +21,7 @@ class ItemModel {
   late String? referenceNo;
   final SpecialPriceModel? hasSpecialPrice;
   final ItemModel? item;
-  int? itemQty;
+  final int? itemQty;
   final double? itemPrice;
 
   ItemModel({
@@ -54,9 +54,9 @@ class ItemModel {
         itemRegNo: json["itemRegNo"],
         itemName: json["itemName"] ?? '',
         costPrice: ((json['costPrice'] ?? 0) as num).toDouble(),
-        salePrice: ((json['salePrice'] ?? 0) as num).toDouble(),
-        nonVatAmount: ((json['nonVatAmount'] ?? 0) as num).toDouble(),
-        openingQty: ((json['openingQty'] ?? 0) as num).toDouble(),
+        salePrice: ((json['salePrice']?? 0) as num).toDouble(),
+        nonVatAmount: ((json['nonVatAmount'] ?? 0)as num).toDouble(),
+        openingQty: ((json['openingQty']?? 0) as num).toDouble(),
         vendorId: json["vendorId"],
         priceLevelId: json["priceLevelId"],
         itemTypeId: json["itemTypeId"],
@@ -66,7 +66,7 @@ class ItemModel {
         status: json["status"],
         isNew: json["isNew"],
         itemId: json["itemId"],
-        item: json["item"] != null ? ItemModel.fromJson(json["item"]) : null,
+        item: json["item"] != null ? ItemModel.fromJson(json["item"]) : null ,
         itemQty: json["itemQty"],
         itemPrice: json["itemPrice"],
         hasSpecialPrice: json["hasSpecialPrice"] == null

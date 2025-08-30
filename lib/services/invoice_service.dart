@@ -9,7 +9,7 @@ import '../providers/data_provider.dart';
 class InvoiceService {
   Future<int> invoiceCount(int routeCardId) async {
     final response =
-        await respo('invoice/count-by-routecard?id=$routeCardId');
+        await respo('invoice/count-by-routecard?id=${routeCardId}');
     final int count = response.data;
     return count;
   }
@@ -33,7 +33,7 @@ class InvoiceService {
     String url =
         'invoice/get?customerId=${cId ?? context.read<DataProvider>().selectedCustomer!.customerId}';
     if (type != null) {
-      url = '$url&type=$type';
+      url = url + '&type=${type}';
     }
 
     final response = await respo(url);

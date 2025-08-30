@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
-import 'package:gsr/commons/enums.dart';
 import 'package:gsr/models/item_summary_customer_wise.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/screens/about_rc_screen.dart';
@@ -206,7 +205,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const SelectCustomerView(
+                        builder: (context) => SelectCustomerView(
                               type: 'Loan',
                             )),
                   ).then((value) {
@@ -228,9 +227,8 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const SelectCustomerView(
+                        builder: (context) => SelectCustomerView(
                               type: 'Return',
-                              featureType: AppFeatureType.returnCylinder,
                             )),
                   ).then((value) {
                     dataProvider.clearItemList();
@@ -251,7 +249,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const SelectCustomerView(
+                        builder: (context) => SelectCustomerView(
                               type: 'Leak',
                             )),
                   ).then((value) {
