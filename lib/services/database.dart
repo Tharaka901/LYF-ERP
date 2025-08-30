@@ -162,9 +162,7 @@ Future<List<RouteCardItemModel>> getLeakIssueItems(
           item: ItemModel(
               id: loanItem.id ?? 0,
               itemRegNo: loanItem.itemRegNo ?? '',
-              itemName: loanItem.leakItem?.freeCylinderId == 0
-                  ? itemNameMap[loanItem.itemId.toString()] ?? ""
-                  : loanItem.itemName ?? "",
+              itemName: loanItem.itemName ?? "",
               costPrice: loanItem.costPrice?.toDouble() ?? 0,
               salePrice: loanItem.salePrice?.toDouble() ?? 0,
               openingQty: loanItem.openingQty?.toDouble() ?? 0,
