@@ -991,7 +991,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                         Navigator.popUntil(
                                             context,
                                             ModalRoute.withName(
-                                                SelectCustomerScreen.routeId));
+                                                SelectCustomerView.routeId));
                                       }
                                     } else {
                                       waiting(context, body: 'Sending...');
@@ -1010,7 +1010,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                       Navigator.popUntil(
                                           context,
                                           ModalRoute.withName(
-                                              SelectCustomerScreen.routeId));
+                                              SelectCustomerView.routeId));
                                     }
                                   },
                                   onSaveAndPrint: () async {
@@ -1147,7 +1147,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                                   Navigator.popUntil(
                                                       context,
                                                       ModalRoute.withName(
-                                                          SelectCustomerScreen
+                                                          SelectCustomerView
                                                               .routeId))
                                                 });
                                       }
@@ -1165,7 +1165,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                                 Navigator.popUntil(
                                                     context,
                                                     ModalRoute.withName(
-                                                        SelectCustomerScreen
+                                                        SelectCustomerView
                                                             .routeId))
                                               });
                                     }

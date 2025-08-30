@@ -867,7 +867,7 @@ Future<void> sendPaymentWithPrevious(BuildContext context, double total,
     invoiceProvider.invoiceRes = null;
 
     Navigator.popUntil(
-        context, ModalRoute.withName(SelectCustomerScreen.routeId));
+        context, ModalRoute.withName(SelectCustomerView.routeId));
     toast(
       'Sent successfully',
       toastState: TS.success,

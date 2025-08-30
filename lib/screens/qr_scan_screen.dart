@@ -46,7 +46,7 @@ class _QRScanScreenState extends State<QRScanScreen> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) => SelectCustomerScreen(
+              builder: (context) => SelectCustomerView(
                     qrText: customer.registrationId,
                     type: widget.type,
                   )));

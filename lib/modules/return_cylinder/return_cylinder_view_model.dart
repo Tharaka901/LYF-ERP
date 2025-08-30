@@ -91,7 +91,7 @@ class ReturnCylinderViewModel {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => const SelectCustomerScreen(
+              builder: (context) => const SelectCustomerView(
                     type: 'Return',
                   )),
         ).then((value) {

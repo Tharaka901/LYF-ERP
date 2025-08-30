@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
+import 'package:gsr/commons/enums.dart';
 import 'package:gsr/models/item_summary_customer_wise/item_summary_customer_wise.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/modules/route_card/about_rc_screen.dart';
@@ -123,7 +124,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                     title: 'Billing',
                     onTap: () => Navigator.pushNamed(
                       context,
-                      SelectCustomerScreen.routeId,
+                      SelectCustomerView.routeId,
                       arguments: {
                         //  'route_card': routeCard,
                       },
@@ -145,7 +146,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                     title: 'Manual Billing',
                     onTap: () => Navigator.pushNamed(
                       context,
-                      SelectCustomerScreen.routeId,
+                      SelectCustomerView.routeId,
                       arguments: {'route_card': routeCard, 'isManual': true},
                     ).then((value) {
                       dataProvider.clearItemList();
@@ -194,7 +195,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const SelectCustomerScreen(
+                          builder: (context) => const SelectCustomerView(
                                 type: 'Loan',
                               )),
                     ).then((value) {
@@ -216,8 +217,9 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const SelectCustomerScreen(
+                          builder: (context) => const SelectCustomerView(
                                 type: 'Return',
+                                featureType: AppFeatureType.returnCylinder,
                               )),
                     ).then((value) {
                       dataProvider.clearItemList();
@@ -238,7 +240,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const SelectCustomerScreen(
+                          builder: (context) => const SelectCustomerView(
                                 type: 'Leak',
                               )),
                     ).then((value) {

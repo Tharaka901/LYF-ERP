@@ -107,7 +107,8 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                 final formKey = GlobalKey<FormState>();
                 ItemModel? item;
                 double? maxQuantity;
-                callBack({required ItemModel selectedItem, required double maxQty}) {
+                callBack(
+                    {required ItemModel selectedItem, required double maxQty}) {
                   item = selectedItem;
                   if (selectedItem.hasSpecialPrice != null) {
                     item?.salePrice = selectedItem.hasSpecialPrice!.itemPrice;
@@ -218,7 +219,8 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                                 isNew: item!.isNew,
                                 status: item!.status,
                                 cylinderNo: cylindserNumberController.text,
-                                referenceNo: referenceNumberController.text),
+                                referenceNo: referenceNumberController.text,
+                                nonVatAmount: item!.nonVatAmount),
                             cylinderNo: cylindserNumberController.text,
                             referenceNo: referenceNumberController.text,
                             quantity: widget.type == 'Leak'

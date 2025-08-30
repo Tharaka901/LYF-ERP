@@ -1,3 +1,5 @@
+import 'package:gsr/modules/return_cylinder/providers/return_cylinder_provider.dart';
+import 'package:gsr/modules/return_cylinder/providers/select_credit_invoice_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import '../commons/locator.dart';
@@ -40,5 +42,7 @@ class AppProviders {
             invoiceService: locator<InvoiceService>(),
           ),
         ),
+        ChangeNotifierProvider(create: (_) => ReturnCylinderProvider()),
+        ChangeNotifierProvider(create: (_) => SelectCreditInvoiceProvider()),
       ];
 }

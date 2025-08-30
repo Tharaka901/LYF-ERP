@@ -10,8 +10,7 @@ class ItemService {
       bool onlyRefill = true,
       String? type}) async {
     if (type == 'rc-summary') {
-      final response =
-          await respo('route-card/$routeCardId/items');
+      final response = await respo('route-card/$routeCardId/items');
       List<dynamic> list = response.data;
 
       return list
@@ -110,5 +109,12 @@ class ItemService {
       }
     }
     return rcNewItems;
+  }
+
+  static Future<List<ItemModel>> getReturnCylinderItems(
+      int priceLevelId) async {
+    final response = await respo('items/get-return?priceLevelId=$priceLevelId');
+    List<dynamic> list = response.data;
+    return list.map((e) => ItemModel.fromJson(e)).toList();
   }
 }

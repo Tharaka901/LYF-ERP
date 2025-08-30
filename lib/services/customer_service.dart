@@ -64,4 +64,15 @@ class CustomerService {
       rethrow;
     }
   }
+
+  static Future<void> updateCustomerDepositBalance(
+      {required BuildContext context,
+      required int customerId,
+      required double depositBalance}) async {
+    await respo(
+      'customers/update',
+      method: Method.put,
+      data: {"customerId": customerId, "depositBalance": depositBalance},
+    );
+  }
 }

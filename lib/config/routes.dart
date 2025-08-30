@@ -9,7 +9,7 @@ class AppRoutes {
         AboutRCScreen.routeId: (context) => const AboutRCScreen(),
         AddItemsScreen.routeId: (context) => const AddItemsScreen(),
         AddPaymentScreen.routeId: (context) => const AddPaymentScreen(),
-        SelectCustomerScreen.routeId: (context) => const SelectCustomerScreen(),
+        SelectCustomerView.routeId: (context) => const SelectCustomerView(),
         CompletedRCScreen.routeId: (context) => const CompletedRCScreen(),
         InvoiceSummaryScreen.routeId: (context) => const InvoiceSummaryScreen(),
         HomeScreen.routeId: (context) => const HomeScreen(),
