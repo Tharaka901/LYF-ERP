@@ -18,13 +18,31 @@ import 'package:provider/provider.dart';
 class ReturnCylinderProvider extends ChangeNotifier {
   List<ItemModel> selectedItems = [];
   String returnCylinderInvoiceNumber = '';
+  double customerVatPercentage = 0;
 
-  double get totalPrice => selectedItems
-      .map((e) => e.salePrice * e.itemQty!)
-      .reduce((value, element) => value + element);
-  double get nonVatAmount => selectedItems
-      .map((e) => e.nonVatAmount! * e.itemQty!)
-      .reduce((value, element) => value + element);
+  double get totalItemAmount => selectedItems.isEmpty 
+      ? 0.0 
+      : selectedItems
+          .map((e) => e.salePrice * e.itemQty!)
+          .reduce((value, element) => value + element);
+          
+  double get nonVatAmount => selectedItems.isEmpty 
+      ? 0.0 
+      : selectedItems
+          .map((e) => e.nonVatAmount! * e.itemQty!)
+          .reduce((value, element) => value + element);
+          
+  double get subtotal => totalItemAmount + nonVatAmount;
+  
+  double get vatAmount => subtotal * customerVatPercentage / 100;
+  
+  double get grandPrice => subtotal + vatAmount;
+
+  void setCustomerVatPercentage(BuildContext context) {
+    final dataProvider = Provider.of<DataProvider>(context, listen: false);
+    final vat = dataProvider.selectedCustomer?.vat?.vatAmount ?? "18";
+    customerVatPercentage = double.parse(vat);
+  }
 
   void addSelectedItem(ItemModel item) {
     if (selectedItems.any((element) => element.id == item.id)) {
@@ -65,7 +83,7 @@ class ReturnCylinderProvider extends ChangeNotifier {
         Provider.of<SelectCreditInvoiceProvider>(context, listen: false);
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
 
-    if (totalPrice >= selectCreditInvoiceProvider.totalInvoicePaymentAmount) {
+    if (grandPrice >= selectCreditInvoiceProvider.totalInvoicePaymentAmount) {
       waiting(context, body: 'Sending...');
       try {
         //! Create request return cylinder invoice
@@ -75,16 +93,16 @@ class ReturnCylinderProvider extends ChangeNotifier {
             routecardId: dataProvider.currentRouteCard!.routeCardId!,
             customerId: dataProvider.selectedCustomer!.customerId!,
             employeeId: dataProvider.currentEmployee!.employeeId!,
-            status: totalPrice -
+            status: grandPrice -
                         selectCreditInvoiceProvider.totalInvoicePaymentAmount ==
                     0
                 ? 2
                 : 1,
-            total: totalPrice,
+            total: grandPrice,
             vatAmount:
-                double.parse((totalPrice - nonVatAmount).toStringAsFixed(2)),
+                double.parse((grandPrice - nonVatAmount).toStringAsFixed(2)),
             withoutVat: nonVatAmount,
-            balance: (totalPrice -
+            balance: (grandPrice -
                     selectCreditInvoiceProvider.totalInvoicePaymentAmount)
                 .toStringAsFixed(2),
           ),
@@ -131,7 +149,7 @@ class ReturnCylinderProvider extends ChangeNotifier {
           await CreditPaymentService.createCreditPayment(request);
         }
 
-        if (totalPrice - selectCreditInvoiceProvider.totalInvoicePaymentAmount >
+        if (grandPrice - selectCreditInvoiceProvider.totalInvoicePaymentAmount >
             0) {
           //! Update customer deposit balance
           if (context.mounted) {
@@ -139,7 +157,7 @@ class ReturnCylinderProvider extends ChangeNotifier {
                 context: context,
                 customerId: dataProvider.selectedCustomer!.customerId!,
                 depositBalance: dataProvider.selectedCustomer!.depositBalance! +
-                    (totalPrice -
+                    (grandPrice -
                         selectCreditInvoiceProvider.totalInvoicePaymentAmount));
           }
 
@@ -148,7 +166,7 @@ class ReturnCylinderProvider extends ChangeNotifier {
             routecardId: dataProvider.currentRouteCard!.routeCardId!,
             receiptNo: invoiceRes.data["invoice"]["invoiceNo"],
             customerId: dataProvider.selectedCustomer!.customerId!,
-            value: (totalPrice -
+            value: (grandPrice -
                     selectCreditInvoiceProvider.totalInvoicePaymentAmount)
                 .toStringAsFixed(2),
             status: 2,

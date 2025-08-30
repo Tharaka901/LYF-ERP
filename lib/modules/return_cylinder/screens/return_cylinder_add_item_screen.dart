@@ -23,6 +23,7 @@ class _ReturnCylinderAddItemScreenState
   void initState() {
     returnCylinderProvider =
         Provider.of<ReturnCylinderProvider>(context, listen: false);
+    returnCylinderProvider.setCustomerVatPercentage(context);
     super.initState();
   }
 

@@ -4,7 +4,6 @@ import 'package:gsr/modules/return_cylinder/components/text_containers.dart';
 import 'package:gsr/modules/return_cylinder/providers/return_cylinder_provider.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/modules/return_cylinder/screens/select_credit_invoice_for_return_cylinder.dart';
-import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
 
 class ReturnNoteScreen extends StatefulWidget {
@@ -27,6 +26,7 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
+    final vat = dataProvider.selectedCustomer?.vat?.vatAmount ?? "18";
     final returnCylinderProvider =
         Provider.of<ReturnCylinderProvider>(context, listen: false);
     const titleRowColor = Colors.white;
@@ -266,6 +266,15 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
               ),
               Row(
                 children: [
+                  const TextContainer(text: 'Total'),
+                  const Spacer(),
+                  TextContainer(
+                      text:
+                          formatPrice(returnCylinderProvider.totalItemAmount)),
+                ],
+              ),
+              Row(
+                children: [
                   const TextContainer(text: 'Non VAT Item Total'),
                   const Spacer(),
                   TextContainer(
@@ -274,9 +283,18 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
               ),
               Row(
                 children: [
+                  TextContainer(text: 'VAT $vat%'),
+                  const Spacer(),
+                  TextContainer(
+                      text: formatPrice(returnCylinderProvider.vatAmount)),
+                ],
+              ),
+              Row(
+                children: [
                   const TextContainer(text: 'Total Return Cylinder Price'),
                   const Spacer(),
-                  TextContainer(text: formatPrice(returnCylinderProvider.totalPrice)),
+                  TextContainer(
+                      text: formatPrice(returnCylinderProvider.grandPrice)),
                 ],
               ),
               const Divider(

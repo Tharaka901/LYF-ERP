@@ -56,7 +56,7 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
                             fontSize: 17, fontWeight: FontWeight.bold),
                       ),
                       const Spacer(),
-                      Text(formatPrice(returnCylinderProvider.totalPrice),
+                      Text(formatPrice(returnCylinderProvider.grandPrice),
                           style: const TextStyle(
                               fontSize: 17, fontWeight: FontWeight.bold)),
                     ],
