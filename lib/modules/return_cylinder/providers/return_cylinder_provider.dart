@@ -101,6 +101,7 @@ class ReturnCylinderProvider extends ChangeNotifier {
             total: grandPrice,
             vatAmount: vatAmount,
             withoutVat: totalItemAmount,
+            nonRefundableAmount: nonVatAmount,
             balance: (grandPrice -
                     selectCreditInvoiceProvider.totalInvoicePaymentAmount)
                 .toStringAsFixed(2),
@@ -142,7 +143,7 @@ class ReturnCylinderProvider extends ChangeNotifier {
                 ? invoice.chequeId!
                 : invoice.issuedInvoice.invoiceId!,
             receiptNo: invoiceRes.data["invoice"]["invoiceNo"],
-            status: 4,
+            status: invoice.chequeId != null ? 9 : 4,
             type: "return-cheque",
           );
           await CreditPaymentService.createCreditPayment(request);

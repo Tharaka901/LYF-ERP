@@ -24,6 +24,7 @@ class ReturnCylinderInvoice {
   final double total;
   final double vatAmount;
   final double withoutVat;
+  final double nonRefundableAmount;
   final String balance;
 
   ReturnCylinderInvoice({
@@ -35,6 +36,7 @@ class ReturnCylinderInvoice {
     required this.total,
     required this.vatAmount,
     required this.withoutVat,
+    required this.nonRefundableAmount,
     required this.balance,
   });
 
@@ -48,6 +50,7 @@ class ReturnCylinderInvoice {
       'total': total,
       'vatAmount': vatAmount,
       'withoutVat': withoutVat,
+      'nonRefundableAmount': nonRefundableAmount,
       'balance': balance,
     };
   }
