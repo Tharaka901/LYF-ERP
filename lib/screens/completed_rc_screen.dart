@@ -123,7 +123,7 @@ class _CompletedRCScreenState extends State<CompletedRCScreen> {
                         return SizedBox.shrink();
                       }
                       return OptionCard(
-                        title: routeCard.date,
+                        title: routeCard.date?.toString().split(' ')[0] ?? 'No Date',
                         subtitle: routeCard.routeCardNo,
                         trailing: routeCard.status == 0
                             ? const Icon(

@@ -111,7 +111,7 @@ class PrintInvoiceView extends StatelessWidget {
                               ),
                             ),
                             pw.Text(
-                              'Date: ${issuedInvoice?.createdAt ?? date(DateTime.now(), format: 'dd.MM.yyyy')}',
+                              'Date: ${dataProvider.currentRouteCard!.date?.toString().split(' ')[0] ?? 'No Date'}',
                               style: const pw.TextStyle(
                                 fontSize: 22.0,
                               ),

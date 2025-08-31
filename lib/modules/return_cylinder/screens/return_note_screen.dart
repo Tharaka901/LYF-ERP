@@ -28,7 +28,7 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     final vat = dataProvider.selectedCustomer?.vat?.vatAmount ?? "18";
     final returnCylinderProvider =
-        Provider.of<ReturnCylinderProvider>(context, listen: false);
+        Provider.of<ReturnCylinderProvider>(context);
     const titleRowColor = Colors.white;
     return Scaffold(
       appBar: AppBar(
@@ -104,7 +104,7 @@ class _ReturnNoteScreenState extends State<ReturnNoteScreen> {
                   Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: Text(
-                      date(DateTime.now(), format: 'dd.MM.yyyy'),
+                      dataProvider.currentRouteCard!.date?.toString().split(' ')[0] ?? 'No Date',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 16.0,

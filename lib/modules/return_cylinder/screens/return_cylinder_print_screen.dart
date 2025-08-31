@@ -45,12 +45,12 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
 
     // Get data from providers
     final invoiceNo = returnCylinderProvider.returnCylinderInvoiceNumber;
-    final totalAmount = returnCylinderProvider.totalPrice;
-    final vatAmount = double.parse((returnCylinderProvider.totalPrice -
+    final totalAmount = returnCylinderProvider.grandPrice;
+    final vatAmount = double.parse((returnCylinderProvider.grandPrice -
             returnCylinderProvider.nonVatAmount)
         .toStringAsFixed(2));
     final nonVatAmount = returnCylinderProvider.nonVatAmount;
-    final items = returnCylinderProvider.selectedReturnCylinderItems;
+    final items = returnCylinderProvider.selectedItems;
     final paidIssuedInvoices = selectCreditInvoiceProvider.paidIssuedInvoices;
     final totalInvoicePaymentAmount =
         selectCreditInvoiceProvider.totalInvoicePaymentAmount;
@@ -73,7 +73,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
               child: pw.Column(
                 children: [
                   // Company details
-                  ...CompanyConstants.companyDetails,
+                  ...CompanyConstants.companyDetails(true),
 
                   // Return Cylinder Invoice details
                   pw.SizedBox(height: 10.0),
@@ -511,14 +511,18 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                   pw.SizedBox(height: 20.0),
 
                   // Footer
-                  pw.Text(
-                    'Thank you for your business!',
-                    style: pw.TextStyle(
-                      fontSize: 14.0,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
-                    textAlign: pw.TextAlign.center,
+                  pw.Divider(thickness: 0.5),
+                  pwtitleCell(
+                    'Billing By: ${dataProvider.currentEmployee?.firstName}',
+                    color: const PdfColor.fromInt(0xFF000000),
                   ),
+                  pwtitleCell(
+                    'Billing Date & Time: $date',
+                    color: const PdfColor.fromInt(0xFF000000),
+                  ),
+                  pw.SizedBox(height: 2),
+                  MessageConstants.signatureNotRequired,
+                  pw.SizedBox(height: 5)
                 ],
               ),
             ),

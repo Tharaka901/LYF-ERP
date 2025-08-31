@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 // ignore: unused_import
@@ -119,26 +120,57 @@ class _SelectCustomerViewState extends State<SelectCustomerView> {
                   ),
                   TypeAheadField<CustomerModel>(
                     direction: VerticalDirection.up,
-                    onSelected: (customer) => setState(() {
-                      searchController.text = customer.businessName ?? '';
-                      qrController.text = customer.registrationId ?? '';
-                      dataProvider.setSelectedCustomer(customer);
-                    }),
+                    debounceDuration: const Duration(milliseconds: 300),
+                    onSelected: (customer) {
+                      setState(() {
+                        qrController.text = customer.registrationId ?? '';
+                        dataProvider.setSelectedCustomer(customer);
+                      });
+                    },
                     itemBuilder: (context, customer) => ListTile(
-                      title: Text(customer.businessName ?? ''),
-                      subtitle: Text(customer.registrationId ?? ''),
+                      title: Text(
+                        customer.businessName ?? 'No Name',
+                        style: const TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                      subtitle: Text(
+                        customer.registrationId ?? 'No ID',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
                     ),
                     emptyBuilder: (context) => const Padding(
-                      padding: EdgeInsets.all(10.0),
-                      child: Text('No customers matched!'),
+                      padding: EdgeInsets.all(16.0),
+                      child: Text(
+                        'No customers available.',
+                        style: TextStyle(color: Colors.grey),
+                      ),
                     ),
-                    loadingBuilder: (context) =>
-                        const Center(child: CircularProgressIndicator()),
-                    suggestionsCallback: (pattern) => selectCustomerViewModel
-                        .onPressedSearchCustomerTextField(pattern, context),
+                    loadingBuilder: (context) => const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                    suggestionsCallback: (pattern) async {
+                      // Force a small delay to ensure the search is triggered
+                      await Future.delayed(const Duration(milliseconds: 100));
+
+                      final results = await selectCustomerViewModel
+                          .onPressedSearchCustomerTextField(pattern, context);
+
+                      return results;
+                    },
                     builder: (context, controller, focusNode) {
+                      // Update the TypeAheadField's controller when a customer is selected
+                      if (dataProvider.selectedCustomer != null &&
+                          controller.text !=
+                              dataProvider.selectedCustomer!.businessName) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          controller.text =
+                              dataProvider.selectedCustomer!.businessName ?? '';
+                        });
+                      }
+
                       return TextField(
-                        controller: searchController,
+                        controller:
+                            controller, // Use the controller from TypeAheadField
                         focusNode: focusNode,
                         style: const TextStyle(
                           fontSize: 16.0,
@@ -196,11 +228,17 @@ class _SelectCustomerViewState extends State<SelectCustomerView> {
                           ),
                         ),
                         onTap: () => qrController.clear(),
+                        onChanged: (value) {
+                          controller.text = value;
+                        },
                       );
                     },
                   ),
                   const SizedBox(
                     height: 20.0,
+                  ),
+                  const SizedBox(
+                    height: 10.0,
                   ),
                   SizedBox(
                     width: double.infinity,
