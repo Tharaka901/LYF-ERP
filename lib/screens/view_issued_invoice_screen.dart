@@ -41,14 +41,13 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: defaultBackgroundColor,
       appBar: AppBar(
         title: Text(issuedInvoice.invoiceNo),
         actions: [
           IconButton(
               onPressed: () {
-                final cash = issuedInvoice.payments
-                        !.where((p) => p.paymentMethod == 1)
+                final cash = issuedInvoice.payments!
+                        .where((p) => p.paymentMethod == 1)
                         .isNotEmpty
                     ? issuedInvoice.payments!
                         .where((p) => p.paymentMethod == 1)
@@ -122,7 +121,6 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                                 creditValue: 0,
                                 employeeId: 0,
                                 status: 0,
-                              
                                 payments: [],
                                 previousPayments: [],
                                 createdAt: DateTime.now().toString(),
@@ -168,7 +166,8 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: Text(
-                            issuedInvoice.createdAt ?? date(DateTime.now(),format: 'dd.MM.yyyy'),
+                            issuedInvoice.createdAt ??
+                                date(DateTime.now(), format: 'dd.MM.yyyy'),
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 18.0,
@@ -291,30 +290,34 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      ...issuedInvoice.invoiceItems!
-                          .map(
-                            (item) => TableRow(
-                              children: [
-                                cell(
-                                  item.item?.itemName ?? '',
-                                  align: TextAlign.start,
-                                ),
-                                cell(
-                                  item.itemQty != null ? item.itemQty!.toString() : '',
-                                  align: TextAlign.center,
-                                ),
-                                cell(
-                                  item.itemPrice != null ? formatPrice(item.itemPrice!) : '',
-                                  align: TextAlign.center,
-                                ),
-                                cell(
-                                  item.itemPrice != null && item.itemQty != null ? formatPrice(item.itemPrice! * item.itemQty!) : '',
-                                  align: TextAlign.end,
-                                ),
-                              ],
+                      ...issuedInvoice.invoiceItems!.map(
+                        (item) => TableRow(
+                          children: [
+                            cell(
+                              item.item?.itemName ?? '',
+                              align: TextAlign.start,
                             ),
-                          )
-                          ,
+                            cell(
+                              item.itemQty != null
+                                  ? item.itemQty!.toInt().toString()
+                                  : '',
+                              align: TextAlign.center,
+                            ),
+                            cell(
+                              item.itemPrice != null
+                                  ? formatPrice(item.itemPrice!)
+                                  : '',
+                              align: TextAlign.center,
+                            ),
+                            cell(
+                              item.itemPrice != null && item.itemQty != null
+                                  ? formatPrice(item.itemPrice! * item.itemQty!)
+                                  : '',
+                              align: TextAlign.end,
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -344,7 +347,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                   ],
                 ),
               ),
-               SizedBox(
+              SizedBox(
                 width: double.infinity,
                 child: Row(
                   children: [
@@ -424,7 +427,9 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                               ),
                               cell(
                                 invoice.creditInvoice?.createdAt != null
-                                    ? date(DateTime.parse(invoice.creditInvoice!.createdAt!),
+                                    ? date(
+                                        DateTime.parse(
+                                            invoice.creditInvoice!.createdAt!),
                                         format: 'dd-MM-yyyy')
                                     : '',
                                 align: TextAlign.center,
@@ -475,7 +480,8 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                               Row(
                                 children: [
                                   text('Receipt No:'),
-                                  text(issuedInvoice.payments![0].receiptNo ?? ''),
+                                  text(issuedInvoice.payments![0].receiptNo ??
+                                      ''),
                                 ],
                               ),
                             ],
