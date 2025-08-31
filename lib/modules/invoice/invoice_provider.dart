@@ -1,8 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/invoice/invoice_model.dart';     
+import '../../models/invoice/invoice_model.dart';
 import '../../models/invoice_item/invoice_item_model.dart';
 import '../../models/payment_data/payment_data_model.dart';
 import '../../models/response.dart';
@@ -27,8 +28,8 @@ class InvoiceProvider extends ChangeNotifier {
     final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     if (hiveDBProvider.isInternetConnected) {
-      int invoiceCount = await invoiceService.invoiceCount(
-          dataProvider.currentRouteCard!.routeCardId!);
+      int invoiceCount = await invoiceService
+          .invoiceCount(dataProvider.currentRouteCard!.routeCardId!);
       int invoiceCountLocalDb = hiveDBProvider.invoiceBox!.length;
       invoiceNu =
           '${dataProvider.currentRouteCard!.routeCardNo}/${invoiceCount + invoiceCountLocalDb + 1}';
@@ -56,31 +57,38 @@ class InvoiceProvider extends ChangeNotifier {
     iscreateReceipt = false;
     // Ensure the context is mounted when used after an async gap
     if (!context.mounted) return;
-
-    final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
-    final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    if (hiveDBProvider.isInternetConnected) {
-      final invoiceRequest = invoiceViewModel.setInvoiceCreateRequest(context);
-      invoiceRes = await invoiceService.createInvoice(invoiceRequest);
-      //! Update local DB invoice number
-      int invoiceCount = await invoiceService.invoiceCount(
-          dataProvider.currentRouteCard!.routeCardId!);
-      await hiveDBProvider.dataBox!.put(
-        'invoiceCount',
-        invoiceCount.toString(),
-      );
-    } else {
-      //! Save invoice in local DB
-      final invoice = invoiceViewModel.setInvoiceObject(context,
-          onlyPayment: onlyPayment, paymentDataModel: paymentDataModel);
-      await hiveDBProvider.invoiceBox!.put(invoiceNo ?? invoiceNu, invoice);
-      //! Update local DB invoice number
-      int invoiceCount =
-          int.parse(hiveDBProvider.dataBox!.get('invoiceCount') ?? '0');
-      await hiveDBProvider.dataBox!.put(
-        'invoiceCount',
-        (invoiceCount + 1).toString(),
-      );
+    try {
+      final hiveDBProvider =
+          Provider.of<HiveDBProvider>(context, listen: false);
+      final dataProvider = Provider.of<DataProvider>(context, listen: false);
+      if (hiveDBProvider.isInternetConnected) {
+        final invoiceRequest =
+            invoiceViewModel.setInvoiceCreateRequest(context);
+        invoiceRes = await invoiceService.createInvoice(invoiceRequest);
+        //! Update local DB invoice number
+        int serverCount = await invoiceService
+            .invoiceCount(dataProvider.currentRouteCard!.routeCardId!);
+        int localCount =
+            int.parse(hiveDBProvider.dataBox!.get('invoiceCount') ?? '0');
+        int maxCount = serverCount > localCount ? serverCount : localCount;
+        await hiveDBProvider.dataBox!.put('invoiceCount', maxCount.toString());
+      } else {
+        //! Save invoice in local DB
+        final invoice = invoiceViewModel.setInvoiceObject(context,
+            onlyPayment: onlyPayment, paymentDataModel: paymentDataModel);
+        await hiveDBProvider.invoiceBox!.put(invoiceNo ?? invoiceNu, invoice);
+        //! Update local DB invoice number
+        int invoiceCount =
+            int.parse(hiveDBProvider.dataBox!.get('invoiceCount') ?? '0');
+        await hiveDBProvider.dataBox!.put(
+          'invoiceCount',
+          (invoiceCount + 1).toString(),
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error creating invoice: $e');
+      }
     }
   }
 

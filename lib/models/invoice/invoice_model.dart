@@ -76,8 +76,10 @@ class InvoiceModel {
         employee: json["employee"] == null
             ? null
             : EmployeeModel.fromJson(json["employee"]),
-        invoiceItems: json["invoiceItems"] != null
-            ? List<InvoiceItemModel>.from(json["invoiceItems"])
+        invoiceItems: json["items"] != null
+            ? List<InvoiceItemModel>.from(
+                json["items"].map((x) => InvoiceItemModel.fromJson(x)),
+              )
             : [],
         payments: json["payments"] == null
             ? []

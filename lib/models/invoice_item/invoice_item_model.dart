@@ -31,7 +31,7 @@ class InvoiceItemModel {
         status: json["status"],
         routecardId: json["routecardId"],
         itemName: json["itemName"],
-        item: json["item"],
+        item: json["item"] != null ? ItemModel.fromJson(json["item"]) : null,
       );
 
   Map<dynamic, dynamic> toJson() => {

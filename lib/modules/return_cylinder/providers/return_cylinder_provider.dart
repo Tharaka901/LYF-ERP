@@ -99,9 +99,8 @@ class ReturnCylinderProvider extends ChangeNotifier {
                 ? 2
                 : 1,
             total: grandPrice,
-            vatAmount:
-                double.parse((grandPrice - nonVatAmount).toStringAsFixed(2)),
-            withoutVat: nonVatAmount,
+            vatAmount: vatAmount,
+            withoutVat: totalItemAmount,
             balance: (grandPrice -
                     selectCreditInvoiceProvider.totalInvoicePaymentAmount)
                 .toStringAsFixed(2),

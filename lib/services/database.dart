@@ -496,9 +496,9 @@ Future<List<CustomerDeposite>> getCustomerDeposites(BuildContext context,
 }
 
 Future<List<InvoiceModel>> getIssuedInvoices(BuildContext context) async {
+  try {
   final response = await respo(
       'invoice/get?routecardId=${context.read<DataProvider>().currentRouteCard!.routeCardId}');
-
   List<dynamic> list = response.data ?? [];
   List<InvoiceModel> selectedInvoiceList = [];
   final allInvoiceList = list.map((e) => InvoiceModel.fromJson(e)).toList();
@@ -507,8 +507,12 @@ Future<List<InvoiceModel>> getIssuedInvoices(BuildContext context) async {
       selectedInvoiceList.add(element);
     }
   }
-  selectedInvoiceList.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
-  return selectedInvoiceList;
+    selectedInvoiceList.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
+    return selectedInvoiceList;
+  } catch (e) {
+    print(e);
+    rethrow;
+  }
 }
 
 Future<List<BalancePayment>> getBalancePayments(BuildContext context,
