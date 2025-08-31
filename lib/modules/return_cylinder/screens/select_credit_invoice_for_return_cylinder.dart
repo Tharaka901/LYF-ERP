@@ -3,6 +3,7 @@ import 'package:gsr/modules/return_cylinder/providers/select_credit_invoice_prov
 import 'package:gsr/modules/return_cylinder/components/select_credit_invoice_section.dart';
 import 'package:gsr/modules/return_cylinder/components/credit_invoice_paid_table.dart';
 import 'package:gsr/modules/return_cylinder/providers/return_cylinder_provider.dart';
+import 'package:gsr/modules/return_cylinder/screens/return_cylinder_print_screen.dart';
 import 'package:provider/provider.dart';
 import '../../../commons/common_methods.dart';
 import '../../../providers/data_provider.dart';
@@ -70,30 +71,59 @@ class _SelectCreditInvoiceForReturnCylinderScreenState
                   const SizedBox(
                     height: 10.0,
                   ),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 55.0,
-                    child: OutlinedButton(
-                      onPressed: () async {
-                        returnCylinderProvider.saveReturnCylinderData(context);
-                      },
-                      style: ButtonStyle(
-                        backgroundColor:
-                            WidgetStateProperty.all(Colors.blue[800]),
-                        shape: WidgetStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 55.0,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              returnCylinderProvider
+                                  .saveReturnCylinderData(context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue[800],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                            ),
+                            child: const Text(
+                              'Save',
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                      child: const Text(
-                        'Save',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          color: Colors.white,
+                      const SizedBox(width: 15.0),
+                      Expanded(
+                        child: SizedBox(
+                          height: 55.0,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              returnCylinderProvider.handlePrint(context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green[600],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                            ),
+                            child: const Text(
+                              'Print',
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),

@@ -13,6 +13,7 @@ import 'package:gsr/services/credit_payment_service.dart';
 import 'package:gsr/services/over_payment_service.dart';
 import 'package:gsr/services/customer_service.dart';
 import 'package:gsr/providers/data_provider.dart';
+import 'package:gsr/modules/return_cylinder/screens/return_cylinder_print_screen.dart';
 import 'package:provider/provider.dart';
 
 class ReturnCylinderProvider extends ChangeNotifier {
@@ -196,6 +197,19 @@ class ReturnCylinderProvider extends ChangeNotifier {
         toast(e.toString(), toastState: TS.error);
         rethrow;
       }
+    }
+  }
+
+  void handlePrint(BuildContext context) {
+    try {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ReturnCylinderPrintScreen(),
+        ),
+      );
+    } catch (e) {
+      toast('Error: $e', toastState: TS.error);
     }
   }
 }
