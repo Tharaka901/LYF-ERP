@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/cheque.dart';
+import 'package:gsr/models/cheque/cheque.dart';
 import 'package:gsr/models/response.dart';
 import 'package:gsr/models/voucher.dart';
 import 'package:gsr/providers/data_provider.dart';
@@ -141,7 +142,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                           onConfirm: () {
                             if (formKey.currentState!.validate()) {
                               dataProvider.addCheque(
-                                Cheque(
+                                ChequeModel(
                                   chequeNumber:
                                       chequeNumberController.text.trim(),
                                   chequeAmount: doub(chequeAmountController.text
@@ -215,12 +216,12 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                         : dummy,
                   ),
                   const Divider(),
-                  FutureBuilder<List<Voucher>>(
+                  FutureBuilder<List<VoucherModel>>(
                     future: getVouchers(context),
-                    builder: (context, AsyncSnapshot<List<Voucher>> snapshot) =>
+                    builder: (context, AsyncSnapshot<List<VoucherModel>> snapshot) =>
                         snapshot.connectionState == ConnectionState.waiting
                             ? const CircularProgressIndicator()
-                            : DropdownButtonFormField<Voucher>(
+                            : DropdownButtonFormField<VoucherModel>(
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),

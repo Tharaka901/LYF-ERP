@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/models/item.dart';
+import 'package:money_formatter/money_formatter.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -8,13 +9,11 @@ import 'package:pdf/widgets.dart' as pw;
 // const baseUrl = 'https://api.cjtradingcompany.lk/api';
 // const baseUrl = 'https://erpapi.hjtradingcompany.lk/api';
 // const baseUrl = 'https://erpapi.hjtradingcompanymannar.lk/api';
-// const baseUrl = 'https://api.hjtradingcompanymannar.lk/api';
 // const baseUrl = 'https://api.jebiyagama.lk/api';
 // const baseUrl = "http://localhost:8080/api";
 // const baseUrl = "http://0.0.0.0:8080/api";
 const baseUrl = 'https://api.ravonbakers.lk/api';
 // const baseUrl = 'https://stageerpapi.jayawardenaagencies.lk/api';
-// const baseUrl = 'https://api.jayawardenaagencies.lk/api';
 
 const defaultAcceptColor = Colors.green;
 
@@ -63,7 +62,7 @@ class MessageConstants {
   //!Print
   static pw.Text signatureNotRequired = pw.Text(
       'This is a system generated invoice and signature isn\'t required',
-      style: const pw.TextStyle(fontSize: 20));
+      style: pw.TextStyle(fontSize: 20));
 }
 
 class ThemeConstants {
@@ -80,12 +79,12 @@ class ThemeConstants {
 }
 
 class CompanyConstants {
-  static const name = 'Jayawardena Enterprises (Pvt) Ltd';
-  static const distribute = 'Distributor of Litro Gas Lanka Limited';
-  static const address = 'No 142, Colombo Road, Biyagama';
-  static const phoneNumber = 'Tel: 011 2488003';
-  static const email = 'Email: jayaentlitro@gmail.com';
-  static const vatNumber = 'Our Vat No - 104648479-7000';
+  // static const name = 'Jayawardena Enterprises (Pvt) Ltd';
+  // static const distribute = 'Distributor of Litro Gas Lanka Limited';
+  // static const address = 'No 142, Colombo Road, Biyagama';
+  // static const phoneNumber = 'Tel: 011 2488003';
+  // static const email = 'Email: jayaentlitro@gmail.com';
+  // static const vatNumber = 'Our Vat No - 104648479-7000';
 
   // static const name = 'Jayawardena Agencies (Pvt) Ltd';
   // static const distribute = 'Distributor of Litro Gas Lanka Limited';
@@ -108,12 +107,12 @@ class CompanyConstants {
   // static const email = 'Email: cjtradingcompany99@gmail.com';
   // static const vatNumber = 'Our Vat No - 109812617-7000';
 
-  // static const name = 'H.J. Trading Company (Pvt) Ltd';
-  // static const distribute = 'Distributor of Litro Gas Lanka Limited';
-  // static const address = 'Pahala Galkandegama, Poonewa, Medawachchiya';
-  // static const phoneNumber = 'Tel: 024-2054830';
-  // static const email = 'Email: hjtrading.vavuniya@gmail.com';
-  // static const vatNumber = 'Our Vat No - 102899156-7000';
+  static const name = 'H.J. Trading Company (Pvt) Ltd';
+  static const distribute = 'Distributor of Litro Gas Lanka Limited';
+  static const address = 'Pahala Galkandegama, Poonewa, Medawachchiya';
+  static const phoneNumber = 'Tel: 024-2054830';
+  static const email = 'Email: hjtrading.vavuniya@gmail.com';
+  static const vatNumber = 'Our Vat No - 102899156-7000';
 
   static companyDetails(bool hasOurVatNumber) => [
         pw.Text(
@@ -148,4 +147,39 @@ class CompanyConstants {
             ],
           ),
       ];
+}
+
+class HiveBox {
+  static const data = 'Data';
+  static const employee = 'Employee';
+  static const routeCard = 'RouteCard';
+  static const customers = 'Customers';
+  static const routeCardBasicItems = 'RouteCardBasicItems';
+  static const routeCardItemSummary = 'RouteCardItemSummary';
+  static const routeCardNewItems = 'RouteCardNewItems';
+  static const routeCardOtherItems = 'RouteCardOtherItems';
+  static const invoice = "Invoicess";
+  static const customerDeposite = "CustomerDeposites";
+  static const customerCredit = "CustomerCredit";
+  static const paymentBox = "PaymentsBox";
+  static const creditInvoicePayFromDepositesDataBox = "CreditInvoicePayFromDepositesDataBox";
+  static const routeCardSoldItems = "RouteCardSoldItems";
+  static const routeCardSoldLoanItems = "RouteCardSoldLoanItems";
+  static const routeCardSoldLeakItems = "RouteCardSoldLeakItems";
+  static const returnCylinderSummaryCustomerWiseLeak = "ReturnCylinderSummaryCustomerWiseLeak";
+}
+
+price(double price) {
+  final bool negative = price < 0;
+  return MoneyFormatter(
+    amount: negative ? -price : price,
+    settings: MoneyFormatterSettings(
+      symbol: negative ? '-Rs' : 'Rs',
+      thousandSeparator: ',',
+      decimalSeparator: '.',
+      symbolAndNumberSeparator: '.',
+      fractionDigits: 2,
+      compactFormatType: CompactFormatType.short,
+    ),
+  ).output.symbolOnLeft;
 }

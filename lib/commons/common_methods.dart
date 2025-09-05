@@ -237,3 +237,36 @@ pwtitleCell(String value,
                 color: color ?? PdfColor.fromInt(0xFF000000)),
           ),
         ]));
+
+TableCell cell(String value, {TextAlign? align}) => TableCell(
+      child: Padding(
+        padding: const EdgeInsets.all(5.0),
+        child: Text(
+          value,
+          textAlign: align ?? TextAlign.center,
+        ),
+      ),
+    );
+TableCell titleCell(String value, {TextAlign? align}) => TableCell(
+      child: Padding(
+        padding: const EdgeInsets.all(5.0),
+        child: Text(
+          value,
+          textAlign: align ?? TextAlign.center,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+Widget text(String value, {TextAlign? align}) => Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: Text(
+        value,
+        textAlign: align ?? TextAlign.center,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );

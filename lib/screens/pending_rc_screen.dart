@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/route_card.dart';
+import 'package:gsr/models/route_card/route_card_model.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/screens/route_card_screen.dart';
 import 'package:gsr/services/database.dart';
@@ -24,10 +25,10 @@ class _PendingRCScreenState extends State<PendingRCScreen> {
       appBar: AppBar(
         title: const Text('Route Cards'),
       ),
-      body: FutureBuilder<List<RouteCard>>(
+      body: FutureBuilder<List<RouteCardModel>>(
         future: getPendingAndAcceptedRouteCards(
             dataProvider.currentEmployee!.employeeId!),
-        builder: (context, AsyncSnapshot<List<RouteCard>> snapshot) =>
+        builder: (context, AsyncSnapshot<List<RouteCardModel>> snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
                 ? const Center(
                     child: CircularProgressIndicator(),
@@ -40,7 +41,7 @@ class _PendingRCScreenState extends State<PendingRCScreen> {
                               final routeCard = snapshot.data![index];
                               return OptionCard(
                                 title:
-                                    '${routeCard.date} : ${routeCard.routeCardNo} - ${routeCard.route.routeName}',
+                                    '${routeCard.date} : ${routeCard.routeCardNo} - ${routeCard.route?.routeName}',
                                 titleFontSize: 20,
                                 height: 30.0,
                                 trailing: routeCard.status == 0

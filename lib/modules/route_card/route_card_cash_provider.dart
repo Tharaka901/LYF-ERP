@@ -86,7 +86,7 @@ class RouteCardCashProvider extends ChangeNotifier {
   Future<void> completeRC(BuildContext context) async {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     final cashSettlementModel = CashSettlementModel(
-      routecardId: dataProvider.currentRouteCard!.routeCardId,
+      routecardId: dataProvider.currentRouteCard!.routeCardId!,
       cash5000: int.parse(cash5000Controller.text),
       cash2000: int.parse(cash2000Controller.text),
       cash1000: int.parse(cash1000Controller.text),

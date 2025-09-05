@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
-import 'package:gsr/models/payment.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
+
+import '../models/payment/payment_model.dart';
 
 class OverallSummaryScreen extends StatefulWidget {
   static const routeId = 'O_SUMMARY';
@@ -39,13 +40,13 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
               const SizedBox(
                 height: 10.0,
               ),
-              FutureBuilder<List<Payment>>(
+              FutureBuilder<List<PaymentModel>>(
                 future: getPayments(
                   context,
-                  routecardId: dataProvider.currentRouteCard!.routeCardId,
+                  routecardId: dataProvider.currentRouteCard!.routeCardId!,
                   paymentMethod: 1,
                 ),
-                builder: (context, AsyncSnapshot<List<Payment>> snapshot) {
+                builder: (context, AsyncSnapshot<List<PaymentModel>> snapshot) {
                   var cashTotal = 0.0;
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -54,7 +55,7 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     final payments = snapshot.data!;
                     for (var payment in payments) {
-                      cashTotal += payment.amount;
+                      cashTotal += payment.amount ?? 0;
                     }
                     return Column(
                       children: [
@@ -88,7 +89,7 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                                 (payment) => TableRow(
                                   children: [
                                     cell(
-                                      payment.receiptNo,
+                                      payment.receiptNo ?? '',
                                       align: TextAlign.start,
                                     ),
                                     cell(
@@ -98,7 +99,9 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                                     ),
                                     cell(payment.invoice!.invoiceNo.toString()),
                                     cell(
-                                      formatPrice(payment.amount),
+                                      payment.amount != null
+                                          ? formatPrice(payment.amount!)
+                                          : '',
                                       align: TextAlign.end,
                                     ),
                                   ],
@@ -140,13 +143,13 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
               const SizedBox(
                 height: 10.0,
               ),
-              FutureBuilder<List<Payment>>(
+              FutureBuilder<List<PaymentModel>>(
                 future: getPayments(
                   context,
-                  routecardId: dataProvider.currentRouteCard!.routeCardId,
+                  routecardId: dataProvider.currentRouteCard!.routeCardId!,
                   paymentMethod: 2,
                 ),
-                builder: (context, AsyncSnapshot<List<Payment>> snapshot) {
+                builder: (context, AsyncSnapshot<List<PaymentModel>> snapshot) {
                   var chequeTotal = 0.0;
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -155,7 +158,7 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     final payments = snapshot.data!;
                     for (var payment in payments) {
-                      chequeTotal += payment.amount;
+                      chequeTotal += payment.amount ?? 0;
                     }
                     return Column(
                       children: [
@@ -190,7 +193,7 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                                 (payment) => TableRow(
                                   children: [
                                     cell(
-                                      payment.receiptNo,
+                                      payment.receiptNo ?? '',
                                       align: TextAlign.start,
                                     ),
                                     cell(
@@ -201,7 +204,9 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                                     cell(payment.invoice!.invoiceNo.toString()),
                                     cell(payment.chequeNo!),
                                     cell(
-                                      formatPrice(payment.amount),
+                                      payment.amount != null
+                                          ? formatPrice(payment.amount!)
+                                          : '',
                                       align: TextAlign.end,
                                     ),
                                   ],
@@ -243,13 +248,13 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
               const SizedBox(
                 height: 10.0,
               ),
-              FutureBuilder<List<Payment>>(
+              FutureBuilder<List<PaymentModel>>(
                 future: getPayments(
                   context,
-                  routecardId: dataProvider.currentRouteCard!.routeCardId,
+                  routecardId: dataProvider.currentRouteCard!.routeCardId!,
                   paymentMethod: 3,
                 ),
-                builder: (context, AsyncSnapshot<List<Payment>> snapshot) {
+                builder: (context, AsyncSnapshot<List<PaymentModel>> snapshot) {
                   var voucherTotal = 0.0;
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -258,7 +263,7 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     final payments = snapshot.data!;
                     for (var payment in payments) {
-                      voucherTotal += payment.amount;
+                      voucherTotal += payment.amount ?? 0;
                     }
                     return Column(
                       children: [
@@ -295,11 +300,11 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                                     (payment) => TableRow(
                                       children: [
                                         cell(
-                                          payment.receiptNo,
+                                          payment.receiptNo ?? '',
                                           align: TextAlign.start,
                                         ),
                                         cell(
-                                          payment.invoice?.customer
+                                            payment.invoice?.customer
                                                   ?.businessName ??
                                               '',
                                           align: TextAlign.start,
@@ -308,7 +313,9 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                                             .toString()),
                                         cell(payment.chequeNo ?? '-'),
                                         cell(
-                                          formatPrice(payment.amount),
+                                          payment.amount != null
+                                              ? formatPrice(payment.amount!)
+                                              : '',
                                           align: TextAlign.end,
                                         ),
                                       ],

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/models/item.dart';
-import 'package:gsr/models/routecard_item.dart';
 import 'package:provider/provider.dart';
 
 import '../models/added_item.dart';
+import '../models/item/item_model.dart';
+import '../models/route_card_item/route_card_item_model.dart';
 import '../providers/data_provider.dart';
 
 class CounterWidget extends StatefulWidget {
-  final RoutecardItem routecardItem;
+  final RouteCardItemModel routecardItem;
 
   const CounterWidget({super.key, required this.routecardItem});
   @override
@@ -34,16 +35,16 @@ class _CounterWidgetState extends State<CounterWidget> {
         final item = widget.routecardItem.item;
         dataProvider.addItem(
           AddedItem(
-            item: Item(
-                id: item!.id,
-                itemRegNo: item.itemRegNo,
-                itemName: item.itemName,
-                costPrice: item.costPrice,
-                salePrice: item.salePrice,
-                openingQty: item.openingQty,
-                vendorId: item.vendorId,
-                priceLevelId: item.priceLevelId,
-                itemTypeId: item.itemTypeId,
+            item: ItemModel(
+                id: item!.id!,
+                itemRegNo: item.itemRegNo ?? '',
+                itemName: item.itemName ?? '',
+                costPrice: item.costPrice ?? 0,
+                salePrice: item.salePrice ?? 0,
+                openingQty: item.openingQty ?? 0,
+                vendorId: item.vendorId ?? 0,
+                priceLevelId: item.priceLevelId ?? 0,
+                itemTypeId: item.itemTypeId ?? 0,
                 stockId: item.stockId,
                 costAccId: item.costAccId,
                 incomeAccId: item.incomeAccId,
@@ -99,13 +100,13 @@ class _CounterWidgetState extends State<CounterWidget> {
         final item = widget.routecardItem.item;
         dataProvider.addItem(
           AddedItem(
-            item: Item(
-                id: item!.id,
-                itemRegNo: item.itemRegNo,
-                itemName: item.itemName,
-                costPrice: item.costPrice,
-                salePrice: item.salePrice,
-                openingQty: item.openingQty,
+            item: ItemModel(
+                id: item!.id!,
+                itemRegNo: item.itemRegNo ?? '',
+                itemName: item.itemName ?? '',
+                costPrice: item.costPrice ?? 0,
+                salePrice: item.salePrice ?? 0,
+                openingQty: item.openingQty ?? 0,
                 vendorId: item.vendorId,
                 priceLevelId: item.priceLevelId,
                 itemTypeId: item.itemTypeId,

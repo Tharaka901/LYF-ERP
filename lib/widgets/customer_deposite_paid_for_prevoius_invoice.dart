@@ -6,19 +6,19 @@ import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/services/database.dart';
 import 'package:provider/provider.dart';
 
-import '../models/issued_invoice.dart';
+import '../models/invoice/invoice_model.dart';
 
 class CustomerDepositePaidForPriviousInvoice extends StatefulWidget {
   final TextEditingController paymentController;
   final GlobalKey<FormState> formKey;
   final void Function(Balance selectedBalance) callBack;
   const CustomerDepositePaidForPriviousInvoice({
-    Key? key,
+    super.key,
     required this.paymentController,
     required this.formKey,
     required this.callBack,
     // required this.balance,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomerDepositePaidForPriviousInvoice> createState() =>
@@ -38,17 +38,17 @@ class _CustomerDepositePaidForPriviousInvoiceState
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            FutureBuilder<List<IssuedInvoice>>(
+            FutureBuilder<List<InvoiceModel>>(
               future: creditInvoices(context,
                   cId: dataProvider.selectedCustomer!.customerId,
                   type: 'with-cheque'),
-              builder: (context, AsyncSnapshot<List<IssuedInvoice>> snapshot) {
+              builder: (context, AsyncSnapshot<List<InvoiceModel>> snapshot) {
                 if (snapshot.connectionState != ConnectionState.waiting) {
                   if (snapshot.data!.isNotEmpty) {
                     dataProvider.setSelectedInvoice(snapshot.data![0]);
                   }
                 }
-                ;
+                
                 return snapshot.connectionState == ConnectionState.waiting
                     ? const CircularProgressIndicator()
                     : SizedBox(
@@ -57,7 +57,7 @@ class _CustomerDepositePaidForPriviousInvoiceState
                           children: [
                             Expanded(
                               flex: 3,
-                              child: DropdownButtonFormField<IssuedInvoice>(
+                              child: DropdownButtonFormField<InvoiceModel>(
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
@@ -92,8 +92,8 @@ class _CustomerDepositePaidForPriviousInvoiceState
                                         return DropdownMenuItem(
                                           value: element,
                                           child: Text(
-                                              '${element.invoiceNo}  ${formatPrice(element.creditValue)}',
-                                              style: TextStyle(fontSize: 12)),
+                                              '${element.invoiceNo}  ${formatPrice(element.creditValue ?? 0)}',
+                                              style: const TextStyle(fontSize: 12)),
                                         );
                                       }).toList()
                                     : [],
@@ -107,7 +107,7 @@ class _CustomerDepositePaidForPriviousInvoiceState
                       );
               },
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             FutureBuilder<List<CustomerDeposite>>(
               future: getCustomerDeposites(context,
                   cId: dataProvider.selectedCustomer!.customerId,
@@ -151,7 +151,7 @@ class _CustomerDepositePaidForPriviousInvoiceState
                             value: element,
                             child: Text(
                               '${element.receiptNo}  ${formatPrice(element.value?.toDouble() ?? 0)}',
-                              style: TextStyle(fontSize: 12),
+                              style: const TextStyle(fontSize: 12),
                             ),
                           );
                         }).toList()
@@ -185,10 +185,9 @@ class _CustomerDepositePaidForPriviousInvoiceState
                   } else if (doub(text) > (data.selectedDeposite?.value)) {
                     return 'Maximum ${formatPrice(data.selectedDeposite?.value?.toDouble() ?? 0)}';
                   } else if (doub(text) >
-                      (double.parse(data.selectedInvoice?.creditValue
-                              .toStringAsFixed(2) ??
-                          '0'))) {
-                    return 'Maximum ${formatPrice(data.selectedInvoice?.creditValue.toDouble() ?? 0)}';
+                      (double.parse(data.selectedInvoice!.creditValue!
+                              .toStringAsFixed(2)))) {
+                    return 'Maximum ${formatPrice(data.selectedInvoice?.creditValue?.toDouble() ?? 0)}';
                   }
 
                   pop(context);

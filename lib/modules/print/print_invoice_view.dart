@@ -1,16 +1,16 @@
-import 'package:flutter/foundation.dart';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/models/added_item.dart';
-import 'package:gsr/models/cheque.dart';
-import 'package:gsr/models/issued_invoice_paid.dart';
+import 'package:gsr/models/cheque/cheque.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
-
 import '../../commons/common_methods.dart';
-import '../../models/issued_invoice.dart';
+import '../../models/invoice/invoice_model.dart';
+import '../../models/issued_invoice_paid_model/issued_invoice_paid.dart';
 import '../../providers/data_provider.dart';
 import 'print_invoice_view_model.dart';
 
@@ -19,10 +19,10 @@ class PrintInvoiceView extends StatelessWidget {
   final String rn;
   final double? cash;
   final double balance;
-  final IssuedInvoice? issuedInvoice;
+  final InvoiceModel? issuedInvoice;
   final List<AddedItem>? items;
-  final List<Cheque>? cheques;
-  final List<IssuedInvoicePaid>? previousPayments;
+  final List<ChequeModel>? cheques;
+  final List<IssuedInvoicePaidModel>? previousPayments;
   final bool? isBillingFrom;
   final Future<void> Function()? onSaveData;
   final String? type;
@@ -93,25 +93,25 @@ class PrintInvoiceView extends StatelessWidget {
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
                             pw.Text(
-                              'Bill to: ${issuedInvoice?.customer.businessName ?? dataProvider.selectedCustomer!.businessName}',
+                              'Bill to: ${issuedInvoice?.customer?.businessName ?? dataProvider.selectedCustomer!.businessName}',
                               style: const pw.TextStyle(
                                 fontSize: 22.0,
                               ),
                             ),
                             pw.Text(
-                              'Address: ${issuedInvoice?.customer.address ?? dataProvider.selectedCustomer!.address}',
+                              'Address: ${issuedInvoice?.customer?.address ?? dataProvider.selectedCustomer!.address}',
                               style: const pw.TextStyle(
                                 fontSize: 22.0,
                               ),
                             ),
                             pw.Text(
-                              'Customer Vat No: ${issuedInvoice?.customer.customerVat ?? dataProvider.selectedCustomer!.customerVat ?? '-'}',
+                              'Customer Vat No: ${issuedInvoice?.customer?.customerVat ?? dataProvider.selectedCustomer!.customerVat ?? '-'}',
                               style: const pw.TextStyle(
                                 fontSize: 22.0,
                               ),
                             ),
                             pw.Text(
-                              'Date: ${date(issuedInvoice?.createdAt ?? DateTime.now(), format: 'dd.MM.yyyy')}',
+                              'Date: ${dataProvider.currentRouteCard!.date?.toString().split(' ')[0] ?? 'No Date'}',
                               style: const pw.TextStyle(
                                 fontSize: 22.0,
                               ),
@@ -378,7 +378,7 @@ class PrintInvoiceView extends StatelessWidget {
                   ],
 
                   // //! Payment section
-                  if (issuedInvoice?.payments.isNotEmpty ??
+                  if (issuedInvoice?.payments?.isNotEmpty ??
                       false ||
                           cash != null ||
                           dataProvider.chequeList.isNotEmpty) ...[
@@ -544,8 +544,8 @@ class PrintInvoiceView extends StatelessWidget {
                           return pw.TableRow(
                             children: [
                               pwcell(
-                                date(dp.issuedInvoice.createdAt,
-                                    format: 'dd-MM-yyyy'),
+                                dp.issuedInvoice.createdAt ??
+                                    date(DateTime.now(), format: 'dd-MM-yyyy'),
                                 align: pw.TextAlign.left,
                               ),
                               pwcell(

@@ -69,7 +69,7 @@ class RouteCardPrintScreen extends StatelessWidget {
                             style: const pw.TextStyle(fontSize: 22.0),
                           ),
                           pw.Text(
-                            'Route: ${routeCard.route.routeName}',
+                            'Route: ${routeCard.route?.routeName}',
                             style: const pw.TextStyle(fontSize: 22.0),
                           ),
                           pw.Text(
@@ -87,13 +87,13 @@ class RouteCardPrintScreen extends StatelessWidget {
                           pw.SizedBox(height: 5.0),
 
                           // Helpers
-                          ...routeCard.relatedEmployees
+                          ...routeCard.relatedEmployees!
                               .where((re) =>
-                                  re.employee.employeeId !=
+                                  re.employee?.employeeId !=
                                   dataProvider.currentEmployee!.employeeId)
                               .map(
                                 (re) => pw.Text(
-                                  'Helper: ${re.employee.firstName} ${re.employee.lastName}',
+                                  'Helper: ${re.employee?.firstName} ${re.employee?.lastName}',
                                   style: const pw.TextStyle(fontSize: 22.0),
                                 ),
                               ),
@@ -125,7 +125,7 @@ class RouteCardPrintScreen extends StatelessWidget {
                               align: pw.TextAlign.left,
                             ),
                             _buildTableCell(
-                              (item.item ?? dummyItem).itemName,
+                                  (item.item)!.itemName,
                               align: pw.TextAlign.left,
                             ),
                             _buildTableCell(

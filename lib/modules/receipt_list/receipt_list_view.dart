@@ -21,7 +21,7 @@ class _ViewReceiptListScreenState extends State<ViewReceiptListScreen> {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     return FutureBuilder<List<CreditPaymentModel>>(
       future: getCreditPayments(
-          routecardId: dataProvider.currentRouteCard!.routeCardId),
+          routecardId: dataProvider.currentRouteCard!.routeCardId!),
       builder: (context, AsyncSnapshot<List<CreditPaymentModel>> snapshot) {
         return Scaffold(
           appBar: AppBar(
@@ -38,7 +38,7 @@ class _ViewReceiptListScreenState extends State<ViewReceiptListScreen> {
                         waiting(context, body: 'Finishing...');
                         await updateRouteCard(
                           routeCardId:
-                              dataProvider.currentRouteCard!.routeCardId,
+                              dataProvider.currentRouteCard!.routeCardId!,
                           status: 2,
                         ).then((value) {
                           pop(context);

@@ -21,7 +21,7 @@ class PrintInvoiceViewModel {
       );
       Navigator.pushNamed(
         context,
-        SelectCustomerScreen.routeId,
+        SelectCustomerView.routeId,
         arguments: {
           //  'route_card': routeCard,
         },

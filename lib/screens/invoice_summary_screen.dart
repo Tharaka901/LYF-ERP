@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
-import 'package:gsr/models/issued_invoice.dart';
+import 'package:gsr/models/invoice/invoice_model.dart';
 import 'package:gsr/modules/route_card/route_card_cash_view.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/screens/view_issued_invoice_screen.dart';
@@ -16,9 +16,9 @@ class InvoiceSummaryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    return FutureBuilder<List<IssuedInvoice>>(
+    return FutureBuilder<List<InvoiceModel>>(
       future: getIssuedInvoices(context),
-      builder: (context, AsyncSnapshot<List<IssuedInvoice>> snapshot) {
+      builder: (context, AsyncSnapshot<List<InvoiceModel>> snapshot) {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Issued Invoices'),
@@ -98,8 +98,10 @@ class InvoiceSummaryScreen extends StatelessWidget {
                                 final issuedInvoice = snapshot.data![index];
                                 return OptionCard(
                                   title:
-                                      '${issuedInvoice.invoiceNo} (${issuedInvoice.customer.businessName})',
-                                  subtitle: formatPrice(issuedInvoice.amount),
+                                      '${issuedInvoice.invoiceNo} (${issuedInvoice.customer?.businessName})',
+                                  subtitle: issuedInvoice.amount != null
+                                      ? formatPrice(issuedInvoice.amount!)
+                                      : '',
                                   onTap: () => Navigator.push(
                                     context,
                                     MaterialPageRoute(

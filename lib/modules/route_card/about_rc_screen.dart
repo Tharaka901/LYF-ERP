@@ -28,7 +28,7 @@ class AboutRCScreen extends StatelessWidget {
             DetailCard(
               detailKey: 'Route',
               detailvalue:
-                  dataProvider.currentRouteCard?.route.routeName ?? "",
+                  dataProvider.currentRouteCard?.route?.routeName ?? "",
             ),
             DetailCard(
               detailKey: 'Vehicle Number',

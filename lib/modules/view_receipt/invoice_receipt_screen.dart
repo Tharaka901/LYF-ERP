@@ -1,36 +1,41 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/balance.dart';
-import 'package:gsr/models/response.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/modules/print/print_invoice_view.dart';
 import 'package:gsr/providers/items_provider.dart';
-import 'package:gsr/screens/route_card_screen.dart';
-import 'package:gsr/modules/select_customer/select_customer_screen.dart';
-import 'package:gsr/screens/select_previous_invoice_screen.dart';
-import 'package:gsr/services/database.dart';
 import 'package:gsr/widgets/credit_invoice.dart';
 import 'package:gsr/widgets/customer_deposite_paid.dart';
 import 'package:provider/provider.dart';
 
+import '../../providers/payment_provider.dart';
 import '../../widgets/confirm_for_save_and_print.dart';
 import '../invoice/invoice_provider.dart';
+import '../select_customer/select_customer_screen.dart';
+import 'invoice_receipt_view_model.dart';
 
 class InvoiceReceiptScreen extends StatefulWidget {
   static const routeId = 'RECEIPT';
   const InvoiceReceiptScreen({
-    super.key,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<InvoiceReceiptScreen> createState() => _InvoiceReceiptScreenState();
 }
 
 class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
+  PaymentProvider? paymentProvider;
   final TextEditingController receiptNoController = TextEditingController();
   final formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    paymentProvider = Provider.of<PaymentProvider>(context, listen: false);
+    paymentProvider!.getReceiptNumber(context);
+    super.initState();
+  }
 
   _balance(DataProvider data, {required double cash}) {
     return data.getTotalChequeAmount() +
@@ -43,24 +48,18 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final invoiceReceiptViewModel = InvoiceReceiptViewModel();
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     final itemProvider = Provider.of<ItemsProvider>(context, listen: false);
     final invoiceProvider =
         Provider.of<InvoiceProvider>(context, listen: false);
     final double cash = (ModalRoute.of(context)!.settings.arguments
         as Map<String, dynamic>)['cash'];
-    final Respo invoiceRes = (ModalRoute.of(context)!.settings.arguments
-        as Map<String, dynamic>)['invoiceRes'];
+    // final Respo invoiceRes = Respo(success: true);
     final isManual = (ModalRoute.of(context)!.settings.arguments
             as Map<String, dynamic>)['isManual'] ??
         false;
-    final totalpayment = dataProvider.getTotalChequeAmount() +
-        cash +
-        (dataProvider.selectedVoucher != null
-            ? dataProvider.selectedVoucher!.value
-            : 0.0);
     return Scaffold(
-      backgroundColor: defaultBackgroundColor,
       appBar: AppBar(
         title: const Text('Receipt'),
       ),
@@ -119,9 +118,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    dataProvider
-                                            .selectedCustomer!.businessName ??
-                                        '',
+                                    dataProvider.selectedCustomer!.businessName ?? '',
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(fontSize: 18.0),
                                     maxLines: 2,
@@ -168,19 +165,17 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.all(5.0),
-                                    child: FutureBuilder<String>(
-                                      future: getReceiptNumber(context),
-                                      builder:
-                                          (context, AsyncSnapshot snapshot) =>
-                                              Text(
-                                        snapshot.hasData
-                                            ? snapshot.data
+                                    child: Consumer<PaymentProvider>(
+                                      builder: (context, paymentProvider, _) =>
+                                          Text(
+                                        paymentProvider.receiptNumber != null
+                                            ? paymentProvider.receiptNumber!
                                             : 'Generating...',
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(fontSize: 18.0),
                                       ),
                                     ),
-                                  ),
+                                  )
                                 ],
                               ),
                             Row(
@@ -198,7 +193,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(5.0),
                                   child: Text(
-                                    invoiceRes.data['invoice']['invoiceNo'],
+                                    invoiceProvider.invoiceNu ?? '',
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(fontSize: 18.0),
                                   ),
@@ -279,7 +274,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
-                              formatPrice(cash).replaceAll('Rs.', ''),
+                              price(cash).replaceAll('Rs.', ''),
                               textAlign: TextAlign.end,
                               style: const TextStyle(fontSize: 16.0),
                             ),
@@ -307,7 +302,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                             Padding(
                               padding: const EdgeInsets.all(5.0),
                               child: Text(
-                                formatPrice(cheque.chequeAmount)
+                                price(cheque.chequeAmount)
                                     .replaceAll('Rs.', ''),
                                 textAlign: TextAlign.end,
                                 style: const TextStyle(fontSize: 16.0),
@@ -347,7 +342,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                                     .selectedVoucher!.value ==
                                                 0)
                                         ? '0.00'
-                                        : formatPrice(dataProvider
+                                        : price(dataProvider
                                                 .selectedVoucher!.value)
                                             .replaceAll('Rs.', ''),
                                     textAlign: TextAlign.end,
@@ -385,7 +380,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                             ),
                             const Spacer(),
                             Text(
-                              formatPrice(dataProvider.getTotalChequeAmount() +
+                              price(dataProvider.getTotalChequeAmount() +
                                   cash +
                                   (dataProvider.selectedVoucher != null
                                       ? dataProvider.selectedVoucher!.value
@@ -413,7 +408,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                             ),
                             const Spacer(),
                             Text(
-                              formatPrice(dataProvider.grandTotal),
+                              price(dataProvider.grandTotal),
                               textAlign: TextAlign.end,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -440,8 +435,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                     ),
                                     const Spacer(),
                                     Text(
-                                      formatPrice(
-                                          data.getTotalCreditPaymentAmount()),
+                                      price(data.getTotalCreditPaymentAmount()),
                                       textAlign: TextAlign.end,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -478,7 +472,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                       if (dataProvider
                                           .issuedInvoicePaidList.isNotEmpty)
                                         Text(
-                                          formatPrice(currentBalance < 0
+                                          price(currentBalance < 0
                                               ? -currentBalance
                                               : currentBalance -
                                                   (dataProvider
@@ -501,7 +495,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                       if (!dataProvider
                                           .issuedInvoicePaidList.isNotEmpty)
                                         Text(
-                                          formatPrice(currentBalance < 0
+                                          price(currentBalance < 0
                                               ? -currentBalance
                                               : currentBalance),
                                           textAlign: TextAlign.end,
@@ -617,7 +611,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                               padding:
                                                   const EdgeInsets.all(5.0),
                                               child: Text(
-                                                formatPrice(-paidBalance
+                                                price(-paidBalance
                                                         .balance.balanceAmount)
                                                     .replaceAll('Rs.', ''),
                                                 textAlign: TextAlign.center,
@@ -632,7 +626,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                               padding:
                                                   const EdgeInsets.all(5.0),
                                               child: Text(
-                                                formatPrice(paidBalance.payment)
+                                                price(paidBalance.payment)
                                                     .replaceAll('Rs.', ''),
                                                 textAlign: TextAlign.end,
                                               ),
@@ -659,7 +653,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                 const SizedBox(
                   height: 10.0,
                 ),
-                const SizedBox(height: 5),
+                SizedBox(height: 5),
                 if (isManual)
                   TextFormField(
                     controller: receiptNoController,
@@ -677,106 +671,103 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                       return null;
                     },
                   ),
-                const SizedBox(height: 10),
-                if (totalpayment != dataProvider.grandTotal)
-                  Consumer<DataProvider>(
-                    builder: (context, data, _) {
-                      final currentBalance = _balance(data, cash: cash);
-                      return currentBalance > 0
-                          ? SizedBox(
-                              width: double.infinity,
-                              height: 60.0,
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  final paymentController =
-                                      TextEditingController();
-                                  final formKey = GlobalKey<FormState>();
-                                  callBack(Balance selectedBalance) {}
-                                  confirm(
-                                    context,
-                                    title: 'Previous Invoice',
-                                    body: CreditInvoice(
-                                      paymentController: paymentController,
-                                      formKey: formKey,
-                                      callBack: callBack,
-                                      balance: currentBalance,
-                                      invoiceId: invoiceRes.data['invoice']
-                                          ['invoiceId'] as int,
-                                    ),
-                                    onConfirm: () {
-                                      if (formKey.currentState!.validate()) {
-                                        paymentController.clear();
-                                        return;
-                                      }
-                                    },
-                                    confirmText: 'Add',
-                                  );
-                                },
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      WidgetStateProperty.all(Colors.blue[600]),
-                                  shape: WidgetStateProperty.all(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
+                SizedBox(height: 10),
+                Consumer<DataProvider>(
+                  builder: (context, data, _) {
+                    final currentBalance = _balance(data, cash: cash);
+                    return currentBalance > 0
+                        ? SizedBox(
+                            width: double.infinity,
+                            height: 60.0,
+                            child: OutlinedButton(
+                              onPressed: () {
+                                final paymentController =
+                                    TextEditingController();
+                                final formKey = GlobalKey<FormState>();
+                                callBack(Balance selectedBalance) {}
+                                confirm(
+                                  context,
+                                  title: 'Previous Invoice',
+                                  body: CreditInvoice(
+                                    paymentController: paymentController,
+                                    formKey: formKey,
+                                    callBack: callBack,
+                                    balance: currentBalance,
                                   ),
-                                ),
-                                child: const Text(
-                                  'Previous payment',
-                                  style: TextStyle(
-                                    fontSize: 20.0,
-                                    color: Colors.white,
+                                  onConfirm: () {
+                                    if (formKey.currentState!.validate()) {
+                                      paymentController.clear();
+                                      return;
+                                    }
+                                  },
+                                  confirmText: 'Add',
+                                );
+                              },
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.blue[600]),
+                                shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                 ),
                               ),
-                            )
-                          : SizedBox(
-                              width: double.infinity,
-                              height: 60.0,
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  final paymentController =
-                                      TextEditingController();
-                                  final formKey = GlobalKey<FormState>();
-                                  callBack(Balance selectedBalance) {}
-                                  confirm(
-                                    context,
-                                    title: 'Previous Invoices',
-                                    body: CustomerDepositePaid(
-                                      paymentController: paymentController,
-                                      formKey: formKey,
-                                      callBack: callBack,
-                                      balnce: currentBalance,
-                                    ),
-                                    onConfirm: () {
-                                      if (formKey.currentState!.validate()) {
-                                        paymentController.clear();
-                                        return;
-                                      }
-                                    },
-                                    confirmText: 'Add',
-                                  );
-                                },
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      WidgetStateProperty.all(Colors.blue[600]),
-                                  shape: WidgetStateProperty.all(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                  ),
+                              child: const Text(
+                                'Previous payment',
+                                style: TextStyle(
+                                  fontSize: 20.0,
+                                  color: Colors.white,
                                 ),
-                                child: const Text(
-                                  'Over Payment',
-                                  style: TextStyle(
-                                    fontSize: 20.0,
-                                    color: Colors.white,
+                              ),
+                            ),
+                          )
+                        : SizedBox(
+                            width: double.infinity,
+                            height: 60.0,
+                            child: OutlinedButton(
+                              onPressed: () {
+                                final paymentController =
+                                    TextEditingController();
+                                final formKey = GlobalKey<FormState>();
+                                callBack(Balance selectedBalance) {}
+                                confirm(
+                                  context,
+                                  title: 'Previous Invoices',
+                                  body: CustomerDepositePaid(
+                                    paymentController: paymentController,
+                                    formKey: formKey,
+                                    callBack: callBack,
+                                    balnce: currentBalance,
+                                  ),
+                                  onConfirm: () {
+                                    if (formKey.currentState!.validate()) {
+                                      paymentController.clear();
+                                      return;
+                                    }
+                                  },
+                                  confirmText: 'Add',
+                                );
+                              },
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.blue[600]),
+                                shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                 ),
                               ),
-                            );
-                    },
-                  ),
+                              child: const Text(
+                                'Previous Payment',
+                                style: TextStyle(
+                                  fontSize: 20.0,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          );
+                  },
+                ),
                 const SizedBox(
                   height: 10.0,
                 ),
@@ -839,7 +830,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                             .issuedDeposite.paymentInvoiceId
                                             .toString()),
                                         cell(
-                                          formatPrice(invoice.paymentAmount)
+                                          price(invoice.paymentAmount)
                                               .replaceAll('Rs.', ''),
                                           align: TextAlign.center,
                                         ),
@@ -865,7 +856,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                               children: [
                                 text('Total Previous Payment'),
                                 const Spacer(),
-                                text(formatPrice(
+                                text(price(
                                     data.getTotalDepositePaymentAmount())),
                               ],
                             ),
@@ -877,7 +868,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                             ),
                           ],
                         )
-                      : const SizedBox();
+                      : SizedBox();
                 }),
                 Consumer<DataProvider>(builder: (context, data, _) {
                   final currentBalance = _balance(data, cash: cash);
@@ -929,13 +920,12 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                           align: TextAlign.start,
                                         ),
                                         cell(
-                                          date(invoice.issuedInvoice.createdAt,
-                                              format: 'dd-MM-yyyy'),
+                                          invoice.issuedInvoice.createdAt ?? '',
                                           align: TextAlign.center,
                                         ),
                                         cell(invoice.issuedInvoice.invoiceNo),
                                         cell(
-                                          formatPrice(invoice.paymentAmount)
+                                          price(invoice.paymentAmount)
                                               .replaceAll('Rs.', ''),
                                           align: TextAlign.center,
                                         ),
@@ -960,8 +950,8 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                               children: [
                                 text('Total Previous Payment'),
                                 const Spacer(),
-                                text(formatPrice(
-                                    data.getTotalInvoicePaymentAmount())),
+                                text(
+                                    price(data.getTotalInvoicePaymentAmount())),
                               ],
                             ),
                             const Divider(
@@ -977,30 +967,14 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                 onPressed: () => confirmForSaveAndPrint(
                                   context,
                                   onSave: () async {
-                                    if (invoiceProvider.iscreateReceipt) {
-                                      Navigator.popUntil(
-                                          context,
-                                          ModalRoute.withName(
-                                              SelectCustomerScreen.routeId));
-                                      return;
-                                    }
                                     pop(context);
                                     if (isManual) {
-                                      if (totalpayment != 0
-                                          ? formKey.currentState!.validate()
-                                          : true) {
+                                      if (formKey.currentState!.validate()) {
                                         waiting(context, body: 'Sending...');
-                                        await sendPaymentWithPrevious(
-                                          context,
-                                          dataProvider.getTotalChequeAmount() +
-                                              cash +
-                                              (dataProvider.selectedVoucher !=
-                                                      null
-                                                  ? dataProvider
-                                                      .selectedVoucher!.value
-                                                  : 0.0),
-                                          cash,
-                                          currentBalance -
+                                        await invoiceReceiptViewModel.pay(
+                                          context: context,
+                                          cash: cash,
+                                          balance: currentBalance -
                                               (dataProvider
                                                       .issuedInvoicePaidList
                                                       .map((e) =>
@@ -1008,158 +982,46 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                                       .toList())
                                                   .reduce((value, element) =>
                                                       value + element),
-                                          invoiceRes,
                                           receiptNo:
                                               receiptNoController.text.trim(),
                                           isOnlySave: true,
                                         );
                                         itemProvider.clearData();
-                                        dataProvider.chequeList.clear();
-                                        dataProvider.setSelectedCustomer(null);
                                         Navigator.popUntil(
-                                          context,
-                                          ModalRoute.withName(
-                                              RouteCardScreen.routeId),
-                                        );
-                                        Navigator.pushNamed(
-                                          context,
-                                          SelectCustomerScreen.routeId,
-                                          arguments: {
-                                            //  'route_card': routeCard,
-                                          },
-                                        );
+                                            context,
+                                            ModalRoute.withName(
+                                                SelectCustomerView.routeId));
                                       }
                                     } else {
                                       waiting(context, body: 'Sending...');
-                                      await sendPaymentWithPrevious(
-                                        context,
-                                        dataProvider.getTotalChequeAmount() +
-                                            cash +
-                                            (dataProvider.selectedVoucher !=
-                                                    null
-                                                ? dataProvider
-                                                    .selectedVoucher!.value
-                                                : 0.0),
-                                        cash,
-                                        currentBalance -
+                                      await invoiceReceiptViewModel.pay(
+                                        context: context,
+                                        cash: cash,
+                                        balance: currentBalance -
                                             (dataProvider.issuedInvoicePaidList
                                                     .map((e) => e.paymentAmount)
                                                     .toList())
                                                 .reduce((value, element) =>
                                                     value + element),
-                                        invoiceRes,
                                         isOnlySave: true,
                                       );
                                       itemProvider.clearData();
-                                      dataProvider.chequeList.clear();
-                                      dataProvider.setSelectedCustomer(null);
                                       Navigator.popUntil(
-                                        context,
-                                        ModalRoute.withName(
-                                            RouteCardScreen.routeId),
-                                      );
-                                      Navigator.pushNamed(
-                                        context,
-                                        SelectCustomerScreen.routeId,
-                                        arguments: {
-                                          //  'route_card': routeCard,
-                                        },
-                                      );
+                                          context,
+                                          ModalRoute.withName(
+                                              SelectCustomerView.routeId));
                                     }
                                   },
                                   onSaveAndPrint: () async {
                                     pop(context);
                                     if (isManual) {
-                                      if (totalpayment != 0
-                                          ? formKey.currentState!.validate()
-                                          : true) {
+                                      if (formKey.currentState!.validate()) {
                                         Future<void> onSaveData() async {
                                           waiting(context, body: 'Sending...');
-                                          try {
-                                            await sendPaymentWithPrevious(
-                                              context,
-                                              dataProvider
-                                                      .getTotalChequeAmount() +
-                                                  cash +
-                                                  (dataProvider
-                                                              .selectedVoucher !=
-                                                          null
-                                                      ? dataProvider
-                                                          .selectedVoucher!
-                                                          .value
-                                                      : 0.0),
-                                              cash,
-                                              currentBalance -
-                                                  (dataProvider
-                                                          .issuedInvoicePaidList
-                                                          .map((e) =>
-                                                              e.paymentAmount)
-                                                          .toList())
-                                                      .reduce(
-                                                          (value, element) =>
-                                                              value + element),
-                                              invoiceRes,
-                                              receiptNo: receiptNoController
-                                                  .text
-                                                  .trim(),
-                                            );
-                                            itemProvider.clearData();
-                                            invoiceProvider.iscreateReceipt =
-                                                true;
-                                          } catch (e) {
-                                            if (kDebugMode) {
-                                              print(e);
-                                            }
-                                          }
-                                        }
-
-                                        try {
-                                          if (!invoiceProvider
-                                              .iscreateReceipt) {
-                                            await onSaveData();
-                                          }
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  PrintInvoiceView(
-                                                invoiceNo:
-                                                    invoiceRes.data['invoice']
-                                                        ['invoiceNo'],
-                                                rn: receiptNoController.text
-                                                    .trim(),
-                                                cash: cash,
-                                                balance: currentBalance,
-                                                isBillingFrom: true,
-                                              ),
-                                            ),
-                                          ).then((value) => {
-                                                dataProvider.chequeList.clear(),
-                                              });
-                                        } catch (e) {
-                                          if (kDebugMode) {
-                                            print(e);
-                                          }
-                                        }
-                                      }
-                                    } else {
-                                      final rn =
-                                          await getReceiptNumber(context);
-                                      Future<void> onSaveData() async {
-                                        waiting(context, body: 'Sending...');
-                                        try {
-                                          await sendPaymentWithPrevious(
-                                            context,
-                                            dataProvider
-                                                    .getTotalChequeAmount() +
-                                                cash +
-                                                (dataProvider.selectedVoucher !=
-                                                        null
-                                                    ? dataProvider
-                                                        .selectedVoucher!.value
-                                                    : 0.0),
-                                            cash,
-                                            currentBalance -
+                                          await invoiceReceiptViewModel.pay(
+                                            context: context,
+                                            cash: cash,
+                                            balance: currentBalance -
                                                 (dataProvider
                                                         .issuedInvoicePaidList
                                                         .map((e) =>
@@ -1167,57 +1029,78 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                                         .toList())
                                                     .reduce((value, element) =>
                                                         value + element),
-                                            invoiceRes,
+                                            receiptNo:
+                                                receiptNoController.text.trim(),
                                           );
                                           itemProvider.clearData();
-                                          invoiceProvider.iscreateReceipt =
-                                              true;
-                                        } catch (e) {
-                                          if (kDebugMode) {
-                                            print(e);
-                                          }
                                         }
-                                      }
 
-                                      try {
-                                        if (!invoiceProvider.iscreateReceipt) {
-                                          await onSaveData();
-                                        }
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => PrintInvoiceView(
-                                                invoiceNo:
-                                                    invoiceRes.data['invoice']
-                                                        ['invoiceNo'],
-                                                rn: rn,
-                                                cash: cash,
-                                                balance: currentBalance -
-                                                    (dataProvider
-                                                            .issuedInvoicePaidList
-                                                            .map((e) =>
-                                                                e.paymentAmount)
-                                                            .toList())
-                                                        .reduce((value,
-                                                                element) =>
-                                                            value + element),
-                                                isBillingFrom: true),
+                                            builder: (context) =>
+                                                PrintInvoiceView(
+                                              invoiceNo:
+                                                  invoiceProvider.invoiceNu!,
+                                              rn: receiptNoController.text
+                                                  .trim(),
+                                              cash: cash,
+                                              balance: currentBalance,
+                                              isBillingFrom: true,
+                                              onSaveData: onSaveData,
+                                            ),
                                           ),
-                                        ).then((value) => {
-                                              dataProvider.chequeList.clear(),
-                                            });
-                                      } catch (e) {
-                                        if (kDebugMode) {
-                                          print(e);
-                                        }
+                                        );
                                       }
+                                    } else {
+                                      Future<void> onSaveData() async {
+                                        waiting(context, body: 'Sending...');
+                                        await invoiceReceiptViewModel.pay(
+                                          context: context,
+                                          cash: cash,
+                                          balance: currentBalance -
+                                              (dataProvider
+                                                      .issuedInvoicePaidList
+                                                      .map((e) =>
+                                                          e.paymentAmount)
+                                                      .toList())
+                                                  .reduce((value, element) =>
+                                                      value + element),
+                                        );
+                                        itemProvider.clearData();
+                                      }
+
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              PrintInvoiceView(
+                                            invoiceNo:
+                                                invoiceProvider.invoiceNu!,
+                                            rn: paymentProvider
+                                                    ?.receiptNumber ??
+                                                '',
+                                            cash: cash,
+                                            balance: currentBalance -
+                                                (dataProvider
+                                                        .issuedInvoicePaidList
+                                                        .map((e) =>
+                                                            e.paymentAmount)
+                                                        .toList())
+                                                    .reduce((value, element) =>
+                                                        value + element),
+                                            isBillingFrom: true,
+                                            onSaveData: onSaveData,
+                                          ),
+                                        ),
+                                      );
                                     }
                                   },
                                 ),
                                 style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all(
+                                  backgroundColor: MaterialStateProperty.all(
                                       Colors.green[700]),
-                                  shape: WidgetStateProperty.all(
+                                  shape: MaterialStateProperty.all(
                                     RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10.0),
                                     ),
@@ -1243,215 +1126,118 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                 onPressed: () => confirmForSaveAndPrint(
                                   context,
                                   onSave: () async {
-                                    if (invoiceProvider.iscreateReceipt) {
-                                      Navigator.popUntil(
-                                          context,
-                                          ModalRoute.withName(
-                                              SelectCustomerScreen.routeId));
-                                      return;
-                                    }
                                     pop(context);
                                     if (isManual) {
-                                      if (totalpayment != 0
-                                          ? formKey.currentState!.validate()
-                                          : true) {
+                                      if (formKey.currentState!.validate()) {
                                         waiting(context, body: 'Sending...');
-                                        await sendPayment(
-                                          context,
-                                          cash: cash,
-                                          totalPayment: dataProvider
-                                                  .getTotalChequeAmount() +
-                                              cash +
-                                              (dataProvider.selectedVoucher !=
-                                                      null
-                                                  ? dataProvider
-                                                      .selectedVoucher!.value
-                                                  : 0.0),
-                                          balance: currentBalance,
-                                          invoiceResponse: invoiceRes,
-                                          receiptNo:
-                                              receiptNoController.text.trim(),
-                                          isOnlySave: true,
-                                        ).then((value) => {
-                                              pop(context),
-                                              itemProvider.clearData(),
-                                              dataProvider.chequeList.clear(),
-                                              dataProvider
-                                                  .setSelectedCustomer(null),
-                                              dataProvider
-                                                  .setSelectedCustomer(null),
-                                              Navigator.popUntil(
-                                                context,
-                                                ModalRoute.withName(
-                                                    RouteCardScreen.routeId),
-                                              ),
-                                              Navigator.pushNamed(
-                                                context,
-                                                SelectCustomerScreen.routeId,
-                                                arguments: {
-                                                  //  'route_card': routeCard,
-                                                },
-                                              )
-                                            });
+                                        await invoiceReceiptViewModel
+                                            .pay(
+                                              context: context,
+                                              cash: cash,
+                                              balance: currentBalance,
+                                              receiptNo: receiptNoController
+                                                  .text
+                                                  .trim(),
+                                              isOnlySave: true,
+                                            )
+                                            .then((value) => {
+                                                  pop(context),
+                                                  itemProvider.clearData(),
+                                                  Navigator.popUntil(
+                                                      context,
+                                                      ModalRoute.withName(
+                                                          SelectCustomerView
+                                                              .routeId))
+                                                });
                                       }
                                     } else {
-                                      waiting(context, body: 'Sending...');
-                                      await sendPayment(
-                                        context,
-                                        cash: cash,
-                                        totalPayment: dataProvider
-                                                .getTotalChequeAmount() +
-                                            cash +
-                                            (dataProvider.selectedVoucher !=
-                                                    null
-                                                ? dataProvider
-                                                    .selectedVoucher!.value
-                                                : 0.0),
-                                        balance: currentBalance,
-                                        invoiceResponse: invoiceRes,
-                                        isOnlySave: true,
-                                      ).then((value) => {
-                                            pop(context),
-                                            itemProvider.clearData(),
-                                            dataProvider.chequeList.clear(),
-                                            dataProvider
-                                                .setSelectedCustomer(null),
-                                            Navigator.popUntil(
-                                              context,
-                                              ModalRoute.withName(
-                                                  RouteCardScreen.routeId),
-                                            ),
-                                            Navigator.pushNamed(
-                                              context,
-                                              SelectCustomerScreen.routeId,
-                                              arguments: {
-                                                //  'route_card': routeCard,
-                                              },
-                                            )
-                                          });
+                                      await invoiceReceiptViewModel
+                                          .pay(
+                                            context: context,
+                                            cash: cash,
+                                            balance: currentBalance,
+                                            isOnlySave: true,
+                                          )
+                                          .then((value) => {
+                                                pop(context),
+                                                itemProvider.clearData(),
+                                                Navigator.popUntil(
+                                                    context,
+                                                    ModalRoute.withName(
+                                                        SelectCustomerView
+                                                            .routeId))
+                                              });
                                     }
                                   },
                                   onSaveAndPrint: () async {
                                     pop(context);
                                     if (isManual) {
                                       Future<void> onSaveData() async {
-                                        waiting(context, body: 'Sending...');
-                                        try {
-                                          await sendPayment(
-                                            context,
-                                            cash: cash,
-                                            totalPayment: dataProvider
-                                                    .getTotalChequeAmount() +
-                                                cash +
-                                                (dataProvider.selectedVoucher !=
-                                                        null
-                                                    ? dataProvider
-                                                        .selectedVoucher!.value
-                                                    : 0.0),
-                                            balance: currentBalance,
-                                            invoiceResponse: invoiceRes,
-                                            receiptNo:
-                                                receiptNoController.text.trim(),
-                                          );
-                                          itemProvider.clearData();
-                                          invoiceProvider.iscreateReceipt =
-                                              true;
-                                        } catch (e) {
-                                          rethrow;
-                                        }
+                                        await invoiceReceiptViewModel.pay(
+                                          context: context,
+                                          cash: cash,
+                                          balance: currentBalance,
+                                          receiptNo:
+                                              receiptNoController.text.trim(),
+                                        );
+                                        itemProvider.clearData();
                                       }
 
-                                      if (totalpayment != 0
-                                          ? formKey.currentState!.validate()
-                                          : true) {
-                                        try {
-                                          if (!invoiceProvider
-                                              .iscreateReceipt) {
-                                            await onSaveData();
-                                          }
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  PrintInvoiceView(
-                                                invoiceNo:
-                                                    invoiceRes.data['invoice']
-                                                        ['invoiceNo'],
-                                                rn: receiptNoController.text
-                                                    .trim(),
-                                                cash: cash,
-                                                balance: currentBalance,
-                                                isBillingFrom: true,
-                                              ),
-                                            ),
-                                          ).then(
-                                            (value) => {
-                                              dataProvider.chequeList.clear()
-                                            },
-                                          );
-                                        } catch (e) {
-                                          print(e);
-                                        }
-                                      }
-                                    } else {
-                                      final rn =
-                                          await getReceiptNumber(context);
-                                      Future<void> onSaveData() async {
-                                        waiting(context, body: 'Sending...');
-                                        try {
-                                          await sendPayment(
-                                            context,
-                                            cash: cash,
-                                            totalPayment: dataProvider
-                                                    .getTotalChequeAmount() +
-                                                cash +
-                                                (dataProvider.selectedVoucher !=
-                                                        null
-                                                    ? dataProvider
-                                                        .selectedVoucher!.value
-                                                    : 0.0),
-                                            balance: currentBalance,
-                                            invoiceResponse: invoiceRes,
-                                          );
-                                          itemProvider.clearData();
-                                          invoiceProvider.iscreateReceipt =
-                                              true;
-                                        } catch (e) {
-                                          print(e);
-                                        }
-                                      }
-
-                                      try {
-                                        if (!invoiceProvider.iscreateReceipt) {
-                                          await onSaveData();
-                                        }
+                                      if (formKey.currentState!.validate()) {
+                                        //pop(context);
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 PrintInvoiceView(
-                                              invoiceNo: invoiceRes
-                                                  .data['invoice']['invoiceNo'],
-                                              rn: rn,
+                                              invoiceNo:
+                                                  invoiceProvider.invoiceNu!,
+                                              rn: receiptNoController.text
+                                                  .trim(),
                                               cash: cash,
                                               balance: currentBalance,
                                               isBillingFrom: true,
+                                              onSaveData: onSaveData,
                                             ),
                                           ),
-                                        ).then((value) =>
-                                            {dataProvider.chequeList.clear()});
-                                      } catch (e) {
-                                        if (kDebugMode) {
-                                          print(e);
-                                        }
+                                        );
                                       }
+                                    } else {
+                                      Future<void> onSaveData() async {
+                                        waiting(context, body: 'Sending...');
+                                        await invoiceReceiptViewModel.pay(
+                                          context: context,
+                                          cash: cash,
+                                          balance: currentBalance,
+                                        );
+                                        itemProvider.clearData();
+                                      }
+
+                                      //pop(context);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              PrintInvoiceView(
+                                            invoiceNo:
+                                                invoiceProvider.invoiceNu!,
+                                            rn: paymentProvider
+                                                    ?.receiptNumber ??
+                                                '',
+                                            cash: cash,
+                                            balance: currentBalance,
+                                            isBillingFrom: true,
+                                            onSaveData: onSaveData,
+                                          ),
+                                        ),
+                                      );
                                     }
                                   },
                                 ),
                                 style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all(
+                                  backgroundColor: MaterialStateProperty.all(
                                       Colors.green[700]),
-                                  shape: WidgetStateProperty.all(
+                                  shape: MaterialStateProperty.all(
                                     RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10.0),
                                     ),
@@ -1466,7 +1252,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 15),
+                            SizedBox(height: 15),
                           ],
                         );
                 }),

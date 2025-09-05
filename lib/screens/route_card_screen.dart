@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
-import 'package:gsr/models/item_summary_customer_wise.dart';
+import 'package:gsr/commons/enums.dart';
+import 'package:gsr/models/item_summary_customer_wise/item_summary_customer_wise.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/modules/route_card/about_rc_screen.dart';
 import 'package:gsr/screens/invoice_summary_screen.dart';
 import 'package:gsr/screens/overall_summary_screen.dart';
-import 'package:gsr/screens/previous_screen.dart';
+import 'package:gsr/modules/previous_customer_select/previous_screen.dart';
 import 'package:gsr/screens/rc_summary_screen.dart';
 import 'package:gsr/modules/select_customer/select_customer_screen.dart';
-import 'package:gsr/screens/stock_screen.dart';
+import 'package:gsr/modules/stock/stock_screen.dart';
 import 'package:gsr/services/database.dart';
 import 'package:gsr/widgets/option_card.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +31,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '${routeCard.route.routeName} -${routeCard.date}',
+          '${routeCard.route?.routeName} - ${date(routeCard.date!, format: 'dd.MM.yyyy')}',
         ),
       ),
       floatingActionButton: Consumer<DataProvider>(
@@ -67,7 +68,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                     );
                     data.clearRCItems();
                     await getItemsByRoutecard(
-                            routeCardId: routeCard.routeCardId,
+                            routeCardId: routeCard.routeCardId!,
                             onlyRefill: false,
                             priceLevelId: 1,
                             type: data.currentRouteCard!.status == 0
@@ -89,7 +90,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                             if (!context.mounted) return;
                             waiting(context, body: 'Accepting Route Card...');
                             updateRouteCard(
-                              routeCardId: data.currentRouteCard!.routeCardId,
+                              routeCardId: data.currentRouteCard!.routeCardId!,
                               status: 1,
                             ).then((value) {
                               if (!context.mounted) return;
@@ -123,7 +124,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                     title: 'Billing',
                     onTap: () => Navigator.pushNamed(
                       context,
-                      SelectCustomerScreen.routeId,
+                      SelectCustomerView.routeId,
                       arguments: {
                         //  'route_card': routeCard,
                       },
@@ -145,7 +146,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                     title: 'Manual Billing',
                     onTap: () => Navigator.pushNamed(
                       context,
-                      SelectCustomerScreen.routeId,
+                      SelectCustomerView.routeId,
                       arguments: {'route_card': routeCard, 'isManual': true},
                     ).then((value) {
                       dataProvider.clearItemList();
@@ -194,7 +195,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const SelectCustomerScreen(
+                          builder: (context) => const SelectCustomerView(
                                 type: 'Loan',
                               )),
                     ).then((value) {
@@ -216,8 +217,9 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const SelectCustomerScreen(
+                          builder: (context) => const SelectCustomerView(
                                 type: 'Return',
+                                featureType: AppFeatureType.returnCylinder,
                               )),
                     ).then((value) {
                       dataProvider.clearItemList();
@@ -238,7 +240,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const SelectCustomerScreen(
+                          builder: (context) => const SelectCustomerView(
                                 type: 'Leak',
                               )),
                     ).then((value) {
@@ -263,15 +265,15 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                         body: 'Receiving data...',
                       );
                       final itemSummary =
-                          await getItemSummary(routeCard.routeCardId);
+                          await getItemSummary(routeCard.routeCardId!);
                       final itemSummaryCW = await getItemSummaryCustomerWise(
-                          routeCard.routeCardId);
+                          routeCard.routeCardId!);
                       final itemSummaryCWLeak =
                           await getItemSummaryCustomerWiseLeak(
-                              routeCard.routeCardId);
+                              routeCard.routeCardId!);
                       final itemSummaryCWReturnC =
                           await getReturnCylinderSummaryCustomerWiseLeak(
-                              routeCard.routeCardId,
+                              routeCard.routeCardId!,
                               isCustomerWise: true);
                       if (!context.mounted) return;
                       pop(context);
@@ -377,26 +379,26 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
 
                       data.clearRCItems();
 
-                      final rcItems = await getItemsByRoutecard(
-                        routeCardId: routeCard.routeCardId,
-                        onlyRefill: false,
-                        priceLevelId: 1,
-                        type: data.currentRouteCard!.status == 0
-                            ? ''
-                            : 'rc-summary',
-                      );
+                      // final rcItems = await getItemsByRoutecard(
+                      //   routeCardId: routeCard.routeCardId!,
+                      //   onlyRefill: false,
+                      //   priceLevelId: 1,
+                      //   type: data.currentRouteCard!.status == 0
+                      //       ? ''
+                      //       : 'rc-summary',
+                      // );
 
-                      if (!context.mounted) return;
+                      // if (!context.mounted) return;
 
-                      for (var element in rcItems) {
-                        if (element.item?.itemTypeId != 5) {
-                          data.addRCItem(element);
-                        }
-                      }
+                      // for (var element in rcItems) {
+                      //   if (element.item?.itemTypeId != 5) {
+                      //     data.addRCItem(element);
+                      //   }
+                      // }
 
-                      final rcItemSummary = await getItemsSummaryByRoutecard(
-                        routeCardId: routeCard.routeCardId,
-                      );
+                      // final rcItemSummary = await getItemsSummaryByRoutecard(
+                      //   routeCardId: routeCard.routeCardId!,
+                      // );
 
                       if (!context.mounted) return;
 
@@ -405,8 +407,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              StockScreen(rcItemSummary: rcItemSummary),
+                          builder: (context) => StockScreen(),
                         ),
                       );
                     },

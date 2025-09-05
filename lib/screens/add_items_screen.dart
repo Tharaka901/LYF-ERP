@@ -4,6 +4,7 @@ import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/added_item.dart';
 import 'package:gsr/models/item.dart';
+import 'package:gsr/modules/return_cylinder/screens/return_note_screen.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/providers/items_provider.dart';
 import 'package:gsr/modules/leak_cylinders/leak_note_screen.dart';
@@ -16,6 +17,7 @@ import 'package:gsr/widgets/modify_item.dart';
 import 'package:gsr/widgets/option_card.dart';
 import 'package:provider/provider.dart';
 
+import '../models/item/item_model.dart';
 import '../widgets/buttons/text_toogle.dart';
 
 class AddItemsScreen extends StatefulWidget {
@@ -83,6 +85,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
       ),
       appBar: AppBar(
         title: const Text('Add Items'),
+        backgroundColor: Colors.blueAccent,
         elevation: 1,
         leading: IconButton(
             onPressed: () {
@@ -104,9 +107,10 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                 final cylindserNumberController = TextEditingController();
                 final referenceNumberController = TextEditingController();
                 final formKey = GlobalKey<FormState>();
-                Item? item;
+                ItemModel? item;
                 double? maxQuantity;
-                callBack({required Item selectedItem, required double maxQty}) {
+                callBack(
+                    {required ItemModel selectedItem, required double maxQty}) {
                   item = selectedItem;
                   if (selectedItem.hasSpecialPrice != null) {
                     item?.salePrice = selectedItem.hasSpecialPrice!.itemPrice;
@@ -150,13 +154,13 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                                       leakTypeController.text == 'Leak Recive'
                                           ? 2
                                           : 3,
-                                  item: Item(
-                                      id: item!.id,
-                                      itemRegNo: item!.itemRegNo,
-                                      itemName: item!.itemName,
-                                      costPrice: item!.costPrice,
-                                      salePrice: item!.salePrice,
-                                      openingQty: item!.openingQty,
+                                  item: ItemModel(
+                                      id: item!.id!,
+                                      itemRegNo: item!.itemRegNo ?? '',
+                                      itemName: item!.itemName ?? '',
+                                      costPrice: item!.costPrice ?? 0,
+                                      salePrice: item!.salePrice ?? 0,
+                                      openingQty: item!.openingQty ?? 0,
                                       vendorId: item!.vendorId,
                                       priceLevelId: item!.priceLevelId,
                                       itemTypeId: item!.itemTypeId,
@@ -201,13 +205,13 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                             leakType: leakTypeController.text == 'Leak Recive'
                                 ? 2
                                 : 3,
-                            item: Item(
-                                id: item!.id,
-                                itemRegNo: item!.itemRegNo,
-                                itemName: item!.itemName,
-                                costPrice: item!.costPrice,
-                                salePrice: item!.salePrice,
-                                openingQty: item!.openingQty,
+                            item: ItemModel(
+                                id: item!.id!,
+                                itemRegNo: item!.itemRegNo ?? '',
+                                itemName: item!.itemName ?? '',
+                                costPrice: item!.costPrice ?? 0,
+                                salePrice: item!.salePrice ?? 0,
+                                openingQty: item!.openingQty ?? 0,
                                 vendorId: item!.vendorId,
                                 priceLevelId: item!.priceLevelId,
                                 itemTypeId: item!.itemTypeId,
@@ -217,7 +221,8 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                                 isNew: item!.isNew,
                                 status: item!.status,
                                 cylinderNo: cylindserNumberController.text,
-                                referenceNo: referenceNumberController.text),
+                                referenceNo: referenceNumberController.text,
+                                nonVatAmount: item!.nonVatAmount),
                             cylinderNo: cylindserNumberController.text,
                             referenceNo: referenceNumberController.text,
                             quantity: widget.type == 'Leak'
