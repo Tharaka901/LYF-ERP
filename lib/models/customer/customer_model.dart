@@ -1,10 +1,12 @@
+import '../vat/vat.dart';
+
 class CustomerModel {
   final int? customerId;
-  final String registrationId;
+  final String? registrationId;
   final DateTime? regDate;
   final String? customerVat;
   final String? dealerCode;
-  final String businessName;
+  final String? businessName;
   final String? parentCompany;
   final String? ownerName;
   final String? address;
@@ -16,16 +18,17 @@ class CustomerModel {
   final int? priceLevelId;
   final int? routeId;
   final int? employeeId;
-  final double depositBalance;
+  final double? depositBalance;
   final int? status;
+  final Vat? vat;
 
   CustomerModel({
     this.customerId,
-    required this.registrationId,
+    this.registrationId,
     this.regDate,
     this.customerVat,
     this.dealerCode,
-    required this.businessName,
+    this.businessName,
     this.parentCompany,
     this.ownerName,
     this.address,
@@ -37,11 +40,12 @@ class CustomerModel {
     this.priceLevelId,
     this.routeId,
     this.employeeId,
-    required this.depositBalance,
+    this.depositBalance,
     this.status,
+    this.vat,
   });
 
-  factory CustomerModel.fromJson(Map<dynamic, dynamic> json) => CustomerModel(
+  factory CustomerModel.fromJson(Map<String, dynamic> json) => CustomerModel(
         customerId: json["customerId"],
         registrationId: json["registrationId"],
         regDate:
@@ -66,6 +70,7 @@ class CustomerModel {
             ? json["depositBalance"]?.toDouble()
             : json["depositBalance"],
         status: json["status"],
+        vat: json["vat"] != null ? Vat.fromJson(json["vat"]) : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -89,5 +94,6 @@ class CustomerModel {
         "employeeId": employeeId,
         "depositBalance": depositBalance,
         "status": status,
+        "vat": vat?.toJson(),
       };
 }

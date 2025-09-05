@@ -6,11 +6,13 @@ class ModifyItem extends StatefulWidget {
   final TextEditingController quantityController;
   final GlobalKey<FormState> formKey;
   final AddedItem addedItem;
+  final String? type;
   const ModifyItem({
     Key? key,
     required this.quantityController,
     required this.formKey,
     required this.addedItem,
+    this.type,
   }) : super(key: key);
 
   @override
@@ -26,7 +28,7 @@ class _ModifyItemState extends State<ModifyItem> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(widget.addedItem.item.itemName ),
+            Text(widget.addedItem.item.itemName),
             const SizedBox(
               height: 10.0,
             ),
@@ -45,7 +47,7 @@ class _ModifyItemState extends State<ModifyItem> {
                   return 'Quantity cannot be empty!';
                 } else if (doub(text) <= 0) {
                   return 'Invalid quantity!';
-                } else if (doub(text) > widget.addedItem.maxQuantity) {
+                } else if (doub(text) > widget.addedItem.maxQuantity && widget.type != 'Loan') {
                   return 'Quantity exceeded (${num(widget.addedItem.maxQuantity)})';
                 }
                 return null;

@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:pdf/widgets.dart' as pw;
+import 'package:gsr/models/item.dart';
 import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 //const baseUrl = 'https://stageerp.jayawardenaenterprises.lk/api';
-const baseUrl = 'https://api.ravonbakers.lk/api';
+// const baseUrl = 'https://api.hjenterprises.lk/api';
+// const baseUrl = 'https://api.cjtradingcompany.lk/api';
+// const baseUrl = 'https://erpapi.hjtradingcompany.lk/api';
+// const baseUrl = 'https://erpapi.hjtradingcompanymannar.lk/api';
+// const baseUrl = 'https://api.hjtradingcompanymannar.lk/api';
+// const baseUrl = 'https://api.jebiyagama.lk/api';
 // const baseUrl = "http://localhost:8080/api";
 // const baseUrl = "http://0.0.0.0:8080/api";
+const baseUrl = 'https://api.ravonbakers.lk/api';
+// const baseUrl = 'https://stageerpapi.jayawardenaagencies.lk/api';
+// const baseUrl = 'https://api.jayawardenaagencies.lk/api';
 
 const defaultAcceptColor = Colors.green;
 
@@ -32,11 +41,29 @@ final defaultShape = RoundedRectangleBorder(
 
 const defaultSpacing = 10.0;
 
+// TEMP
+final dummyItem = Item(
+  id: 0,
+  itemRegNo: 'Dymmy',
+  itemName: 'Dummy',
+  costPrice: 0,
+  salePrice: 0,
+  openingQty: 0,
+  vendorId: 0,
+  priceLevelId: 0,
+  itemTypeId: 0,
+  stockId: 0,
+  costAccId: 0,
+  incomeAccId: 0,
+  isNew: 0,
+  status: 0,
+);
+
 class MessageConstants {
   //!Print
   static pw.Text signatureNotRequired = pw.Text(
       'This is a system generated invoice and signature isn\'t required',
-      style: pw.TextStyle(fontSize: 20));
+      style: const pw.TextStyle(fontSize: 20));
 }
 
 class ThemeConstants {
@@ -54,53 +81,71 @@ class ThemeConstants {
 
 class CompanyConstants {
   static const name = 'Jayawardena Enterprises (Pvt) Ltd';
-  static const address =
-      'Distributor of Litro Gas Lanka Limited\nNo 142, Colombo Road, Biyagama';
-  static const phoneNumber = 'Tel: 011 248 8003';
+  static const distribute = 'Distributor of Litro Gas Lanka Limited';
+  static const address = 'No 142, Colombo Road, Biyagama';
+  static const phoneNumber = 'Tel: 011 2488003';
   static const email = 'Email: jayaentlitro@gmail.com';
   static const vatNumber = 'Our Vat No - 104648479-7000';
 
-  static final companyDetails = [
-    pw.Text(
-      CompanyConstants.name,
-      style: ThemeConstants.boldStyleForPdf,
-    ),
-    pw.Text(
-      CompanyConstants.address,
-      style: ThemeConstants.boldStyleForPdf,
-    ),
-    pw.Text(
-      CompanyConstants.phoneNumber,
-      style: ThemeConstants.boldStyleForPdf,
-    ),
-    pw.Text(
-      CompanyConstants.email,
-      style: ThemeConstants.boldStyleForPdf,
-    ),
-    pw.SizedBox(height: 5.0),
-    pw.Row(
-      mainAxisAlignment: pw.MainAxisAlignment.end,
-      children: [
-        pw.Text(
-          CompanyConstants.vatNumber,
-          style: const pw.TextStyle(fontSize: 22.0),
-        ),
-      ],
-    ),
-  ];
-}
+  // static const name = 'Jayawardena Agencies (Pvt) Ltd';
+  // static const distribute = 'Distributor of Litro Gas Lanka Limited';
+  // static const address = '294,Mihinthala Road,Mathale Junction,Anuradhapura';
+  // static const phoneNumber = 'Tel: 025 2223895';
+  // static const email = 'Email: jayawardenaagencies@gmail.com';
+  // static const vatNumber = 'Our Vat No - 114315877-7000';
 
-class HiveBox {
-  static const data = 'Data';
-  static const employee = 'Employee';
-  static const routeCard = 'RouteCard';
-  static const customers = 'Customers';
-  static const routeCardBasicItems = 'RouteCardBasicItems';
-  static const routeCardNewItems = 'RouteCardNewItems';
-  static const routeCardOtherItems = 'RouteCardOtherItems';
-  static const invoice = "Invoicess";
-  static const customerDeposite = "CustomerDeposites";
-  static const customerCredit = "CustomerCredit";
-  static const paymentBox = "PaymentsBox";
-  static const creditInvoicePayFromDepositesDataBox = "CreditInvoicePayFromDepositesDataBox";
+  // static const name = 'H.J. Enterprises (Pvt) Ltd';
+  // static const distribute = 'Distributor of Litro Gas Lanka Limited';
+  // static const address = 'Polonnaruwa Road, Minneriya';
+  // static const phoneNumber = 'Tel: 027-2055808';
+  // static const email = 'Email: hjenterprises.polonnaruwa@gmail.com';
+  // static const vatNumber = 'Our Vat No - 102899113-7000';
+
+  // static const name = 'C J  Trading Company (Pvt) Ltd';
+  // static const distribute = 'Distributor of Litro Gas Lanka Limited';
+  // static const address = 'No : 135, Katuwewa, padeniya';
+  // static const phoneNumber = 'Tel: 037 2041113';
+  // static const email = 'Email: cjtradingcompany99@gmail.com';
+  // static const vatNumber = 'Our Vat No - 109812617-7000';
+
+  // static const name = 'H.J. Trading Company (Pvt) Ltd';
+  // static const distribute = 'Distributor of Litro Gas Lanka Limited';
+  // static const address = 'Pahala Galkandegama, Poonewa, Medawachchiya';
+  // static const phoneNumber = 'Tel: 024-2054830';
+  // static const email = 'Email: hjtrading.vavuniya@gmail.com';
+  // static const vatNumber = 'Our Vat No - 102899156-7000';
+
+  static companyDetails(bool hasOurVatNumber) => [
+        pw.Text(
+          CompanyConstants.name,
+          style: ThemeConstants.boldStyleForPdf,
+        ),
+        pw.Text(
+          CompanyConstants.distribute,
+          style: ThemeConstants.boldStyleForPdf,
+        ),
+        pw.Text(
+          CompanyConstants.address,
+          style: ThemeConstants.boldStyleForPdf,
+        ),
+        pw.Text(
+          CompanyConstants.phoneNumber,
+          style: ThemeConstants.boldStyleForPdf,
+        ),
+        pw.Text(
+          CompanyConstants.email,
+          style: ThemeConstants.boldStyleForPdf,
+        ),
+        pw.SizedBox(height: 5.0),
+        if (hasOurVatNumber)
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.end,
+            children: [
+              pw.Text(
+                CompanyConstants.vatNumber,
+                style: const pw.TextStyle(fontSize: 22.0),
+              ),
+            ],
+          ),
+      ];
 }

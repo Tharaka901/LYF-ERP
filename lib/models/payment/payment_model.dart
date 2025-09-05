@@ -1,5 +1,3 @@
-import 'package:gsr/models/invoice/invoice_model.dart';
-
 import '../payment_method/payment_method.dart';
 
 class PaymentModel {
@@ -17,7 +15,6 @@ class PaymentModel {
   final int? employeeId;
   final int? status;
   final PaymentMethodModel? paymentMethods;
-  final InvoiceModel? invoice;
 
   PaymentModel({
     this.paymentId,
@@ -34,30 +31,27 @@ class PaymentModel {
     this.employeeId,
     this.status,
     this.paymentMethods,
-    this.invoice,
   });
 
   factory PaymentModel.fromJson(Map<String, dynamic> json) => PaymentModel(
-      paymentId: json["paymentId"],
-      invoiceId: json["invoiceId"],
-      amount:
-          json["amount"] is int ? json["amount"].toDouble() : json["amount"],
-      receiptNo: json["receiptNo"],
-      paymentMethod: json["paymentMethod"],
-      routecardId: json["routecardId"],
-      routeId: json["routeId"],
-      chequeNo: json["chequeNo"],
-      customerId: json["customerId"],
-      customerTypeId: json["customerTypeId"],
-      priceLevelId: json["priceLevelId"],
-      employeeId: json["employeeId"],
-      status: json["status"],
-      paymentMethods: json["paymentMethods"] == null
-          ? null
-          : PaymentMethodModel.fromJson(json["paymentMethods"]),
-      invoice: json["invoice"] == null
-          ? null
-          : InvoiceModel.fromJson(json["invoice"]));
+        paymentId: json["paymentId"],
+        invoiceId: json["invoiceId"],
+        amount:
+            json["amount"] is int ? json["amount"].toDouble() : json["amount"],
+        receiptNo: json["receiptNo"],
+        paymentMethod: json["paymentMethod"],
+        routecardId: json["routecardId"],
+        routeId: json["routeId"],
+        chequeNo: json["chequeNo"],
+        customerId: json["customerId"],
+        customerTypeId: json["customerTypeId"],
+        priceLevelId: json["priceLevelId"],
+        employeeId: json["employeeId"],
+        status: json["status"],
+        paymentMethods: json["paymentMethods"] == null
+            ? null
+            : PaymentMethodModel.fromJson(json["paymentMethods"]),
+      );
 
   Map<String, dynamic> toJson() => {
         "paymentId": paymentId,

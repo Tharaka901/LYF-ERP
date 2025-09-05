@@ -1,66 +1,147 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:gsr/models/added_item.dart';
+import 'package:gsr/models/customer/customer_model.dart';
+import 'package:gsr/models/employee/employee_model.dart';
+import 'package:gsr/models/route_card.dart';
 
 import '../commons/common_methods.dart';
-import '../models/invoice/invoice_model.dart';
+import '../models/cylinder.dart';
 import '../models/response.dart';
-import '../providers/data_provider.dart';
 
 class InvoiceService {
-  Future<int> invoiceCount(int routeCardId) async {
+  Future<String> invoiceNumber(RouteCard routeCard) async {
     final response =
-        await respo('invoice/count-by-routecard?id=$routeCardId');
+        await respo('invoice/count-by-routecard?id=${routeCard.routeCardId}');
     final int count = response.data;
-    return count;
+    return '${routeCard.routeCardNo}/${count + 1}';
   }
 
-  Future<Respo> createInvoice(dynamic request) async {
+  Future<String> returnCylinderInvoiceNumber(RouteCard routeCard) async {
+    final response = await respo(
+        'return-cylinder-invoice/count-by-routecard?id=${routeCard.routeCardId}');
+    final int count = response.data;
+    return '${routeCard.routeCardNo}/${count + 1}';
+  }
+
+  Future<String> loanInvoiceNumber(RouteCard routeCard) async {
+    final response = await respo(
+        'loan-invoice/count-by-routecard?id=${routeCard.routeCardId}');
+    final int count = response.data;
+    return '${routeCard.routeCardNo}/${count + 1}';
+  }
+
+  Future<String> leakInvoiceNumber(RouteCard routeCard) async {
+    final response = await respo(
+        'leak-invoice/count-by-routecard?id=${routeCard.routeCardId}');
+    final int count = response.data;
+    return '${routeCard.routeCardNo}/${count + 1}';
+  }
+
+  Future<void> updateInvoice(
+      int invoiceId, int status, double creditValue) async {
+    respo('invoice/update', method: Method.put, data: {
+      "invoiceId": invoiceId,
+      "status": status,
+      "creditValue": creditValue
+    });
+  }
+
+  Future<void> updateCheque(
+      {required int chequeId, required double balance, int? isActive}) async {
+    final data = {"id": chequeId, "balance": balance};
+    if (isActive != null) {
+      data["isActive"] = isActive;
+    }
+    respo('cheque/update', method: Method.put, data: data);
+  }
+
+  Future<Respo> createLoanInvoice(
+      {required RouteCard routeCard,
+      required CustomerModel customer,
+      required List<AddedItem> itemList,
+      int? loanType,
+      required EmployeeModel employee}) async {
     try {
+      final invoiceNo = await loanInvoiceNumber(routeCard);
       //! Create invoice
       final invoiceResponse = await respo(
-        'invoice/create',
+        'loan-invoice/create',
         method: Method.post,
-        data: request,
+        data: {
+          "invoice": {
+            "invoiceNo":
+                invoiceNo.replaceAll('RCN', loanType == 2 ? 'LO/R' : 'LO/I'),
+            "routecardId": routeCard.routeCardId,
+            "customerId": customer.customerId,
+            "employeeId": employee.employeeId,
+            "status": loanType,
+          },
+          "invoiceItems": itemList
+              .map((invoiceItem) => {
+                    "itemId": invoiceItem.item.id,
+                    "itemQty": invoiceItem.quantity,
+                    "routecardId": routeCard.routeCardId,
+                    "customerId1": customer.customerId,
+                  })
+              .toList()
+        },
       );
       return invoiceResponse;
     } catch (e) {
+      toast(e.toString());
       rethrow;
     }
   }
 
-  Future<List<InvoiceModel>> getCreditInvoices(BuildContext context,
-      {int? cId, String? type, int? invoiceId}) async {
-    String url =
-        'invoice/get?customerId=${cId ?? context.read<DataProvider>().selectedCustomer!.customerId}';
-    if (type != null) {
-      url = '$url&type=$type';
+  Future<Respo> createLeakInvoice(
+      {required RouteCard routeCard,
+      required CustomerModel customer,
+      required List<AddedItem> itemList,
+      required List<int> selectedCylinderItemIds,
+      required EmployeeModel employee,
+      required List<Cylinder> selectedCylinderList,
+      int? leakType}) async {
+    try {
+      final invoiceNo = await leakInvoiceNumber(routeCard);
+      //! Create invoice
+      final invoiceResponse = await respo(
+        'leak-invoice/create',
+        method: Method.post,
+        data: {
+          "invoice": {
+            "invoiceNo":
+                invoiceNo.replaceAll('RCN', leakType == 2 ? 'LE/R' : 'LE/I'),
+            "routecardId": routeCard.routeCardId,
+            "customerId": customer.customerId,
+            "employeeId": employee.employeeId,
+            "status": leakType,
+          },
+          "invoiceItems": leakType == 2
+              ? itemList
+                  .map((invoiceItem) => {
+                        "itemId": invoiceItem.item.id,
+                        "itemQty": invoiceItem.quantity,
+                        "routecardId": routeCard.routeCardId,
+                        "customerId1": customer.customerId,
+                        "cylinderNo": invoiceItem.item.cylinderNo,
+                        "referenceNo": invoiceItem.item.referenceNo,
+                        "status": leakType == 2 ? 1 : 6
+                      })
+                  .toList()
+              : selectedCylinderList
+                  .map((cylinder) => {
+                        "id": cylinder.id,
+                        "status": 6,
+                        "routecardId": routeCard.routeCardId,
+                        "freeCylinderId": cylinder.freeCylinderId
+                      })
+                  .toList()
+        },
+      );
+
+      return invoiceResponse;
+    } catch (e) {
+      toast(e.toString());
+      rethrow;
     }
-
-    final response = await respo(url);
-    List<dynamic> list = response.data;
-    return list
-        .where((element) => element['status'] == 1 || element['status'] == 99)
-        .map((e) {
-          return InvoiceModel.fromJson(e);
-        })
-        .where((ii) => ii.creditValue != 0 && ii.invoiceId != (invoiceId ?? 0))
-        .toList();
-  }
-
-  Future<List<InvoiceModel>> getIssuedInvoices(BuildContext context) async {
-    final response = await respo(
-        'invoice/get?routecardId=${context.read<DataProvider>().currentRouteCard!.routeCardId}');
-
-    List<dynamic> list = response.data ?? [];
-    List<InvoiceModel> selectedInvoiceList = [];
-    final allInvoiceList = list.map((e) => InvoiceModel.fromJson(e)).toList();
-    for (var element in allInvoiceList) {
-      if (element.status != 3) {
-        selectedInvoiceList.add(element);
-      }
-    }
-    selectedInvoiceList.sort((a, b) =>
-        DateTime.parse(a.createdAt ?? DateTime.now().toString()).compareTo(DateTime.parse(b.createdAt!)));
-    return selectedInvoiceList;
   }
 }

@@ -1,32 +1,33 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/balance_payment.dart';
 import 'package:gsr/models/credit_payment.dart';
 import 'package:gsr/models/customer.dart';
+import 'package:gsr/models/customer_deposite.dart';
 import 'package:gsr/models/cylinder.dart';
-import 'package:gsr/models/employee/employee_model.dart';
 import 'package:gsr/models/issued_invoice.dart';
-import 'package:gsr/models/item/item_model.dart';
+import 'package:gsr/models/item.dart';
 import 'package:gsr/models/item_summary.dart' as it;
 import 'package:gsr/models/item_summary_customer_wise.dart' as itcw;
 import 'package:gsr/models/loanItem.dart';
 import 'package:gsr/models/loan_stock.dart' as ls;
 import 'package:gsr/models/payment.dart';
 import 'package:gsr/models/payments.dart';
-import 'package:gsr/models/rcItemSummary.dart';
+import 'package:gsr/models/rc_item_summary.dart';
 import 'package:gsr/models/response.dart';
 import 'package:gsr/models/route_card.dart';
-import 'package:gsr/models/route_card_item/route_card_item_model.dart';
+import 'package:gsr/models/routecard_item.dart';
+import 'package:gsr/models/voucher.dart';
 import 'package:gsr/modules/invoice/invoice_provider.dart';
 import 'package:gsr/providers/data_provider.dart';
-import 'package:gsr/providers/hive_db_provider.dart';
-import 'package:gsr/modules/select_customer/select_customer_view.dart';
-import 'package:gsr/modules/home/home_view.dart';
+import 'package:gsr/modules/select_customer/select_customer_screen.dart';
+import 'package:gsr/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/credit_payment/credit_payment_model.dart';
-import '../models/invoice/invoice_model.dart';
-import '../models/route_card/route_card_model.dart';
+import '../models/customer/customer_model.dart';
+import '../models/employee/employee_model.dart';
 
 login(
   BuildContext context, {
@@ -41,17 +42,11 @@ login(
     },
     method: Method.post,
   ).then((response) async {
-    print(response);
     if (response.success) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('username', contactNumber).then((success) async {
         success
             ? await prefs.setString('password', password).then((value) {
-                final employee = EmployeeModel.fromJson(response.data);
-                context
-                    .read<HiveDBProvider>()
-                    .employeeBox
-                    ?.put(employee.employeeId, employee);
                 context
                     .read<DataProvider>()
                     .setCurrentEmployee(EmployeeModel.fromJson(response.data));
@@ -72,7 +67,6 @@ login(
       );
     }
   }).onError((error, stackTrace) {
-    print(error);
     toast(
       error.toString(),
       toastState: TS.error,
@@ -95,6 +89,7 @@ Future<Respo> loginStart(
       },
       method: Method.post,
     );
+    print(t.data);
   } catch (e) {
     print(e);
     rethrow;
@@ -102,22 +97,21 @@ Future<Respo> loginStart(
   return t;
 }
 
-Future<List<RouteCardItemModel>> getLoanItems(int routeCardId,
-    {int? status}) async {
+Future<List<RoutecardItem>> getLoanItems(int routeCardId, {int? status}) async {
   try {
     final response = await respo(
         'items/get-loan?routecardId=$routeCardId&status=${status ?? 5}');
     List<dynamic> list = response.data;
     return list.map((element) {
       LoanItem loanItem = LoanItem.fromJson(element);
-      return RouteCardItemModel(
+      return RoutecardItem(
           routecardItemsId: loanItem.cardItem?.routecardItemsId ?? 0,
           itemId: loanItem.cardItem?.itemId ?? 0,
           transferQty: loanItem.cardItem?.transferQty?.toDouble() ?? 0,
           sellQty: loanItem.cardItem?.sellQty?.toDouble() ?? 0,
           routecardId: loanItem.cardItem?.routecardId ?? 0,
           status: loanItem.cardItem?.status ?? 0,
-          item: ItemModel(
+          item: Item(
               id: loanItem.id ?? 0,
               itemRegNo: loanItem.itemRegNo ?? '',
               itemName: loanItem.itemName ?? '',
@@ -139,27 +133,35 @@ Future<List<RouteCardItemModel>> getLoanItems(int routeCardId,
   }
 }
 
-Future<List<RouteCardItemModel>> getLeakIssueItems(
-    int routeCardId, int customerId1,
+Future<List<RoutecardItem>> getLeakIssueItems(int routeCardId, int customerId1,
     {int? status}) async {
   try {
     final response = await respo(
-        'items/leak-issue?routecardId=$routeCardId&customerId1=${customerId1}');
+        'items/leak-issue?routecardId=$routeCardId&customerId1=$customerId1');
     List<dynamic> list = response.data;
-
+    const itemNameMap = {
+      '36': 'C2 Free Cylinder',
+      '37': 'C5 Free Cylinder',
+      '34': 'C12 Free Cylinder',
+      '35': 'C37 Free Cylinder',
+      '48': 'C12 Free Empty Cylinder',
+      '49': 'C5 Free Empty Cylinder',
+      '50': 'C2 Free Empty Cylinder',
+      '51': 'C37 Free Empty Cylinder'
+    };
     return list.map((element) {
       LoanItem loanItem = LoanItem.fromJson(element);
-      return RouteCardItemModel(
+      return RoutecardItem(
           routecardItemsId: loanItem.cardItem?.routecardItemsId ?? 0,
           itemId: loanItem.cardItem?.itemId ?? 0,
           transferQty: loanItem.cardItem?.transferQty?.toDouble() ?? 0,
           sellQty: loanItem.cardItem?.sellQty?.toDouble() ?? 0,
           routecardId: loanItem.cardItem?.routecardId ?? 0,
           status: loanItem.cardItem?.status ?? 0,
-          item: ItemModel(
+          item: Item(
               id: loanItem.id ?? 0,
               itemRegNo: loanItem.itemRegNo ?? '',
-              itemName: loanItem.itemName ?? '',
+              itemName: itemNameMap[loanItem.itemId.toString()] ?? '',
               costPrice: loanItem.costPrice?.toDouble() ?? 0,
               salePrice: loanItem.salePrice?.toDouble() ?? 0,
               openingQty: loanItem.openingQty?.toDouble() ?? 0,
@@ -173,7 +175,9 @@ Future<List<RouteCardItemModel>> getLeakIssueItems(
               status: loanItem.status?.toInt() ?? 0));
     }).toList();
   } catch (e) {
-    print(e);
+    if (kDebugMode) {
+      print(e);
+    }
     rethrow;
   }
 }
@@ -185,7 +189,9 @@ Future<List<ls.LoanStock>> getLoanStock(int routeCardId) async {
     List<dynamic> list = response.data;
     return list.map((e) => ls.LoanStock.fromJson(e)).toList();
   } catch (e) {
-    print(e);
+    if (kDebugMode) {
+      print(e);
+    }
     rethrow;
   }
 }
@@ -197,7 +203,9 @@ Future<List<ls.LoanStock>> getLeakStock(int routeCardId) async {
     List<dynamic> list = response.data;
     return list.map((e) => ls.LoanStock.fromJson(e)).toList();
   } catch (e) {
-    print(e);
+    if (kDebugMode) {
+      print(e);
+    }
     rethrow;
   }
 }
@@ -255,21 +263,24 @@ Future<List<itcw.ItemSummaryCustomerWise>> getItemSummaryCustomerWiseLeak(
 }
 
 Future<List<itcw.ItemSummaryCustomerWise>>
-    getReturnCylinderSummaryCustomerWiseLeak(int routeCardId) async {
+    getReturnCylinderSummaryCustomerWiseLeak(int routeCardId,
+        {bool isCustomerWise = true}) async {
   try {
     final response = await respo(
         'route-card/get-summary-return-cylinder-customer-wise',
         method: Method.post,
-        data: {"routecardId": routeCardId});
+        data: {"routecardId": routeCardId, "isCustomerWise": isCustomerWise});
     List<dynamic> list = response.data;
     return list.map((e) => itcw.ItemSummaryCustomerWise.fromJson(e)).toList();
   } catch (e) {
-    print(e);
+    if (kDebugMode) {
+      print(e);
+    }
     rethrow;
   }
 }
 
-Future<List<RouteCardItemModel>> getItemsByRoutecard(
+Future<List<RoutecardItem>> getItemsByRoutecard(
     {required int routeCardId,
     required int priceLevelId,
     bool onlyDeposit = false,
@@ -280,14 +291,14 @@ Future<List<RouteCardItemModel>> getItemsByRoutecard(
         await respo('items/get-all-by-route-card?routecardId=$routeCardId');
     List<dynamic> list = response.data;
 
-    return list.map((element) => RouteCardItemModel.fromJson(element)).toList();
+    return list.map((element) => RoutecardItem.fromJson(element)).toList();
   } else if (type == 'return') {
-    List<RouteCardItemModel> returnItems = [];
+    List<RoutecardItem> returnItems = [];
     final response = await respo('items/get-return?priceLevelId=$priceLevelId');
     List<dynamic> list = response.data;
     for (var element in list) {
-      final item = ItemModel.fromJson(element);
-      returnItems.add(RouteCardItemModel(
+      final item = Item.fromJson(element);
+      returnItems.add(RoutecardItem(
         routecardItemsId: 0,
         itemId: item.id,
         transferQty: 1,
@@ -303,20 +314,18 @@ Future<List<RouteCardItemModel>> getItemsByRoutecard(
       'items/get-all-by-route-card?routecardId=$routeCardId&priceLevelId=$priceLevelId');
   List<dynamic> list = response.data ?? [];
 
-  List<RouteCardItemModel> allItems = [];
+  List<RoutecardItem> allItems = [];
   final items = onlyRefill
       ? list
-          .map((element) => RouteCardItemModel.fromJson(element))
+          .map((element) => RoutecardItem.fromJson(element))
           .where((rci) => rci.item!.itemTypeId != 3)
           .toList()
       : onlyDeposit
           ? list
-              .map((element) => RouteCardItemModel.fromJson(element))
+              .map((element) => RoutecardItem.fromJson(element))
               .where((rci) => rci.item!.itemTypeId == 3)
               .toList()
-          : list
-              .map((element) => RouteCardItemModel.fromJson(element))
-              .toList();
+          : list.map((element) => RoutecardItem.fromJson(element)).toList();
   for (var element in items) {
     if (!(allItems.map((e) => e.item?.itemName).toList())
         .contains(element.item?.itemName)) {
@@ -341,7 +350,7 @@ Future<List<RcItemsSummary>> getItemsSummaryByRoutecard({
   }
 }
 
-Future<List<RouteCardItemModel>> getNewItems({
+Future<List<RoutecardItem>> getNewItems({
   required int routeCardId,
   required int priceLevelId,
 }) async {
@@ -354,12 +363,11 @@ Future<List<RouteCardItemModel>> getNewItems({
   final newResponse = await respo(
       'items/get-new?priceLevelId=$priceLevelId&routecardId=$routeCardId');
   List<dynamic> newItemList = newResponse.data ?? [];
-  List<RouteCardItemModel> rcNewItems = [];
+  List<RoutecardItem> rcNewItems = [];
   final response = await respo(
       'items/get-all-by-route-card?routecardId=$routeCardId&priceLevelId=$priceLevelId');
   List<dynamic> list = response.data ?? [];
-  final list2 =
-      list.map((element) => RouteCardItemModel.fromJson(element)).toList();
+  final list2 = list.map((element) => RoutecardItem.fromJson(element)).toList();
   for (var element in list2) {
     if (element.item?.itemTypeId == 3) {
       rcNewItems.add(element);
@@ -371,11 +379,11 @@ Future<List<RouteCardItemModel>> getNewItems({
     }
   }
   for (var element in newItemList) {
-    final item = ItemModel.fromJson(element);
+    final item = Item.fromJson(element);
     for (var element2 in refillItemsList) {
       if (item.itemName.replaceAll('Deposit', 'Refill') ==
           element2.item?.itemName) {
-        rcNewItems.add(RouteCardItemModel(
+        rcNewItems.add(RoutecardItem(
           routecardItemsId: 0,
           itemId: item.id,
           transferQty: element2.transferQty,
@@ -390,7 +398,7 @@ Future<List<RouteCardItemModel>> getNewItems({
   return rcNewItems;
 }
 
-Future<List<RouteCardModel>> getRouteCards(int uid,
+Future<List<RouteCard>> getRouteCards(int uid,
     {RC? rcStatus = RC.pending}) async {
   try {
     Respo response;
@@ -401,10 +409,10 @@ Future<List<RouteCardModel>> getRouteCards(int uid,
       response = await respo(
           'route-card/get-by-uid/$uid?status=${rcStatus == RC.pending ? 0 : rcStatus == RC.accepted ? 1 : rcStatus == RC.rejected ? 4 : rcStatus == RC.pendingOrAccepted ? 10 : 2}');
     } else {
-      response = await respo('route-card/get-by-uid/$uid?status=2,3');
+      response = await respo('route-card/get-by-uid/$uid?status=2,3,5');
     }
     List<dynamic> list = response.data;
-    return list.map((element) => RouteCardModel.fromJson(element)).toList();
+    return list.map((element) => RouteCard.fromJson(element)).toList();
   } catch (e) {
     print(e);
     rethrow;
@@ -433,6 +441,28 @@ Future<List<Payment>> getPayments(
   return list.map((element) => Payment.fromJson(element)).toList();
 }
 
+Future<List<CreditPaymentModel>> getCreditPayments({
+  required int routecardId,
+}) async {
+  final response = await respo('credit-payment/get?routecardId=$routecardId');
+  List<dynamic> list = response.data ?? [];
+  List<CreditPaymentModel> selectedReceiptList = [];
+  final receiptList =
+      list.map((element) => CreditPaymentModel.fromJson(element)).toList();
+  for (var element in receiptList) {
+    if (!selectedReceiptList
+        .map((e) => e.receiptNo)
+        .toList()
+        .contains(element.receiptNo)) {
+      if (element.status == 1 || element.status == 3) {
+        selectedReceiptList.add(element);
+      }
+    }
+  }
+
+  return selectedReceiptList;
+}
+
 Future<List<CreditPayment>> getCreditPaymentsByReceipt({
   required String receiptNo,
 }) async {
@@ -454,12 +484,12 @@ Future<Customer> getQRCustomer() async {
   return Customer.fromJson(response.data);
 }
 
-Future<List<InvoiceModel>> creditInvoices(BuildContext context,
+Future<List<IssuedInvoice>> creditInvoices(BuildContext context,
     {int? cId, String? type, int? invoiceId}) async {
   String url =
       'invoice/get?customerId=${cId ?? context.read<DataProvider>().selectedCustomer!.customerId}';
   if (type != null) {
-    url = url + '&type=${type}';
+    url = '$url&type=$type';
   }
 
   final response = await respo(url);
@@ -467,10 +497,27 @@ Future<List<InvoiceModel>> creditInvoices(BuildContext context,
   return list
       .where((element) => element['status'] == 1 || element['status'] == 99)
       .map((e) {
-        return InvoiceModel.fromJson(e);
+        return IssuedInvoice.fromJson(e);
       })
       .where((ii) => ii.creditValue != 0 && ii.invoiceId != (invoiceId ?? 0))
       .toList();
+}
+
+Future<List<CustomerDeposite>> getCustomerDeposites(BuildContext context,
+    {int? cId, int? routecardId}) async {
+  try {
+    final response = await respo(
+        'over-payment/get?customerId=${cId ?? context.read<DataProvider>().selectedCustomer!.customerId}&routecardId=${routecardId}');
+    List<dynamic> list = response.data;
+    return list
+        .where((element) => (element['status'] == 1 || element['status'] == 2))
+        .map((e) {
+      return CustomerDeposite.fromJson(e);
+    }).toList();
+  } catch (e) {
+    print(e);
+    rethrow;
+  }
 }
 
 Future<List<IssuedInvoice>> getIssuedInvoices(BuildContext context) async {
@@ -512,8 +559,6 @@ Future<String> loanInvoiceNumber(BuildContext context) async {
   return '${routeCard.routeCardNo}/${count + 1}';
 }
 
-
-
 Future<String> leakInvoiceNumber(BuildContext context) async {
   final routeCard = context.read<DataProvider>().currentRouteCard!;
   final response = await respo(
@@ -529,6 +574,21 @@ Future<String> getReceiptNumber(BuildContext context) async {
   return 'R/${routeCard.routeCardNo}/${count + 1}';
 }
 
+Future<List<Voucher>> getVouchers(BuildContext context) async {
+  final response = await respo('voucher/all');
+  List<dynamic> list = response.data;
+  List<Voucher> vouchers = list.map((e) => Voucher.fromJson(e)).toList();
+  vouchers.insert(
+    0,
+    Voucher(
+      id: 0,
+      code: 'None',
+      value: 0.0,
+    ),
+  );
+  return vouchers;
+}
+
 Future<void> updateRouteCard({
   required int routeCardId,
   required int status,
@@ -539,17 +599,17 @@ Future<void> updateRouteCard({
   });
 }
 
-Future<List<Customer>> getCustomers(String pattern) async {
+Future<List<CustomerModel>> getCustomers(String pattern) async {
   try {
     final response = await respo('customers/get-all');
     List<dynamic> list = response.data;
     return list
-        .map((element) => Customer.fromJson(element))
+        .map((element) => CustomerModel.fromJson(element))
         .where((element) =>
-            element.businessName
+            element.businessName!
                 .toLowerCase()
                 .contains(pattern.toLowerCase()) ||
-            element.registrationId
+            element.registrationId!
                 .toLowerCase()
                 .contains(pattern.toLowerCase()))
         .toList();
@@ -586,6 +646,7 @@ Future<Respo> createInvoice(BuildContext context, {String? invoiceNu}) async {
           "creditValue":
               double.parse((dataProvider.grandTotal).toStringAsFixed(2)),
           "employeeId": dataProvider.currentEmployee!.employeeId,
+          "rep": dataProvider.selectedCustomer?.employeeId.toString(),
           "status": 1,
         },
         "invoiceItems": dataProvider.itemList
@@ -604,43 +665,6 @@ Future<Respo> createInvoice(BuildContext context, {String? invoiceNu}) async {
     rethrow;
   }
 }
-
-Future<Respo> createLoanInvoice(BuildContext context) async {
-  try {
-    final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    final selectedCustomer = dataProvider.selectedCustomer!;
-    final invoiceNo = await loanInvoiceNumber(context);
-    //! Create invoice
-    final invoiceResponse = await respo(
-      'loan-invoice/create',
-      method: Method.post,
-      data: {
-        "invoice": {
-          "invoiceNo": invoiceNo.replaceAll(
-              'RCN', dataProvider.itemList[0].loanType == 2 ? 'LO/R' : 'LO/I'),
-          "routecardId": dataProvider.currentRouteCard!.routeCardId,
-          "customerId": selectedCustomer.customerId,
-          "employeeId": dataProvider.currentEmployee!.employeeId,
-          "status": dataProvider.itemList[0].loanType,
-        },
-        "invoiceItems": dataProvider.itemList
-            .map((invoiceItem) => {
-                  "itemId": invoiceItem.item.id,
-                  "itemQty": invoiceItem.quantity,
-                  "routecardId": dataProvider.currentRouteCard!.routeCardId,
-                  "customerId1": selectedCustomer.customerId,
-                })
-            .toList()
-      },
-    );
-    return invoiceResponse;
-  } catch (e) {
-    toast(e.toString());
-    rethrow;
-  }
-}
-
-
 
 Future<Respo> createLeakInvoice(BuildContext context) async {
   try {
@@ -696,57 +720,7 @@ Future<void> sendPaymentWithPrevious(BuildContext context, double total,
   final selectedCustomer = dataProvider.selectedCustomer!;
 
   try {
-//! Update over payment
-    if (dataProvider.issuedDepositePaidList.isNotEmpty) {
-      await respo(
-        'over-payment/update',
-        method: Method.put,
-        data: {
-          "overPaymentsPayList": [
-            ...dataProvider.issuedDepositePaidList
-                .map((e) => {
-                      "value": (e.depositeValue! - e.paymentAmount).toInt(),
-                      "customerId": dataProvider.selectedCustomer?.customerId,
-                      "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
-                    })
-                .toList()
-          ]
-        },
-      );
-    }
-
-    //! Update return cylinder invoice balance
-    for (var rci in dataProvider.issuedDepositePaidList) {
-      if (rci.issuedDeposite.status == 2) {
-        await respo('return-cylinder-invoice/update',
-            method: Method.put,
-            data: {
-              "invoiceNo": rci.issuedDeposite.receiptNo,
-              "balance": rci.issuedDeposite.value! - rci.paymentAmount,
-              "status":
-                  rci.issuedDeposite.value! - rci.paymentAmount == 0 ? 2 : 1
-            });
-      }
-    }
-
-    if (isOnlySave ?? false) {
-      dataProvider.issuedDepositePaidList.clear();
-    }
-
-    // //! Create invoice
-    await respo(
-      'invoice/update',
-      method: Method.put,
-      data: {
-        "invoiceId": invoiceResponse.data['invoice']['invoiceId'] as int,
-        "status": 2,
-        "creditValue": 0
-      },
-    );
-    if (isOnlySave ?? false) {
-      dataProvider.itemList.clear();
-    }
-    //! Create receipt number
+//! Create receipt number
     String? rn;
     if (receiptNo != null) {
       rn = receiptNo;
@@ -754,40 +728,6 @@ Future<void> sendPaymentWithPrevious(BuildContext context, double total,
       rn = await getReceiptNumber(context);
     }
     final invoiceId = invoiceResponse.data['invoice']['invoiceId'] as int;
-
-    for (var invoice in dataProvider.issuedInvoicePaidList) {
-      final data = {
-        "value": invoice.paymentAmount,
-        "paymentInvoiceId": invoiceId,
-        "routecardId": dataProvider.currentRouteCard!.routeCardId,
-        "creditInvoiceId": invoice.chequeId != null
-            ? invoice.chequeId
-            : invoice.issuedInvoice.invoiceId,
-        "receiptNo": rn,
-        "status": invoice.chequeId != null ? 3 : 2,
-        "type": invoice.chequeId != null ? "return-cheque" : 'default'
-      };
-      await respo('credit-payment/create', method: Method.post, data: data);
-      if (invoice.creditAmount! <= invoice.paymentAmount &&
-          invoice.chequeId == null) {
-        await respo('invoice/update',
-            method: Method.put,
-            data: {"invoiceId": invoice.issuedInvoice.invoiceId, "status": 2});
-      }
-
-      if (invoice.chequeId != null) {
-        if (invoice.creditAmount! <= invoice.paymentAmount) {
-          await respo('cheque/update',
-              method: Method.put,
-              data: {"id": invoice.chequeId, "isActive": 2, "balance": 0});
-        } else {
-          await respo('cheque/update', method: Method.put, data: {
-            "id": invoice.chequeId,
-            "balance": invoice.creditAmount! - invoice.paymentAmount
-          });
-        }
-      }
-    }
 
     //! Create payment
     await respo(
@@ -835,7 +775,7 @@ Future<void> sendPaymentWithPrevious(BuildContext context, double total,
         method: Method.put,
         data: {
           "customerId": selectedCustomer.customerId,
-          "depositBalance": selectedCustomer.depositBalance + balance,
+          "depositBalance": selectedCustomer.depositBalance! + balance,
         },
       );
       await respo(
@@ -885,13 +825,96 @@ Future<void> sendPaymentWithPrevious(BuildContext context, double total,
       );
     }
 
+//! Update over payment
+    if (dataProvider.issuedDepositePaidList.isNotEmpty) {
+      await respo(
+        'over-payment/update',
+        method: Method.put,
+        data: {
+          "overPaymentsPayList": [
+            ...dataProvider.issuedDepositePaidList.map((e) => {
+                  "value": (e.depositeValue! - e.paymentAmount).toInt(),
+                  "customerId": dataProvider.selectedCustomer?.customerId,
+                  "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
+                })
+          ]
+        },
+      );
+    }
+
+    //! Update return cylinder invoice balance
+    for (var rci in dataProvider.issuedDepositePaidList) {
+      if (rci.issuedDeposite.status == 2) {
+        await respo('return-cylinder-invoice/update',
+            method: Method.put,
+            data: {
+              "invoiceNo": rci.issuedDeposite.receiptNo,
+              "balance": rci.issuedDeposite.value! - rci.paymentAmount,
+              "status":
+                  rci.issuedDeposite.value! - rci.paymentAmount == 0 ? 2 : 1
+            });
+      }
+    }
+
+    if (isOnlySave ?? false) {
+      dataProvider.issuedDepositePaidList.clear();
+    }
+
+    // //! Create invoice
+    await respo(
+      'invoice/update',
+      method: Method.put,
+      data: {
+        "invoiceId": invoiceResponse.data['invoice']['invoiceId'] as int,
+        "status": 2,
+        "creditValue": 0
+      },
+    );
+    if (isOnlySave ?? false) {
+      dataProvider.itemList.clear();
+    }
+
+    for (var invoice in dataProvider.issuedInvoicePaidList) {
+      final data = {
+        "value": invoice.paymentAmount,
+        "paymentInvoiceId": invoiceId,
+        "routecardId": dataProvider.currentRouteCard!.routeCardId,
+        "creditInvoiceId": invoice.chequeId != null
+            ? invoice.chequeId
+            : invoice.issuedInvoice.invoiceId,
+        "receiptNo": rn,
+        "status": invoice.chequeId != null ? 3 : 2,
+        "type": invoice.chequeId != null ? "return-cheque" : 'default'
+      };
+      await respo('credit-payment/create', method: Method.post, data: data);
+      if (invoice.creditAmount! <= invoice.paymentAmount &&
+          invoice.chequeId == null) {
+        await respo('invoice/update',
+            method: Method.put,
+            data: {"invoiceId": invoice.issuedInvoice.invoiceId, "status": 2});
+      }
+
+      if (invoice.chequeId != null) {
+        if (invoice.creditAmount! <= invoice.paymentAmount) {
+          await respo('cheque/update',
+              method: Method.put,
+              data: {"id": invoice.chequeId, "isActive": 2, "balance": 0});
+        } else {
+          await respo('cheque/update', method: Method.put, data: {
+            "id": invoice.chequeId,
+            "balance": invoice.creditAmount! - invoice.paymentAmount
+          });
+        }
+      }
+    }
+
     final invoiceProvider =
         Provider.of<InvoiceProvider>(context, listen: false);
     invoiceProvider.invoiceNu = null;
     invoiceProvider.invoiceRes = null;
 
     Navigator.popUntil(
-        context, ModalRoute.withName(SelectCustomerView.routeId));
+        context, ModalRoute.withName(SelectCustomerScreen.routeId));
     toast(
       'Sent successfully',
       toastState: TS.success,
@@ -1005,7 +1028,7 @@ Future<void> sendCreditPayment(BuildContext context, double total, double cash,
           method: Method.put,
           data: {
             "customerId": selectedCustomer.customerId,
-            "depositBalance": selectedCustomer.depositBalance +
+            "depositBalance": selectedCustomer.depositBalance! +
                 (total -
                     dataProvider.issuedInvoicePaidList
                         .map((e) => e.paymentAmount)
@@ -1039,13 +1062,11 @@ Future<void> sendCreditPayment(BuildContext context, double total, double cash,
         method: Method.put,
         data: {
           "overPaymentsPayList": [
-            ...dataProvider.issuedDepositePaidList
-                .map((e) => {
-                      "value": (e.depositeValue! - e.paymentAmount).toInt(),
-                      "customerId": dataProvider.selectedCustomer?.customerId,
-                      "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
-                    })
-                .toList()
+            ...dataProvider.issuedDepositePaidList.map((e) => {
+                  "value": (e.depositeValue! - e.paymentAmount).toInt(),
+                  "customerId": dataProvider.selectedCustomer?.customerId,
+                  "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
+                })
           ]
         },
       );
@@ -1054,202 +1075,214 @@ Future<void> sendCreditPayment(BuildContext context, double total, double cash,
   final invoiceProvider = Provider.of<InvoiceProvider>(context, listen: false);
   invoiceProvider.invoiceNu = null;
   invoiceProvider.invoiceRes = null;
+  // .then((value) {
+  //   if (!isDirectPrevoius) {
+  //     Navigator.popUntil(context, ModalRoute.withName(PreviousScreen.routeId));
+  //   } else {
+  //     Navigator.popUntil(
+  //         context, ModalRoute.withName(SelectCustomerScreen.routeId));
+  //   }
+  //   toast(
+  //     'Sent successfully',
+  //     toastState: TS.success,
+  //   );
+  // });
 }
 
-// Future<void> sendPayment(BuildContext context,
-//     {required double totalPayment,
-//     required double cash,
-//     required double balance,
-//     bool? isDirectPrevoius,
-//     required Respo invoiceResponse,
-//     String? receiptNo,
-//     bool? isOnlySave}) async {
-//   final dataProvider = Provider.of<DataProvider>(context, listen: false);
-//   final selectedCustomer = dataProvider.selectedCustomer!;
-//   try {
-// //! Update over payment
-//     if (dataProvider.issuedDepositePaidList.isNotEmpty) {
-//       await respo(
-//         'over-payment/update',
-//         method: Method.put,
-//         data: {
-//           "overPaymentsPayList": [
-//             ...dataProvider.issuedDepositePaidList
-//                 .map((e) => {
-//                       "value": (e.depositeValue! - e.paymentAmount).toInt(),
-//                       "customerId": dataProvider.selectedCustomer?.customerId,
-//                       "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
-//                     })
-//                 .toList()
-//           ]
-//         },
-//       );
-//       dataProvider.issuedDepositePaidList.forEach((element) async {
-//         final data = {
-//           "value": element.paymentAmount,
-//           "paymentInvoiceId": element.issuedDeposite.paymentInvoiceId,
-//           "routecardId": dataProvider.currentRouteCard!.routeCardId,
-//           "creditInvoiceId":
-//               invoiceResponse.data['invoice']['invoiceId'] as int,
-//           "receiptNo": element.issuedDeposite.receiptNo,
-//           "status": 1
-//         };
-//         await respo('credit-payment/create', method: Method.post, data: data);
-//       });
-//       await respo(
-//         'customers/update',
-//         method: Method.put,
-//         data: {
-//           "customerId": selectedCustomer.customerId,
-//           "depositBalance": selectedCustomer.depositBalance -
-//               dataProvider.issuedDepositePaidList
-//                   .map((e) => e.paymentAmount)
-//                   .reduce((value, element) => value + element),
-//         },
-//       );
-//     }
+Future<void> sendPayment(BuildContext context,
+    {required double totalPayment,
+    required double cash,
+    required double balance,
+    bool? isDirectPrevoius,
+    required Respo invoiceResponse,
+    String? receiptNo,
+    bool? isOnlySave}) async {
+  final dataProvider = Provider.of<DataProvider>(context, listen: false);
+  final selectedCustomer = dataProvider.selectedCustomer!;
+  try {
+//! Update over payment
+    if (dataProvider.issuedDepositePaidList.isNotEmpty) {
+      await respo(
+        'over-payment/update',
+        method: Method.put,
+        data: {
+          "overPaymentsPayList": [
+            ...dataProvider.issuedDepositePaidList.map((e) => {
+                  "value": (e.depositeValue! - e.paymentAmount).toInt(),
+                  "customerId": dataProvider.selectedCustomer?.customerId,
+                  "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
+                })
+          ]
+        },
+      );
+      for (var element in dataProvider.issuedDepositePaidList) {
+        final data = {
+          "value": element.paymentAmount,
+          "paymentInvoiceId": element.issuedDeposite.status == 2
+              ? element.issuedDeposite.id
+              : element.issuedDeposite.paymentInvoiceId,
+          "routecardId": dataProvider.currentRouteCard!.routeCardId,
+          "creditInvoiceId":
+              invoiceResponse.data['invoice']['invoiceId'] as int,
+          "receiptNo": element.issuedDeposite.receiptNo,
+          "status": element.issuedDeposite.status == 2 ? 6 : 1
+        };
+        await respo('credit-payment/create', method: Method.post, data: data);
+      }
+      await respo(
+        'customers/update',
+        method: Method.put,
+        data: {
+          "customerId": selectedCustomer.customerId,
+          "depositBalance": selectedCustomer.depositBalance! -
+              dataProvider.issuedDepositePaidList
+                  .map((e) => e.paymentAmount)
+                  .reduce((value, element) => value + element),
+        },
+      );
+    }
 
-//     if (isOnlySave ?? false) {
-//       dataProvider.issuedDepositePaidList.clear();
-//     }
+    if (isOnlySave ?? false) {
+      dataProvider.issuedDepositePaidList.clear();
+    }
 
-//     //! Update invoice
-//     await respo(
-//       'invoice/update',
-//       method: Method.put,
-//       data: {
-//         "invoiceId": invoiceResponse.data['invoice']['invoiceId'] as int,
-//         "status": balance < 0 ? 1 : 2,
-//         "creditValue": balance < 0 ? -balance : 0.0
-//       },
-//     );
-//     if (isOnlySave ?? false) {
-//       dataProvider.itemList.clear();
-//     }
+//! Create invoice
+    await respo(
+      'invoice/update',
+      method: Method.put,
+      data: {
+        "invoiceId": invoiceResponse.data['invoice']['invoiceId'] as int,
+        "status": balance < 0 ? 1 : 2,
+        "creditValue": balance < 0 ? -balance : 0.0
+      },
+    );
+    if (isOnlySave ?? false) {
+      dataProvider.itemList.clear();
+    }
 
-//     //! Create receipt number
-//     String? rn;
-//     if (receiptNo != null) {
-//       rn = receiptNo;
-//     } else {
-//       rn = await getReceiptNumber(context);
-//     }
-//     final invoiceId = invoiceResponse.data['invoice']['invoiceId'] as int;
-//     if (totalPayment != 0.0) {
-//       //! Create payment
-//       await respo(
-//         'payment/create',
-//         data: Payments(
-//           payments: [
-//             if (cash > 0)
-//               Payment(
-//                 customerTypeId: selectedCustomer.customerTypeId,
-//                 invoiceId: invoiceId,
-//                 amount: cash,
-//                 receiptNo: rn,
-//                 paymentMethod: 1,
-//                 chequeNo: null,
-//                 routecardId: dataProvider.currentRouteCard!.routeCardId,
-//                 routeId: dataProvider.currentRouteCard!.routeId,
-//                 customerId: selectedCustomer.customerId,
-//                 priceLevelId: selectedCustomer.priceLevelId,
-//                 employeeId: dataProvider.currentEmployee!.employeeId,
-//                 status: 1,
-//               ).toJson(),
-//             ...dataProvider.chequeList.map(
-//               (cheque) => Payment(
-//                 customerTypeId: selectedCustomer.customerTypeId,
-//                 invoiceId: invoiceId,
-//                 amount: cheque.chequeAmount,
-//                 chequeNo: cheque.chequeNumber,
-//                 receiptNo: rn!,
-//                 paymentMethod: 2,
-//                 routecardId: dataProvider.currentRouteCard!.routeCardId,
-//                 routeId: dataProvider.currentRouteCard!.routeId,
-//                 customerId: selectedCustomer.customerId,
-//                 priceLevelId: selectedCustomer.priceLevelId,
-//                 employeeId: dataProvider.currentEmployee!.employeeId,
-//                 status: 1,
-//               ).toJson(),
-//             ),
-//           ],
-//         ).toJson(),
-//         method: Method.post,
-//       );
-//       dataProvider.chequeList.clear();
-//       //! Create voucher payment
-//       if (dataProvider.selectedVoucher != null) {
-//         await respo(
-//           'payment/create',
-//           method: Method.post,
-//           data: Payments(
-//             payments: [
-//               if (cash > 0)
-//                 Payment(
-//                   customerTypeId: selectedCustomer.customerTypeId,
-//                   invoiceId: invoiceId,
-//                   amount: dataProvider.selectedVoucher != null
-//                       ? dataProvider.selectedVoucher!.value
-//                       : 0.0,
-//                   chequeNo: dataProvider.selectedVoucher != null
-//                       ? dataProvider.selectedVoucher!.code
-//                       : null,
-//                   receiptNo: rn,
-//                   paymentMethod: 3,
-//                   routecardId: dataProvider.currentRouteCard!.routeCardId,
-//                   routeId: dataProvider.currentRouteCard!.routeId,
-//                   customerId: selectedCustomer.customerId,
-//                   priceLevelId: selectedCustomer.priceLevelId,
-//                   employeeId: dataProvider.currentEmployee!.employeeId,
-//                   status: 1,
-//                 ).toJson(),
-//             ],
-//           ).toJson(),
-//         );
-//       }
+    //! Create receipt number
+    String? rn;
+    if (receiptNo != null) {
+      rn = receiptNo;
+    } else {
+      rn = await getReceiptNumber(context);
+    }
+    final invoiceId = invoiceResponse.data['invoice']['invoiceId'] as int;
+    if (totalPayment != 0.0) {
+      //! Create payment
+      await respo(
+        'payment/create',
+        data: Payments(
+          payments: [
+            if (cash > 0)
+              Payment(
+                customerTypeId: selectedCustomer.customerTypeId,
+                invoiceId: invoiceId,
+                amount: cash,
+                receiptNo: rn,
+                paymentMethod: 1,
+                chequeNo: null,
+                routecardId: dataProvider.currentRouteCard!.routeCardId,
+                routeId: dataProvider.currentRouteCard!.routeId,
+                customerId: selectedCustomer.customerId,
+                priceLevelId: selectedCustomer.priceLevelId,
+                employeeId: dataProvider.currentEmployee!.employeeId,
+                status: 1,
+              ).toJson(),
+            ...dataProvider.chequeList.map(
+              (cheque) => Payment(
+                customerTypeId: selectedCustomer.customerTypeId,
+                invoiceId: invoiceId,
+                amount: cheque.chequeAmount,
+                chequeNo: cheque.chequeNumber,
+                receiptNo: rn!,
+                paymentMethod: 2,
+                routecardId: dataProvider.currentRouteCard!.routeCardId,
+                routeId: dataProvider.currentRouteCard!.routeId,
+                customerId: selectedCustomer.customerId,
+                priceLevelId: selectedCustomer.priceLevelId,
+                employeeId: dataProvider.currentEmployee!.employeeId,
+                status: 1,
+              ).toJson(),
+            ),
+          ],
+        ).toJson(),
+        method: Method.post,
+      );
 
-//       //! Add credit bill
-//       if (balance < 0) {
-//         await respo(
-//           'customer-credit/create',
-//           method: Method.post,
-//           data: {
-//             "value": balance * -1,
-//             "invoiceId": invoiceId,
-//             "customerId": selectedCustomer.customerId,
-//             "status": 1,
-//           },
-//         );
-//       }
-//     }
-//     if (balance > 0) {
-//       await respo(
-//         'customers/update',
-//         method: Method.put,
-//         data: {
-//           "customerId": selectedCustomer.customerId,
-//           "depositBalance": selectedCustomer.depositBalance + balance,
-//         },
-//       );
-//       await respo(
-//         'over-payment/create',
-//         method: Method.post,
-//         data: {
-//           "value": balance,
-//           "status": 1,
-//           "paymentInvoiceId": invoiceId,
-//           "routecardId": dataProvider.currentRouteCard!.routeCardId,
-//           "receiptNo": rn,
-//           "customerId": selectedCustomer.customerId
-//         },
-//       );
-//     }
-//     final invoiceProvider =
-//         Provider.of<InvoiceProvider>(context, listen: false);
-//     invoiceProvider.invoiceNu = null;
-//     invoiceProvider.invoiceRes = null;
-//   } catch (e) {
-//     print(e.toString());
-//     rethrow;
-//   }
-// }
+      //! Create voucher payment
+      if (dataProvider.selectedVoucher != null) {
+        await respo(
+          'payment/create',
+          method: Method.post,
+          data: Payments(
+            payments: [
+              if (cash > 0)
+                Payment(
+                  customerTypeId: selectedCustomer.customerTypeId,
+                  invoiceId: invoiceId,
+                  amount: dataProvider.selectedVoucher != null
+                      ? dataProvider.selectedVoucher!.value
+                      : 0.0,
+                  chequeNo: dataProvider.selectedVoucher != null
+                      ? dataProvider.selectedVoucher!.code
+                      : null,
+                  receiptNo: rn,
+                  paymentMethod: 3,
+                  routecardId: dataProvider.currentRouteCard!.routeCardId,
+                  routeId: dataProvider.currentRouteCard!.routeId,
+                  customerId: selectedCustomer.customerId,
+                  priceLevelId: selectedCustomer.priceLevelId,
+                  employeeId: dataProvider.currentEmployee!.employeeId,
+                  status: 1,
+                ).toJson(),
+            ],
+          ).toJson(),
+        );
+      }
+
+      //! Add credit bill
+      if (balance < 0) {
+        await respo(
+          'customer-credit/create',
+          method: Method.post,
+          data: {
+            "value": balance * -1,
+            "invoiceId": invoiceId,
+            "customerId": selectedCustomer.customerId,
+            "status": 1,
+          },
+        );
+      }
+    }
+    if (balance > 0) {
+      await respo(
+        'customers/update',
+        method: Method.put,
+        data: {
+          "customerId": selectedCustomer.customerId,
+          "depositBalance": selectedCustomer.depositBalance! + balance,
+        },
+      );
+      await respo(
+        'over-payment/create',
+        method: Method.post,
+        data: {
+          "value": balance,
+          "status": 1,
+          "paymentInvoiceId": invoiceId,
+          "routecardId": dataProvider.currentRouteCard!.routeCardId,
+          "receiptNo": rn,
+          "customerId": selectedCustomer.customerId
+        },
+      );
+    }
+    final invoiceProvider =
+        Provider.of<InvoiceProvider>(context, listen: false);
+    invoiceProvider.invoiceNu = null;
+    invoiceProvider.invoiceRes = null;
+  } catch (e) {
+    print(e.toString());
+    rethrow;
+  }
+}

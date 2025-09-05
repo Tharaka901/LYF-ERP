@@ -4,19 +4,18 @@ import 'package:json_annotation/json_annotation.dart';
 part 'voucher.g.dart';
 
 @JsonSerializable()
-class VoucherModel {
+class Voucher {
   final int id;
   final String code;
   final double value;
 
-  VoucherModel({
+  Voucher({
     required this.id,
     required this.code,
     required this.value,
   });
 
-  factory VoucherModel.fromJson(Map<String, dynamic> json) =>
-      _$VoucherFromJson(json);
+  factory Voucher.fromJson(Map<String, dynamic> json) => _$VoucherFromJson(json);
 
   Map<String, dynamic> toJson() => _$VoucherToJson(this);
 }

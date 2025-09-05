@@ -25,8 +25,8 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
   void initState() {
     final invoiceProvider =
         Provider.of<InvoiceProvider>(context, listen: false);
-    invoiceProvider.invoiceNu == null;
-    invoiceProvider.getInvoiceNu(context);
+    if (invoiceProvider.invoiceNu == null)
+      invoiceProvider.getInvoiceNu(context);
     super.initState();
   }
 
@@ -64,6 +64,7 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                     waiting(context, body: 'Sending...');
                     await invoiceProvider.createInvoiceDB(context, null);
                     pop(context);
+                    print(invoiceProvider.invoiceRes);
                     Navigator.pushNamed(context, AddPaymentScreen.routeId,
                         arguments: {'invoiceRes': invoiceProvider.invoiceRes});
                   }
@@ -109,7 +110,7 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
-                              dataProvider.selectedCustomer!.businessName,
+                              dataProvider.selectedCustomer?.businessName ?? '',
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontSize: 16.0,
@@ -122,6 +123,40 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                     ],
                   ),
                 ),
+                SizedBox(
+                  width: double.infinity,
+                  child: Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.all(5.0),
+                            child: Text(
+                              'Address to:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Text(
+                              dataProvider.selectedCustomer?.address ?? '-',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 16.0,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                    ],
+                  ),
+                ),
+
                 SizedBox(
                   width: double.infinity,
                   child: Row(
@@ -318,9 +353,9 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                                   Padding(
                                     padding: const EdgeInsets.all(5.0),
                                     child: Text(
-                                      price(item.item.hasSpecialPrice != null
+                                      formatPrice(item.item.hasSpecialPrice !=
+                                              null
                                           ? item.item.hasSpecialPrice!.itemPrice
-                                              .toDouble()
                                           : item.item.salePrice),
                                       textAlign: TextAlign.center,
                                     ),
@@ -328,11 +363,12 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                                   Padding(
                                     padding: const EdgeInsets.all(5.0),
                                     child: Text(
-                                      price((item.item.hasSpecialPrice != null
-                                              ? item.item.hasSpecialPrice!
-                                                  .itemPrice
-                                              : item.item.salePrice) *
-                                          item.quantity),
+                                      formatPrice(
+                                          (item.item.hasSpecialPrice != null
+                                                  ? item.item.hasSpecialPrice!
+                                                      .itemPrice
+                                                  : item.item.salePrice) *
+                                              item.quantity),
                                       textAlign: TextAlign.end,
                                     ),
                                   ),
@@ -351,11 +387,13 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                 //! Invoice total summery
                 BasicTile(
                     label: 'Sub Total',
-                    value: price(dataProvider.getTotalAmount())),
-                BasicTile(label: 'VAT 18%', value: price(dataProvider.vat)),
+                    value: formatPrice(dataProvider.getTotalAmount())),
                 BasicTile(
-                    label: 'Non VAT Item Total',
-                    value: dataProvider.nonVatItemTotal.toString()),
+                    label: 'VAT 18%', value: formatPrice(dataProvider.vat)),
+                if (dataProvider.nonVatItemTotal > 0)
+                  BasicTile(
+                      label: 'Non VAT Item Total',
+                      value: dataProvider.nonVatItemTotal.toString()),
 
                 const Divider(
                   color: Colors.black,
@@ -391,7 +429,7 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(5.0),
                                   child: Text(
-                                    price(dataProvider.grandTotal),
+                                    formatPrice(dataProvider.grandTotal),
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(color: Colors.white),
                                   ),

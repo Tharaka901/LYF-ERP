@@ -3,12 +3,12 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/added_item.dart';
-import 'package:gsr/models/item/item_model.dart';
+import 'package:gsr/models/item.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/providers/items_provider.dart';
-import 'package:gsr/screens/leak_note_screen.dart';
-import 'package:gsr/screens/loan_note_screen.dart';
-import 'package:gsr/modules/return_cylinder/screens/return_note_screen.dart';
+import 'package:gsr/modules/leak_cylinders/leak_note_screen.dart';
+import 'package:gsr/modules/loan_cylinder/loan_note_screen.dart';
+import 'package:gsr/modules/return_cylinder/return_note_screen.dart';
 import 'package:gsr/modules/invoice/invoice_view.dart';
 import 'package:gsr/widgets/add_items.dart';
 import 'package:gsr/widgets/cards/add_item_card.dart';
@@ -22,7 +22,7 @@ class AddItemsScreen extends StatefulWidget {
   static const routeId = 'ADD_ITEMS';
   final String? type;
   final bool? isManual;
-  const AddItemsScreen({Key? key, this.type, this.isManual}) : super(key: key);
+  const AddItemsScreen({super.key, this.type, this.isManual});
 
   @override
   State<AddItemsScreen> createState() => _AddItemsScreenState();
@@ -31,10 +31,10 @@ class AddItemsScreen extends StatefulWidget {
 class _AddItemsScreenState extends State<AddItemsScreen> {
   @override
   void initState() {
-   
-    super.initState();
-     final itemsProvider = Provider.of<ItemsProvider>(context, listen: false);
+    final itemsProvider = Provider.of<ItemsProvider>(context, listen: false);
+    itemsProvider.isLoadingItems = true;
     itemsProvider.getBasicItems(context);
+    super.initState();
   }
 
   @override
@@ -87,9 +87,10 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
         leading: IconButton(
             onPressed: () {
               dataProvider.itemList.clear();
+              dataProvider.selectedCylinderList.clear();
               Navigator.pop(context);
             },
-            icon: Icon(Icons.arrow_back)),
+            icon: const Icon(Icons.arrow_back)),
         actions: [
           if (widget.type != 'Default') ...[
             IconButton(
@@ -103,9 +104,9 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                 final cylindserNumberController = TextEditingController();
                 final referenceNumberController = TextEditingController();
                 final formKey = GlobalKey<FormState>();
-                ItemModel? item;
+                Item? item;
                 double? maxQuantity;
-                callBack({required ItemModel selectedItem, required double maxQty}) {
+                callBack({required Item selectedItem, required double maxQty}) {
                   item = selectedItem;
                   if (selectedItem.hasSpecialPrice != null) {
                     item?.salePrice = selectedItem.hasSpecialPrice!.itemPrice;
@@ -134,50 +135,56 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                     if (formKey.currentState!.validate()) {
                       if (leakTypeController.text == 'Leak Issue') {
                         if (dataProvider.selectedCylinderList.isNotEmpty) {
-                          dataProvider.selectedCylinderList.forEach((element) {
-                            dataProvider.addItem(
-                              AddedItem(
-                                loanType:
-                                    loanTypeController.text == 'Loan Recive'
-                                        ? 2
-                                        : 3,
-                                leakType:
-                                    leakTypeController.text == 'Leak Recive'
-                                        ? 2
-                                        : 3,
-                                item: ItemModel(
-                                    id: item!.id,
-                                    itemRegNo: item!.itemRegNo,
-                                    itemName: item!.itemName,
-                                    costPrice: item!.costPrice,
-                                    salePrice: item!.salePrice,
-                                    openingQty: item!.openingQty,
-                                    vendorId: item!.vendorId,
-                                    priceLevelId: item!.priceLevelId,
-                                    itemTypeId: item!.itemTypeId,
-                                    stockId: item!.stockId,
-                                    costAccId: item!.costAccId,
-                                    incomeAccId: item!.incomeAccId,
-                                    isNew: item!.isNew,
-                                    status: item!.status,
-                                    cylinderNo: cylindserNumberController.text,
-                                    referenceNo:
-                                        referenceNumberController.text),
-                                cylinderNo: element.cylinderNo,
-                                referenceNo: referenceNumberController.text,
-                                quantity: 1,
-                                maxQuantity: maxQuantity ??
-                                    doub(
-                                      quantityControllerLeak.text,
-                                    ),
-                              ),
-                            );
-                          });
+                          for (var element
+                              in dataProvider.selectedCylinderList) {
+                            if (!dataProvider.itemList
+                                .map((e) => e.cylinderNo)
+                                .contains(element.cylinderNo)) {
+                              dataProvider.addItem(
+                                AddedItem(
+                                  loanType:
+                                      loanTypeController.text == 'Loan Recive'
+                                          ? 2
+                                          : 3,
+                                  leakType:
+                                      leakTypeController.text == 'Leak Recive'
+                                          ? 2
+                                          : 3,
+                                  item: Item(
+                                      id: item!.id,
+                                      itemRegNo: item!.itemRegNo,
+                                      itemName: item!.itemName,
+                                      costPrice: item!.costPrice,
+                                      salePrice: item!.salePrice,
+                                      openingQty: item!.openingQty,
+                                      vendorId: item!.vendorId,
+                                      priceLevelId: item!.priceLevelId,
+                                      itemTypeId: item!.itemTypeId,
+                                      stockId: item!.stockId,
+                                      costAccId: item!.costAccId,
+                                      incomeAccId: item!.incomeAccId,
+                                      isNew: item!.isNew,
+                                      status: item!.status,
+                                      cylinderNo:
+                                          cylindserNumberController.text,
+                                      referenceNo:
+                                          referenceNumberController.text),
+                                  cylinderNo: element.cylinderNo,
+                                  referenceNo: referenceNumberController.text,
+                                  quantity: 1,
+                                  maxQuantity: maxQuantity ??
+                                      doub(
+                                        quantityControllerLeak.text,
+                                      ),
+                                ),
+                              );
+                            }
+                          }
 
                           toast('An item added successfully',
                               toastState: TS.success);
                           quantityController.clear();
-                          dataProvider.clearSelectedCylinderList();
+                          // dataProvider.clearSelectedCylinderList();
                           cylindserNumberController.clear();
                           referenceNumberController.clear();
                           return;
@@ -194,7 +201,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                             leakType: leakTypeController.text == 'Leak Recive'
                                 ? 2
                                 : 3,
-                            item: ItemModel(
+                            item: Item(
                                 id: item!.id,
                                 itemRegNo: item!.itemRegNo,
                                 itemName: item!.itemName,
@@ -210,8 +217,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                                 isNew: item!.isNew,
                                 status: item!.status,
                                 cylinderNo: cylindserNumberController.text,
-                                referenceNo: referenceNumberController.text,
-                                nonVatAmount: item!.nonVatAmount),
+                                referenceNo: referenceNumberController.text),
                             cylinderNo: cylindserNumberController.text,
                             referenceNo: referenceNumberController.text,
                             quantity: widget.type == 'Leak'
@@ -275,11 +281,11 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
           ? SafeArea(
               child: Consumer<ItemsProvider>(builder: (context, ip, _) {
                 return ip.isLoadingItems
-                    ? Center(child: CircularProgressIndicator())
+                    ? const Center(child: CircularProgressIndicator())
                     : ListView(shrinkWrap: true, children: [
                         //! Basic items list
-                        SizedBox(height: 10),
-                        ...ip.basicItems.map((e) => AddItemCard(e)).toList(),
+                        const SizedBox(height: 10),
+                        ...ip.basicItems.map((e) => AddItemCard(e)),
 
                         //! New item section
                         ToogleTextButton(
@@ -287,7 +293,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                           onChanged: ip.onNewItemSwitchPressed,
                         ),
                         if (ip.isViewNewItems)
-                          ...ip.newItems.map((e) => AddItemCard(e)).toList(),
+                          ...ip.newItems.map((e) => AddItemCard(e)),
 
                         //! Other item section
                         ToogleTextButton(
@@ -295,8 +301,8 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                           onChanged: ip.onOtherItemSwitchPressed,
                         ),
                         if (ip.isViewOtherItems)
-                          ...ip.otherItems.map((e) => AddItemCard(e)).toList(),
-                        SizedBox(height: 10)
+                          ...ip.otherItems.map((e) => AddItemCard(e)),
+                        const SizedBox(height: 10)
                       ]);
               }),
             )
@@ -346,13 +352,16 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                                         quantityController: quantityController,
                                         formKey: formKey,
                                         addedItem: addedItem,
+                                        type: widget.type,
                                       ),
                                       onConfirm: () {
                                         if (formKey.currentState!.validate()) {
                                           dataProvider.modifyItem(
-                                            addedItem.modifyAddedItem(
-                                                doub(quantityController.text)),
+                                            addedItem,
+                                            double.parse(
+                                                quantityController.text),
                                           );
+
                                           toast('Item modified successfully',
                                               toastState: TS.success);
                                           quantityController.clear();

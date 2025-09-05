@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/models/item_summary.dart';
 import 'package:gsr/models/item_summary_customer_wise.dart';
-import 'package:gsr/modules/select_previous_invoice/select_previous_invoice_screen.dart';
+import 'package:gsr/screens/select_previous_invoice_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/data_provider.dart';
@@ -13,12 +13,11 @@ class RCSummaryScreen extends StatefulWidget {
   final List<ItemSummaryCustomerWiseFull> itemSummaryCWLeak;
   final List<ItemSummaryCustomerWiseFull> itemSummaryCWReturnC;
   const RCSummaryScreen(
-      {Key? key,
+      {super.key,
       required this.itemSummary,
       required this.itemSummaryCW,
       required this.itemSummaryCWLeak,
-      required this.itemSummaryCWReturnC})
-      : super(key: key);
+      required this.itemSummaryCWReturnC});
 
   @override
   State<RCSummaryScreen> createState() => _RCSummaryScreenState();
@@ -33,20 +32,11 @@ class _RCSummaryScreenState extends State<RCSummaryScreen> {
       appBar: AppBar(
         title: const Text('Summary'),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   backgroundColor: Colors.blue,
-      //   onPressed: () {
-      //     Navigator.pop(context);
-      //   },
-      //   child: const Icon(
-      //     Icons.done,
-      //   ),
-      // ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 9),
         child: ListView(
           children: [
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
               child: Column(
@@ -66,7 +56,7 @@ class _RCSummaryScreenState extends State<RCSummaryScreen> {
                       Padding(
                         padding: const EdgeInsets.all(5.0),
                         child: Text(
-                          dataProvider.currentRouteCard!.date!.toString(),
+                          dataProvider.currentRouteCard!.date!,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 18.0,
@@ -90,7 +80,7 @@ class _RCSummaryScreenState extends State<RCSummaryScreen> {
                       Padding(
                         padding: const EdgeInsets.all(5.0),
                         child: Text(
-                          dataProvider.currentRouteCard?.route?.routeName ?? '',
+                          dataProvider.currentRouteCard?.route.routeName ?? '',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 18.0,
@@ -305,18 +295,6 @@ class _RCSummaryScreenState extends State<RCSummaryScreen> {
                           ),
                         ),
                       ),
-                      // Padding(
-                      //   padding: EdgeInsets.all(5.0),
-                      //   child: Text(
-                      //     'Total',
-                      //     textAlign: TextAlign.center,
-                      //     style: TextStyle(
-                      //       fontWeight: FontWeight.bold,
-                      //       color: titleRowColor,
-                      //       fontSize: 11.0,
-                      //     ),
-                      //   ),
-                      // ),
                     ],
                   ),
                   ...widget.itemSummaryCW.map(
@@ -353,13 +331,6 @@ class _RCSummaryScreenState extends State<RCSummaryScreen> {
                               textAlign: TextAlign.center,
                             ),
                           ),
-                          // Padding(
-                          //   padding: const EdgeInsets.all(5.0),
-                          //   child: Text(
-                          //     (item.recivedQty! - item.issuedQty!).toString(),
-                          //     textAlign: TextAlign.center,
-                          //   ),
-                          // ),
                         ],
                       );
                     },
@@ -367,7 +338,7 @@ class _RCSummaryScreenState extends State<RCSummaryScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             const Text(
               'Leak Summery',
               textAlign: TextAlign.center,
@@ -571,7 +542,7 @@ class _RCSummaryScreenState extends State<RCSummaryScreen> {
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
-                              (widget.itemSummaryCWLeak.indexOf(item) + 1)
+                              (widget.itemSummaryCWReturnC.indexOf(item) + 1)
                                   .toString(),
                               textAlign: TextAlign.start,
                             ),

@@ -1,11 +1,12 @@
-import 'package:gsr/models/item/item_model.dart';
+import 'package:gsr/models/item.dart';
+// ignore: depend_on_referenced_packages
 import 'package:json_annotation/json_annotation.dart';
 
 part 'invoice_item.g.dart';
 
 @JsonSerializable()
 class InvoiceItem {
-  final ItemModel item;
+  final Item item;
   final double itemPrice;
   final double itemQty;
   final int status;

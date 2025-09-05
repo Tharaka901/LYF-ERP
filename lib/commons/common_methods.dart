@@ -196,7 +196,7 @@ popValue(BuildContext context, {required dynamic value}) {
   Navigator.of(context).pop(value);
 }
 
-price(double price) {
+String formatPrice(double price) {
   final bool negative = price < 0;
   return MoneyFormatter(
     amount: negative ? -price : price,
@@ -212,28 +212,28 @@ price(double price) {
 }
 
 pwcell(String value, {pw.TextAlign? align}) => pw.Padding(
-        padding: const pw.EdgeInsets.all(1),
-        child: pw.Text(
-          value,
-          textAlign: align ?? pw.TextAlign.center,
-          style: const pw.TextStyle(
-            fontSize: 22.0,
-          ),
+      padding: const pw.EdgeInsets.all(1),
+      child: pw.Text(
+        value,
+        textAlign: align ?? pw.TextAlign.center,
+        style: const pw.TextStyle(
+          fontSize: 22.0,
         ),
-      );
-  pwtitleCell(String value,
-          {pw.TextAlign? align,
-          pw.MainAxisAlignment? mainAxisAlignment = pw.MainAxisAlignment.start,
-          PdfColor? color}) =>
-      pw.Padding(
-          padding: const pw.EdgeInsets.all(1),
-          child: pw.Row(mainAxisAlignment: mainAxisAlignment!, children: [
-            pw.Text(
-              value,
-              textAlign: align ?? pw.TextAlign.center,
-              style: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold,
-                  fontSize: 22.0,
-                  color: color ?? PdfColor.fromInt(0xFF000000)),
-            ),
-          ]));
+      ),
+    );
+pwtitleCell(String value,
+        {pw.TextAlign? align,
+        pw.MainAxisAlignment? mainAxisAlignment = pw.MainAxisAlignment.start,
+        PdfColor? color}) =>
+    pw.Padding(
+        padding: const pw.EdgeInsets.all(1),
+        child: pw.Row(mainAxisAlignment: mainAxisAlignment!, children: [
+          pw.Text(
+            value,
+            textAlign: align ?? pw.TextAlign.center,
+            style: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold,
+                fontSize: 22.0,
+                color: color ?? PdfColor.fromInt(0xFF000000)),
+          ),
+        ]));

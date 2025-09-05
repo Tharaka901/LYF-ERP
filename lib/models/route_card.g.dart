@@ -11,6 +11,9 @@ RouteCard _$RouteCardFromJson(Map<String, dynamic> json) => RouteCard(
       routeCardNo: json['routeCardNo'] as String,
       routeId: json['routeId'] as int,
       vehicleId: json['vehicleId'] as int,
+      vehicle: json['vehicle'] == null
+          ? null
+          : Vehicle.fromJson(json['vehicle'] as Map<String, dynamic>),
       date: json['date'] as String?,
       route: Route.fromJson(json['route'] as Map<String, dynamic>),
       relatedEmployees: (json['relatedEmployees'] as List<dynamic>)
@@ -24,6 +27,7 @@ Map<String, dynamic> _$RouteCardToJson(RouteCard instance) => <String, dynamic>{
       'routeCardNo': instance.routeCardNo,
       'routeId': instance.routeId,
       'vehicleId': instance.vehicleId,
+      'vehicle': instance.vehicle?.toJson(),
       'date': instance.date,
       'route': instance.route,
       'relatedEmployees': instance.relatedEmployees,

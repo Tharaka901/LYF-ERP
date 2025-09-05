@@ -45,9 +45,9 @@ class CreditPaymentModel {
         routecardId: json["routecardId"],
         creditInvoiceId: json["creditInvoiceId"],
         receiptNo: json["receiptNo"],
-        // createdAt: json["createdAt"] == null
-        //     ? null
-        //     : DateTime.parse(json["createdAt"]),
+        createdAt: json["createdAt"] == null
+            ? null
+            : DateTime.parse(json["createdAt"]),
         creditInvoice: json["creditInvoice"] == null
             ? null
             : InvoiceModel.fromJson(json["creditInvoice"]),
@@ -68,7 +68,7 @@ class CreditPaymentModel {
         "routecardId": routecardId,
         "creditInvoiceId": creditInvoiceId,
         "receiptNo": receiptNo,
-        // "createdAt": createdAt?.toIso8601String(),
+        "createdAt": createdAt?.toIso8601String(),
         "creditInvoice": creditInvoice?.toJson(),
         "paymentInvoice": paymentInvoice?.toJson(),
         "payments": payments == null

@@ -34,7 +34,7 @@ class ChequeCard extends StatelessWidget {
         shape: defaultShape,
         title: Text(chequeNumber),
         subtitle: Text(
-          price(chequeAmount),
+          formatPrice(chequeAmount),
           style: const TextStyle(
             fontSize: 20.0,
             fontWeight: FontWeight.bold,

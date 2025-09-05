@@ -2,15 +2,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/models/added_item.dart';
-import 'package:gsr/models/cheque/cheque.dart';
-import 'package:gsr/models/invoice/invoice_model.dart';
-import 'package:gsr/models/issued_invoice_paid_model/issued_invoice_paid.dart';
+import 'package:gsr/models/cheque.dart';
+import 'package:gsr/models/issued_invoice_paid.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 
 import '../../commons/common_methods.dart';
+import '../../models/issued_invoice.dart';
 import '../../providers/data_provider.dart';
 import 'print_invoice_view_model.dart';
 
@@ -19,10 +19,10 @@ class PrintInvoiceView extends StatelessWidget {
   final String rn;
   final double? cash;
   final double balance;
-  final InvoiceModel? issuedInvoice;
+  final IssuedInvoice? issuedInvoice;
   final List<AddedItem>? items;
-  final List<ChequeModel>? cheques;
-  final List<IssuedInvoicePaidModel>? previousPayments;
+  final List<Cheque>? cheques;
+  final List<IssuedInvoicePaid>? previousPayments;
   final bool? isBillingFrom;
   final Future<void> Function()? onSaveData;
   final String? type;
@@ -43,17 +43,20 @@ class PrintInvoiceView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _viewModel = PrintInvoiceViewModel();
+    final viewModel = PrintInvoiceViewModel();
     return Scaffold(
       appBar: AppBar(
-        title: Text('Print Invoice'),
+        title: const Text('Print Invoice'),
       ),
       body: PdfPreview(
         onPrinted: (context) async {
-          if ((isBillingFrom ?? false) & (onSaveData != null))
+          if ((isBillingFrom ?? false) & (onSaveData != null)) {
             await onSaveData!();
-          if (type != 'previous')
-            _viewModel.onPrinted(context, isBillingFrom ?? false);
+          }
+          if (type != 'previous') {
+            if (!context.mounted) return;
+            viewModel.onPrinted(context, isBillingFrom ?? false);
+          }
         },
         build: (format) => _generatePdf(format, context, rn),
       ),
@@ -73,7 +76,7 @@ class PrintInvoiceView extends StatelessWidget {
               child: pw.Column(
                 children: [
                   //! Company details
-                  ...CompanyConstants.companyDetails,
+                  ...CompanyConstants.companyDetails(true),
 
                   //! Invoice details
                   if (invoiceNo != '0') ...[
@@ -90,26 +93,32 @@ class PrintInvoiceView extends StatelessWidget {
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
                             pw.Text(
-                              'Bill to: ${issuedInvoice?.customer?.businessName ?? dataProvider.selectedCustomer!.businessName}',
-                              style: pw.TextStyle(
+                              'Bill to: ${issuedInvoice?.customer.businessName ?? dataProvider.selectedCustomer!.businessName}',
+                              style: const pw.TextStyle(
                                 fontSize: 22.0,
                               ),
                             ),
                             pw.Text(
-                              'Customer Vat No: ${issuedInvoice?.customer?.customerVat ?? dataProvider.selectedCustomer!.customerVat ?? '-'}',
-                              style: pw.TextStyle(
+                              'Address: ${issuedInvoice?.customer.address ?? dataProvider.selectedCustomer!.address}',
+                              style: const pw.TextStyle(
                                 fontSize: 22.0,
                               ),
                             ),
                             pw.Text(
-                              'Date: ${date(DateTime.parse(issuedInvoice!.createdAt!), format: 'dd.MM.yyyy')}',
-                              style: pw.TextStyle(
+                              'Customer Vat No: ${issuedInvoice?.customer.customerVat ?? dataProvider.selectedCustomer!.customerVat ?? '-'}',
+                              style: const pw.TextStyle(
                                 fontSize: 22.0,
                               ),
                             ),
                             pw.Text(
-                              'Invoice No: ${invoiceNo}',
-                              style: pw.TextStyle(
+                              'Date: ${date(issuedInvoice?.createdAt ?? DateTime.now(), format: 'dd.MM.yyyy')}',
+                              style: const pw.TextStyle(
+                                fontSize: 22.0,
+                              ),
+                            ),
+                            pw.Text(
+                              'Invoice No: $invoiceNo',
+                              style: const pw.TextStyle(
                                 fontSize: 22.0,
                               ),
                             ),
@@ -121,7 +130,7 @@ class PrintInvoiceView extends StatelessWidget {
                     pw.Table(
                       children: [
                         pw.TableRow(
-                          decoration: pw.BoxDecoration(
+                          decoration: const pw.BoxDecoration(
                             color: PdfColor.fromInt(0xFFFFFFFF),
                           ),
                           children: [
@@ -158,11 +167,11 @@ class PrintInvoiceView extends StatelessWidget {
                                 align: pw.TextAlign.left,
                               ),
                               pwcell(
-                                price(invoiceItem.item.salePrice),
+                                formatPrice(invoiceItem.item.salePrice),
                                 align: pw.TextAlign.left,
                               ),
                               pwcell(
-                                price(
+                                formatPrice(
                                   invoiceItem.quantity *
                                       invoiceItem.item.salePrice,
                                 ),
@@ -170,7 +179,7 @@ class PrintInvoiceView extends StatelessWidget {
                               ),
                             ],
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                     pw.Divider(thickness: 0.5),
@@ -189,12 +198,15 @@ class PrintInvoiceView extends StatelessWidget {
                             ),
                           ),
                           pwtitleCell(
-                              price(double.parse(
-                                  '${issuedInvoice?.subTotal?.toStringAsFixed(2) ?? dataProvider.getTotalAmount().toStringAsFixed(2)}')),
+                              formatPrice(double.parse(
+                                  issuedInvoice?.subTotal?.toStringAsFixed(2) ??
+                                      dataProvider
+                                          .getTotalAmount()
+                                          .toStringAsFixed(2))),
                               align: pw.TextAlign.left,
                               mainAxisAlignment:
                                   pw.MainAxisAlignment.spaceBetween,
-                              color: PdfColor.fromInt(0xFF000000)),
+                              color: const PdfColor.fromInt(0xFF000000)),
                         ],
                       ),
                     ),
@@ -212,12 +224,13 @@ class PrintInvoiceView extends StatelessWidget {
                             ),
                           ),
                           pwtitleCell(
-                              price(double.parse(
-                                  '${(issuedInvoice?.vat ?? (dataProvider.getTotalAmount() * 0.18)).toStringAsFixed(2)}')),
+                              formatPrice(double.parse((issuedInvoice?.vat ??
+                                      (dataProvider.getTotalAmount() * 0.18))
+                                  .toStringAsFixed(2))),
                               align: pw.TextAlign.left,
                               mainAxisAlignment:
                                   pw.MainAxisAlignment.spaceBetween,
-                              color: PdfColor.fromInt(0xFF000000)),
+                              color: const PdfColor.fromInt(0xFF000000)),
                         ],
                       ),
                     ),
@@ -238,12 +251,14 @@ class PrintInvoiceView extends StatelessWidget {
                               ),
                             ),
                             pwtitleCell(
-                                price(double.parse(
-                                    '${(issuedInvoice?.nonVatItemTotal ?? (dataProvider.nonVatItemTotal)).toStringAsFixed(2)}')),
+                                formatPrice(double.parse(
+                                    (issuedInvoice?.nonVatItemTotal ??
+                                            (dataProvider.nonVatItemTotal))
+                                        .toStringAsFixed(2))),
                                 align: pw.TextAlign.left,
                                 mainAxisAlignment:
                                     pw.MainAxisAlignment.spaceBetween,
-                                color: PdfColor.fromInt(0xFF000000)),
+                                color: const PdfColor.fromInt(0xFF000000)),
                           ],
                         ),
                       ),
@@ -261,19 +276,109 @@ class PrintInvoiceView extends StatelessWidget {
                             ),
                           ),
                           pwtitleCell(
-                              price(double.parse(
-                                  '${(issuedInvoice?.amount ?? (dataProvider.getTotalAmount() + dataProvider.nonVatItemTotal + dataProvider.getTotalAmount() * 0.18)).toStringAsFixed(2)}')),
+                              formatPrice(double.parse((issuedInvoice?.amount ??
+                                      (dataProvider.getTotalAmount() +
+                                          dataProvider.nonVatItemTotal +
+                                          dataProvider.getTotalAmount() * 0.18))
+                                  .toStringAsFixed(2))),
                               align: pw.TextAlign.left,
                               mainAxisAlignment:
                                   pw.MainAxisAlignment.spaceBetween,
-                              color: PdfColor.fromInt(0xFF000000)),
+                              color: const PdfColor.fromInt(0xFF000000)),
                         ],
                       ),
                     )
                   ],
+                  pw.SizedBox(height: 10.0),
+
+                  //! Over payment settlement
+                  if (dataProvider.issuedDepositePaidList.isNotEmpty) ...[
+                    pw.SizedBox(height: 5.0),
+                    pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.start,
+                        children: [
+                          pw.Text(
+                            'Previous Deposite Payments',
+                            textAlign: pw.TextAlign.start,
+                            style: pw.TextStyle(
+                              fontSize: 22.0,
+                              fontWeight: pw.FontWeight.bold,
+                            ),
+                          ),
+                        ]),
+                    pw.SizedBox(height: 2.0),
+                    pw.Table(
+                      children: [
+                        pw.TableRow(
+                          decoration: const pw.BoxDecoration(),
+                          children: [
+                            pwtitleCell(
+                              '#',
+                              align: pw.TextAlign.start,
+                            ),
+                            pwtitleCell(
+                              'Date',
+                              align: pw.TextAlign.center,
+                            ),
+                            pwtitleCell(
+                              'Invoice No:',
+                              align: pw.TextAlign.center,
+                            ),
+                            pwtitleCell(
+                              'Payment',
+                              align: pw.TextAlign.right,
+                              mainAxisAlignment: pw.MainAxisAlignment.end,
+                            ),
+                          ],
+                        ),
+                        ...dataProvider.issuedDepositePaidList.map((dp) {
+                          return pw.TableRow(
+                            children: [
+                              pwcell(
+                                (dataProvider.issuedDepositePaidList
+                                            .indexOf(dp) +
+                                        1)
+                                    .toString(),
+                                align: pw.TextAlign.start,
+                              ),
+                              pwcell(
+                                date(
+                                    dp.issuedDeposite.createdAt ??
+                                        DateTime.now(),
+                                    format: 'dd-MM-yyyy'),
+                                align: pw.TextAlign.center,
+                              ),
+                              pwcell(
+                                dp.issuedDeposite.paymentInvoiceId.toString(),
+                                align: pw.TextAlign.center,
+                              ),
+                              pwcell(
+                                formatPrice(dp.paymentAmount)
+                                    .replaceAll('Rs.', ''),
+                                align: pw.TextAlign.end,
+                              ),
+                            ],
+                          );
+                        }),
+                      ],
+                    ),
+                    pw.Divider(thickness: 0.5),
+                    pw.Row(
+                      children: [
+                        pw.Text('Total Previous Deposite Payment',
+                            style: const pw.TextStyle(fontSize: 22)),
+                        pw.Spacer(),
+                        pw.Text(
+                            formatPrice(
+                                dataProvider.getTotalDepositePaymentAmount()),
+                            style: const pw.TextStyle(fontSize: 22)),
+                      ],
+                    ),
+                    pw.Divider(thickness: 0.5),
+                  ],
 
                   // //! Payment section
-                  if (issuedInvoice?.payments!.isNotEmpty ??
+                  if (issuedInvoice?.payments.isNotEmpty ??
                       false ||
                           cash != null ||
                           dataProvider.chequeList.isNotEmpty) ...[
@@ -282,7 +387,7 @@ class PrintInvoiceView extends StatelessWidget {
                         mainAxisAlignment: pw.MainAxisAlignment.start,
                         children: [
                           pw.Text(
-                            'Recipt No : ${rn}',
+                            'Recipt No : $rn',
                             textAlign: pw.TextAlign.start,
                             style: const pw.TextStyle(fontSize: 22.0),
                           ),
@@ -291,7 +396,7 @@ class PrintInvoiceView extends StatelessWidget {
                     pw.Table(
                       children: [
                         pw.TableRow(
-                          decoration: pw.BoxDecoration(
+                          decoration: const pw.BoxDecoration(
                             color: PdfColor.fromInt(0xFFFFFFFF),
                           ),
                           children: [
@@ -319,7 +424,7 @@ class PrintInvoiceView extends StatelessWidget {
                                 align: pw.TextAlign.left,
                               ),
                               pwcell(
-                                price(cash ?? 0),
+                                formatPrice(cash ?? 0),
                                 align: pw.TextAlign.end,
                               ),
                             ],
@@ -337,12 +442,12 @@ class PrintInvoiceView extends StatelessWidget {
                                   align: pw.TextAlign.left,
                                 ),
                                 pwcell(
-                                  price(m.chequeAmount),
+                                  formatPrice(m.chequeAmount),
                                   align: pw.TextAlign.end,
                                 ),
                               ],
                             );
-                          }).toList(),
+                          }),
                       ],
                     ),
                     pw.Divider(thickness: 0.5),
@@ -360,12 +465,12 @@ class PrintInvoiceView extends StatelessWidget {
                             ),
                           ),
                           pwtitleCell(
-                              price(double.parse(
+                              formatPrice(double.parse(
                                   '${issuedInvoice != null ? _totalPayment() : (dataProvider.getTotalChequeAmount() + cash)}')),
                               align: pw.TextAlign.left,
                               mainAxisAlignment:
                                   pw.MainAxisAlignment.spaceBetween,
-                              color: PdfColor.fromInt(0xFF000000)),
+                              color: const PdfColor.fromInt(0xFF000000)),
                         ],
                       ),
                     )
@@ -379,7 +484,7 @@ class PrintInvoiceView extends StatelessWidget {
                         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                         children: [
                           pw.Text(
-                            '${balance > 0 ? 'Over Payment' : 'Credit'}',
+                            balance > 0 ? 'Over Payment' : 'Credit',
                             textAlign: pw.TextAlign.center,
                             style: pw.TextStyle(
                               fontWeight: pw.FontWeight.bold,
@@ -387,11 +492,12 @@ class PrintInvoiceView extends StatelessWidget {
                             ),
                           ),
                           pwtitleCell(
-                            '${(balance > 0 ? 1 * balance : -1 * balance).toStringAsFixed(2)}',
+                            (balance > 0 ? 1 * balance : -1 * balance)
+                                .toStringAsFixed(2),
                             align: pw.TextAlign.left,
                             mainAxisAlignment:
                                 pw.MainAxisAlignment.spaceBetween,
-                            color: PdfColor.fromInt(0xFF000000),
+                            color: const PdfColor.fromInt(0xFF000000),
                           ),
                         ],
                       ),
@@ -418,7 +524,7 @@ class PrintInvoiceView extends StatelessWidget {
                     pw.Table(
                       children: [
                         pw.TableRow(
-                          decoration: pw.BoxDecoration(),
+                          decoration: const pw.BoxDecoration(),
                           children: [
                             pwtitleCell(
                               'Date',
@@ -438,7 +544,8 @@ class PrintInvoiceView extends StatelessWidget {
                           return pw.TableRow(
                             children: [
                               pwcell(
-                                dp.issuedInvoice.createdAt ?? '-',
+                                date(dp.issuedInvoice.createdAt,
+                                    format: 'dd-MM-yyyy'),
                                 align: pw.TextAlign.left,
                               ),
                               pwcell(
@@ -446,28 +553,29 @@ class PrintInvoiceView extends StatelessWidget {
                                 align: pw.TextAlign.left,
                               ),
                               pwcell(
-                                price(dp.paymentAmount).replaceAll('Rs.', ''),
+                                formatPrice(dp.paymentAmount)
+                                    .replaceAll('Rs.', ''),
                                 align: pw.TextAlign.end,
                               ),
                             ],
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                     pw.Divider(thickness: 0.5),
                     pw.Row(
                       children: [
                         pw.Text('Total Previous Payment',
-                            style: pw.TextStyle(fontSize: 22)),
+                            style: const pw.TextStyle(fontSize: 22)),
                         pw.Spacer(),
                         pw.Text(
-                            price(issuedInvoice != null
+                            formatPrice(issuedInvoice != null
                                 ? previousPayments!
                                     .map((e) => e.paymentAmount)
                                     .toList()
                                     .reduce((value, element) => value + element)
                                 : dataProvider.getTotalInvoicePaymentAmount()),
-                            style: pw.TextStyle(fontSize: 22)),
+                            style: const pw.TextStyle(fontSize: 22)),
                       ],
                     ),
                   ],
@@ -475,11 +583,11 @@ class PrintInvoiceView extends StatelessWidget {
                   pw.Divider(thickness: 0.5),
                   pwtitleCell(
                     'Billing By: ${dataProvider.currentEmployee?.firstName}',
-                    color: PdfColor.fromInt(0xFF000000),
+                    color: const PdfColor.fromInt(0xFF000000),
                   ),
                   pwtitleCell(
                     'Billing Date & Time: ${date(DateTime.now(), format: 'dd.MM.yyyy hh:mm a')}',
-                    color: PdfColor.fromInt(0xFF000000),
+                    color: const PdfColor.fromInt(0xFF000000),
                   ),
                   pw.SizedBox(height: 2),
                   MessageConstants.signatureNotRequired,
@@ -526,7 +634,7 @@ class PrintInvoiceView extends StatelessWidget {
               style: pw.TextStyle(
                   fontWeight: pw.FontWeight.bold,
                   fontSize: 22.0,
-                  color: color ?? PdfColor.fromInt(0xFF000000)),
+                  color: color ?? const PdfColor.fromInt(0xFF000000)),
             ),
           ]));
 }

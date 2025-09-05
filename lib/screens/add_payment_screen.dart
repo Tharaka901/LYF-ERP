@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
-import 'package:gsr/models/cheque/cheque.dart';
+import 'package:gsr/models/cheque.dart';
+import 'package:gsr/models/response.dart';
 import 'package:gsr/models/voucher.dart';
-import 'package:gsr/modules/invoice/invoice_provider.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/modules/view_receipt/invoice_receipt_screen.dart';
+import 'package:gsr/services/database.dart';
 import 'package:gsr/widgets/cheque_card.dart';
 import 'package:gsr/widgets/cheque_form.dart';
 import 'package:gsr/widgets/detail_card.dart';
 import 'package:provider/provider.dart';
-
-import '../providers/hive_db_provider.dart';
-import '../services/voucher_service.dart';
 
 class AddPaymentScreen extends StatefulWidget {
   static const routeId = 'PAYMENT';
   final String? type;
   final bool? isManual;
 
-  const AddPaymentScreen({Key? key, this.type, this.isManual})
-      : super(key: key);
+  const AddPaymentScreen({super.key, this.type, this.isManual});
 
   @override
   State<AddPaymentScreen> createState() => _AddPaymentScreenState();
@@ -29,19 +26,17 @@ class AddPaymentScreen extends StatefulWidget {
 class _AddPaymentScreenState extends State<AddPaymentScreen> {
   final chequeScrollController = ScrollController();
   final cashController = TextEditingController();
+  bool isCashOnly = false;
+
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
-    final invoiceProvider =
-        Provider.of<InvoiceProvider>(context, listen: false);
-    // final Respo invoiceRes = (ModalRoute.of(context)!.settings.arguments
-    //     as Map<String, dynamic>)['invoiceRes'];
+    final Respo invoiceRes = (ModalRoute.of(context)!.settings.arguments
+        as Map<String, dynamic>)['invoiceRes'];
     final isManual = (ModalRoute.of(context)!.settings.arguments
         as Map<String, dynamic>)['isManual'];
-    final voucherService = VoucherService();
     return Scaffold(
-      backgroundColor: defaultBackgroundColor,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Payments'),
       ),
@@ -58,7 +53,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                 'cash': doub(cashController.text.trim().isEmpty
                     ? '0.0'
                     : cashController.text.trim().replaceAll(',', '')),
-                // 'invoiceRes': invoiceRes,
+                'invoiceRes': invoiceRes,
                 'isManual': isManual
               });
         },
@@ -80,30 +75,43 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                 ),
                 DetailCard(
                   detailKey: 'Customer name',
-                  detailvalue: dataProvider.selectedCustomer!.businessName,
+                  detailvalue:
+                      dataProvider.selectedCustomer?.businessName ?? '',
                 ),
                 DetailCard(
                   detailKey: 'Invoice No',
-                  detailvalue: invoiceProvider.invoiceNu ?? '',
+                  detailvalue: invoiceRes.data['invoice']['invoiceNo'],
                 ),
                 DetailCard(
                   detailKey: 'Total amount',
-                  detailvalue: price(dataProvider.getTotalAmount() +
-                      dataProvider.nonVatItemTotal +
-                      (dataProvider.getTotalAmount() / 100) * 18),
+                  detailvalue: formatPrice(dataProvider.grandTotal),
                 ),
-                const Divider(),
+                CheckboxListTile(
+                  title: const Text('Cash Only'),
+                  value: isCashOnly,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isCashOnly = value ?? false;
+                      if (isCashOnly) {
+                        cashController.text =
+                            dataProvider.grandTotal.toString();
+                      }
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+                const SizedBox(height: 10.0),
                 TextFormField(
                   controller: cashController,
-                  // inputFormatters: [
-                  //   ThousandsFormatter(
-                  //     allowFraction: true,
-                  //   ),
-                  // ],
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
                   style: const TextStyle(fontSize: 18.0),
+                  onChanged: (value) {
+                    setState(() {
+                      isCashOnly = value == dataProvider.grandTotal.toString();
+                    });
+                  },
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
@@ -112,107 +120,107 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                     prefixText: 'Rs. ',
                   ),
                 ),
-                const Divider(),
-                SizedBox(
-                  width: double.infinity,
-                  height: 60.0,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      final chequeNumberController = TextEditingController();
-                      final chequeAmountController = TextEditingController();
-                      final formKey = GlobalKey<FormState>();
-                      confirm(
-                        context,
-                        title: 'New Cheque',
-                        body: ChequeForm(
-                          chequeNumberController: chequeNumberController,
-                          chequeAmountController: chequeAmountController,
-                          formKey: formKey,
-                        ),
-                        onConfirm: () {
-                          if (formKey.currentState!.validate()) {
-                            dataProvider.addCheque(
-                              ChequeModel(
-                                chequeNumber:
-                                    chequeNumberController.text.trim(),
-                                chequeAmount: doub(chequeAmountController.text
-                                    .replaceAll(',', '')),
-                              ),
-                            );
-                            chequeNumberController.clear();
-                            chequeAmountController.clear();
-                            return;
-                          }
-                        },
-                        confirmText: 'Add',
-                      );
-                    },
-                    style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(Colors.blue[800]),
-                      shape: MaterialStateProperty.all(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+                if (!isCashOnly) ...[
+                  const Divider(),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 60.0,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        final chequeNumberController = TextEditingController();
+                        final chequeAmountController = TextEditingController();
+                        final formKey = GlobalKey<FormState>();
+                        confirm(
+                          context,
+                          title: 'New Cheque',
+                          body: ChequeForm(
+                            chequeNumberController: chequeNumberController,
+                            chequeAmountController: chequeAmountController,
+                            formKey: formKey,
+                          ),
+                          onConfirm: () {
+                            if (formKey.currentState!.validate()) {
+                              dataProvider.addCheque(
+                                Cheque(
+                                  chequeNumber:
+                                      chequeNumberController.text.trim(),
+                                  chequeAmount: doub(chequeAmountController.text
+                                      .replaceAll(',', '')),
+                                ),
+                              );
+                              chequeNumberController.clear();
+                              chequeAmountController.clear();
+                              return;
+                            }
+                          },
+                          confirmText: 'Add',
+                        );
+                      },
+                      style: ButtonStyle(
+                        backgroundColor:
+                            WidgetStateProperty.all(Colors.blue[800]),
+                        shape: WidgetStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
                         ),
                       ),
-                    ),
-                    child: const Text(
-                      'New cheque',
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        color: Colors.white,
+                      child: const Text(
+                        'New cheque',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 10.0),
-                Consumer<DataProvider>(
-                  builder: (context, data, _) => data.chequeList.isNotEmpty
-                      ? Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          height: 300.0,
-                          child: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: ListView.separated(
-                              itemCount: data.chequeList.length,
-                              controller: chequeScrollController,
-                              separatorBuilder: (context, index) =>
-                                  const SizedBox(
-                                height: 5.0,
-                              ),
-                              itemBuilder: (context, index) {
-                                final cheque = data.chequeList[index];
-                                return ChequeCard(
-                                  chequeNumber: cheque.chequeNumber,
-                                  chequeAmount: cheque.chequeAmount,
-                                  trailing: IconButton(
-                                    splashRadius: 20.0,
-                                    onPressed: () => data.removeCheque(cheque),
-                                    icon: const Icon(
-                                      Icons.clear_rounded,
-                                      color: defaultErrorColor,
-                                    ),
-                                  ),
-                                );
-                              },
+                  const SizedBox(height: 10.0),
+                  Consumer<DataProvider>(
+                    builder: (context, data, _) => data.chequeList.isNotEmpty
+                        ? Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(10.0),
                             ),
-                          ),
-                        )
-                      : dummy,
-                ),
-                const Divider(),
-                if (hiveDBProvider.isInternetConnected)
-                  FutureBuilder<List<VoucherModel>>(
-                    future: voucherService.getVouchers(context),
-                    builder: (context,
-                            AsyncSnapshot<List<VoucherModel>> snapshot) =>
+                            height: 300.0,
+                            child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: ListView.separated(
+                                itemCount: data.chequeList.length,
+                                controller: chequeScrollController,
+                                separatorBuilder: (context, index) =>
+                                    const SizedBox(
+                                  height: 5.0,
+                                ),
+                                itemBuilder: (context, index) {
+                                  final cheque = data.chequeList[index];
+                                  return ChequeCard(
+                                    chequeNumber: cheque.chequeNumber,
+                                    chequeAmount: cheque.chequeAmount,
+                                    trailing: IconButton(
+                                      splashRadius: 20.0,
+                                      onPressed: () =>
+                                          data.removeCheque(cheque),
+                                      icon: const Icon(
+                                        Icons.clear_rounded,
+                                        color: defaultErrorColor,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          )
+                        : dummy,
+                  ),
+                  const Divider(),
+                  FutureBuilder<List<Voucher>>(
+                    future: getVouchers(context),
+                    builder: (context, AsyncSnapshot<List<Voucher>> snapshot) =>
                         snapshot.connectionState == ConnectionState.waiting
                             ? const CircularProgressIndicator()
-                            : DropdownButtonFormField<VoucherModel>(
+                            : DropdownButtonFormField<Voucher>(
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
@@ -228,7 +236,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                                         return DropdownMenuItem(
                                           value: element,
                                           child: Text(
-                                              '${element.code} ${element.id != 0 ? price(element.value) : ''}'),
+                                              '${element.code} ${element.id != 0 ? formatPrice(element.value) : ''}'),
                                         );
                                       }).toList()
                                     : [],
@@ -241,6 +249,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                                 },
                               ),
                   ),
+                ]
               ],
             ),
           ),
