@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'config/routes.dart';
 import 'config/theme.dart';
+import 'modules/start/start_view.dart';
 import 'screens/start_screen.dart';
 
 class GSRApp extends StatelessWidget {
@@ -11,7 +12,7 @@ class GSRApp extends StatelessWidget {
     return MaterialApp(
       title: 'DSR App',
       theme: AppTheme.light,
-      home: const StartScreen(),
+      home: const StartView(),
       debugShowCheckedModeBanner: false,
       routes: AppRoutes.routes,
     );
