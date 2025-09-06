@@ -3,10 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'app.dart';
 import 'commons/locator.dart';
+import 'commons/hive_db.dart';
 import 'providers/providers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  //! Register Hive Models
+  await registerHiveModels();
   
   // Set system UI style
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(

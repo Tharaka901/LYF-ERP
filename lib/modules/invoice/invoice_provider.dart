@@ -29,7 +29,7 @@ class InvoiceProvider extends ChangeNotifier {
     if (hiveDBProvider.isInternetConnected) {
       int invoiceCount = await invoiceService
           .invoiceCount(dataProvider.currentRouteCard!.routeCardId!);
-      int invoiceCountLocalDb = hiveDBProvider.invoiceBox!.length;
+      int invoiceCountLocalDb = hiveDBProvider.invoiceBox?.length ?? 0;
       invoiceNu =
           '${dataProvider.currentRouteCard!.routeCardNo}/${invoiceCount + invoiceCountLocalDb + 1}';
       //!Save invoice number in local DB
