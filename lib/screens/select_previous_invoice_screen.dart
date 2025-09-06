@@ -487,11 +487,10 @@ class _SelectPreviousInvoiceScreenState
                                                   invoice.issuedInvoice
                                                               .createdAt !=
                                                           null
-                                                      ? date(
-                                                          DateTime.parse(invoice
-                                                              .issuedInvoice
-                                                              .createdAt!),
-                                                          format: 'dd-MM-yyyy')
+                                                      ? invoice.issuedInvoice
+                                                              .createdAt!
+                                                              .toString()
+                                                              .split(' ')[0]
                                                       : '',
                                                   align: TextAlign.center,
                                                 ),

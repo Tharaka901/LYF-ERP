@@ -123,7 +123,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                                 status: 0,
                                 payments: [],
                                 previousPayments: [],
-                                createdAt: DateTime.now().toString(),
+                                createdAt: DateTime.now(),
                               ),
                             ),
                           )
@@ -166,8 +166,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: Text(
-                            issuedInvoice.createdAt ??
-                                date(DateTime.now(), format: 'dd.MM.yyyy'),
+                            issuedInvoice.createdAt.toString().split(' ')[0],
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 18.0,
@@ -429,7 +428,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                                 invoice.creditInvoice?.createdAt != null
                                     ? date(
                                         DateTime.parse(
-                                            invoice.creditInvoice!.createdAt!),
+                                            invoice.creditInvoice!.createdAt!.toIso8601String() ),
                                         format: 'dd-MM-yyyy')
                                     : '',
                                 align: TextAlign.center,

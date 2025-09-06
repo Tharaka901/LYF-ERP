@@ -5,6 +5,7 @@ import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/modules/return_cylinder/providers/return_cylinder_provider.dart';
 import 'package:gsr/modules/return_cylinder/providers/select_credit_invoice_provider.dart';
 import 'package:gsr/providers/data_provider.dart';
+import 'package:gsr/widgets/pdf_components/pdf_summary_row.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -46,23 +47,17 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
     // Get data from providers
     final invoiceNo = returnCylinderProvider.returnCylinderInvoiceNumber;
     final totalAmount = returnCylinderProvider.grandPrice;
-    final vatAmount = double.parse((returnCylinderProvider.grandPrice -
-            returnCylinderProvider.nonVatAmount)
-        .toStringAsFixed(2));
+    final vatAmount = returnCylinderProvider.vatAmount;
     final nonVatAmount = returnCylinderProvider.nonVatAmount;
+    final totalItemAmount = returnCylinderProvider.totalItemAmount;
     final items = returnCylinderProvider.selectedItems;
     final paidIssuedInvoices = selectCreditInvoiceProvider.paidIssuedInvoices;
     final totalInvoicePaymentAmount =
         selectCreditInvoiceProvider.totalInvoicePaymentAmount;
     final customerName = dataProvider.selectedCustomer?.businessName ?? '';
     final customerVat = dataProvider.selectedCustomer?.customerVat ?? '';
-    final customerAddress = dataProvider.selectedCustomer?.address ?? '';
-    final customerContact = dataProvider.selectedCustomer?.contactNumber ?? '';
-    final employeeName =
-        '${dataProvider.currentEmployee?.firstName ?? ''} ${dataProvider.currentEmployee?.lastName ?? ''}'
-            .trim();
-    final routeName = dataProvider.currentRouteCard?.route?.routeName ?? '';
-    final date = DateTime.now().toString().split(' ')[0];
+    final date =
+        dataProvider.currentRouteCard?.date?.toString().split(' ')[0] ?? '';
 
     pdf.addPage(
       pw.MultiPage(
@@ -78,42 +73,33 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                   // Return Cylinder Invoice details
                   pw.SizedBox(height: 10.0),
                   pw.Text(
-                    'Return Cylinder Invoice',
+                    'Tax Return Note',
                     style: ThemeConstants.boldStyleForPdf,
                   ),
                   pw.SizedBox(height: 5.0),
 
                   // Invoice and receipt details
                   pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: pw.MainAxisAlignment.start,
                     children: [
                       pw.Column(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           pw.Text(
-                            'Invoice No: $invoiceNo',
-                            style: const pw.TextStyle(fontSize: 14.0),
-                          ),
-                          pw.Text(
-                            'Receipt No: $invoiceNo',
-                            style: const pw.TextStyle(fontSize: 14.0),
+                            'Return From: $customerName',
+                            style: const pw.TextStyle(fontSize: 22.0),
                           ),
                           pw.Text(
                             'Date: $date',
-                            style: const pw.TextStyle(fontSize: 14.0),
-                          ),
-                        ],
-                      ),
-                      pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.end,
-                        children: [
-                          pw.Text(
-                            'Route: $routeName',
-                            style: const pw.TextStyle(fontSize: 14.0),
+                            style: const pw.TextStyle(fontSize: 22.0),
                           ),
                           pw.Text(
-                            'Employee: $employeeName',
-                            style: const pw.TextStyle(fontSize: 14.0),
+                            'Customer VAT No: $customerVat',
+                            style: const pw.TextStyle(fontSize: 22.0),
+                          ),
+                          pw.Text(
+                            'Return Note No: $invoiceNo',
+                            style: const pw.TextStyle(fontSize: 22.0),
                           ),
                         ],
                       ),
@@ -122,47 +108,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
 
                   pw.SizedBox(height: 10.0),
 
-                  // Customer details
-                  pw.Container(
-                    width: double.infinity,
-                    padding: const pw.EdgeInsets.all(10.0),
-                    decoration: pw.BoxDecoration(
-                      border: pw.Border.all(color: PdfColors.grey),
-                    ),
-                    child: pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: [
-                        pw.Text(
-                          'Return From:',
-                          style: pw.TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: pw.FontWeight.bold,
-                          ),
-                        ),
-                        pw.SizedBox(height: 5.0),
-                        pw.Text(
-                          customerName,
-                          style: const pw.TextStyle(fontSize: 14.0),
-                        ),
-                        pw.Text(
-                          'VAT No: $customerVat',
-                          style: const pw.TextStyle(fontSize: 12.0),
-                        ),
-                        pw.Text(
-                          'Address: $customerAddress',
-                          style: const pw.TextStyle(fontSize: 12.0),
-                        ),
-                        pw.Text(
-                          'Contact: $customerContact',
-                          style: const pw.TextStyle(fontSize: 12.0),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  pw.SizedBox(height: 15.0),
-
-                  // Items table header
+                  //! Items table header
                   pw.Container(
                     width: double.infinity,
                     padding: const pw.EdgeInsets.all(8.0),
@@ -196,7 +142,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                         pw.Expanded(
                           flex: 1,
                           child: pw.Text(
-                            'Price',
+                            'Unit Price',
                             style: pw.TextStyle(
                               fontSize: 12.0,
                               fontWeight: pw.FontWeight.bold,
@@ -267,7 +213,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
 
                   pw.SizedBox(height: 15.0),
 
-                  // Paid Issued Invoices section
+                  //! Paid Issued Invoices section
                   if (paidIssuedInvoices.isNotEmpty) ...[
                     pw.SizedBox(height: 10.0),
 
@@ -353,7 +299,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                               pw.Expanded(
                                 flex: 2,
                                 child: pw.Text(
-                                  paidInvoice.issuedInvoice.invoiceNo ?? '',
+                                  paidInvoice.issuedInvoice.invoiceNo,
                                   style: const pw.TextStyle(fontSize: 12.0),
                                 ),
                               ),
@@ -396,7 +342,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                           ),
                         )),
 
-                    // Total Payment Amount Row
+                    //! Total Payment Amount Row
                     pw.Container(
                       width: double.infinity,
                       padding: const pw.EdgeInsets.all(8.0),
@@ -441,7 +387,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
 
                   pw.SizedBox(height: 10.0),
 
-                  // Summary section
+                  //! Summary section
                   pw.Container(
                     width: double.infinity,
                     padding: const pw.EdgeInsets.all(10.0),
@@ -450,60 +396,19 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                     ),
                     child: pw.Column(
                       children: [
-                        pw.Row(
-                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                          children: [
-                            pw.Text(
-                              'Sub Total:',
-                              style: pw.TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: pw.FontWeight.bold,
-                              ),
-                            ),
-                            pw.Text(
-                              price(nonVatAmount),
-                              style: const pw.TextStyle(fontSize: 14.0),
-                            ),
-                          ],
-                        ),
+                        PdfSummaryRow.create(
+                            label: 'Sub Total:', value: price(totalItemAmount)),
                         pw.SizedBox(height: 5.0),
-                        pw.Row(
-                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                          children: [
-                            pw.Text(
-                              'VAT (18%):',
-                              style: pw.TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: pw.FontWeight.bold,
-                              ),
-                            ),
-                            pw.Text(
-                              price(vatAmount),
-                              style: const pw.TextStyle(fontSize: 14.0),
-                            ),
-                          ],
-                        ),
+                        PdfSummaryRow.create(
+                            label: 'VAT (18%):', value: price(vatAmount)),
                         pw.SizedBox(height: 5.0),
-                        pw.Divider(color: PdfColors.black),
-                        pw.Row(
-                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                          children: [
-                            pw.Text(
-                              'Total:',
-                              style: pw.TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: pw.FontWeight.bold,
-                              ),
-                            ),
-                            pw.Text(
-                              price(totalAmount),
-                              style: pw.TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: pw.FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
+                        PdfSummaryRow.create(
+                            label: 'Non VAT Item Total  :',
+                            value: price(nonVatAmount)),
+                        pw.SizedBox(height: 5.0),
+                        PdfSummaryRow.create(
+                            label: 'Grand Total:', value: price(totalAmount)),
+                        pw.SizedBox(height: 5.0),
                       ],
                     ),
                   ),

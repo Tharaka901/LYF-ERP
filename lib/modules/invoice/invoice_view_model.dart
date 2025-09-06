@@ -35,7 +35,7 @@ class InvoiceViewModel {
         employeeId: dataProvider.currentEmployee!.employeeId,
         status: 1,
         invoiceItems: setInvoiceItems(context),
-        createdAt: DateTime.now().toIso8601String());
+        createdAt: DateTime.now());
   }
 
   List<InvoiceItemModel> setInvoiceItems(BuildContext context) {

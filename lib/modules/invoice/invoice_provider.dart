@@ -7,7 +7,6 @@ import '../../models/invoice/invoice_model.dart';
 import '../../models/invoice_item/invoice_item_model.dart';
 import '../../models/payment_data/payment_data_model.dart';
 import '../../models/response.dart';
-import '../../models/route_card.dart';
 import '../../models/route_card/route_card_model.dart';
 import '../../providers/hive_db_provider.dart';
 import '../../services/invoice_service.dart';

@@ -544,8 +544,7 @@ class PrintInvoiceView extends StatelessWidget {
                           return pw.TableRow(
                             children: [
                               pwcell(
-                                dp.issuedInvoice.createdAt ??
-                                    date(DateTime.now(), format: 'dd-MM-yyyy'),
+                                  dp.issuedInvoice.createdAt.toString().split(' ')[0],
                                 align: pw.TextAlign.left,
                               ),
                               pwcell(

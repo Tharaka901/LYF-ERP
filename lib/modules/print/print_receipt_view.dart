@@ -137,7 +137,7 @@ class PrintReceiptView extends StatelessWidget {
                               align: pw.TextAlign.left,
                             ),
                             pwcell(
-                              i.createdAt!,
+                              i.createdAt.toString().split(' ')[0],
                               align: pw.TextAlign.left,
                             ),
                             pwcell(

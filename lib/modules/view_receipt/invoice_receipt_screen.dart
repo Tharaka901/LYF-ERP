@@ -920,7 +920,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                           align: TextAlign.start,
                                         ),
                                         cell(
-                                          invoice.issuedInvoice.createdAt ?? '',
+                                          invoice.issuedInvoice.createdAt.toString().split(' ')[0],
                                           align: TextAlign.center,
                                         ),
                                         cell(invoice.issuedInvoice.invoiceNo),

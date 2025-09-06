@@ -11,7 +11,7 @@ class ReceiptSummaryViewModel {
       List<CreditPaymentModel> payments, CreditPaymentModel creditPaymentModel) {
     return ReceiptModel(
         employee: creditPaymentModel.paymentInvoice?.employee?.firstName,
-        billingDate: creditPaymentModel.paymentInvoice?.createdAt,
+        billingDate: creditPaymentModel.paymentInvoice?.createdAt?.toString().split(' ')[0],
         totalPreviousPayment: payments
             .map((p) => p.value!)
             .reduce((value, element) => value + element),
@@ -26,11 +26,7 @@ class ReceiptSummaryViewModel {
             .map((i) => InvoiceModel(
                 invoiceNo: i.creditInvoice!.invoiceNo,
                 paymentAmount: i.value,
-                createdAt: i.creditInvoice!.createdAt != null
-                    ? date(
-                        DateTime.parse(i.creditInvoice!.createdAt!),
-                        format: 'dd.MM.yyyy')
-                    : ''))
+                createdAt: i.creditInvoice!.createdAt ?? DateTime.now()))
             .toList(),
         paymentMethods: payments[0]
             .payments!

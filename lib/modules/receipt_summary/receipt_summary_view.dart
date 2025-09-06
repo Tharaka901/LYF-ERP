@@ -45,7 +45,8 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
               : FutureBuilder<List<CreditPaymentModel>>(
                   future: getCreditPaymentsByReceipt(
                       receiptNo: widget.creditPayment.receiptNo!),
-                  builder: (context, AsyncSnapshot<List<CreditPaymentModel>> snapshot) {
+                  builder: (context,
+                      AsyncSnapshot<List<CreditPaymentModel>> snapshot) {
                     return snapshot.hasData
                         ? Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -145,15 +146,7 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
                                               align: TextAlign.start,
                                             ),
                                             cell(
-                                              invoice.creditInvoice
-                                                          ?.createdAt ==
-                                                      null
-                                                  ? '-'
-                                                  : date(
-                                                      DateTime.parse(
-                                                          invoice.creditInvoice!
-                                                              .createdAt!),
-                                                      format: 'dd-MM-yyyy'),
+                                              invoice.creditInvoice?.createdAt?.toString().split(' ')[0] ?? '',
                                               align: TextAlign.center,
                                             ),
                                             cell(invoice
@@ -224,7 +217,8 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
                                                   const EdgeInsets.all(5.0),
                                               child: Text(
                                                 payment.amount != null
-                                                    ? formatPrice(payment.amount!)
+                                                    ? formatPrice(
+                                                            payment.amount!)
                                                         .replaceAll('Rs.', '')
                                                     : '',
                                                 textAlign: TextAlign.end,

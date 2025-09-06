@@ -79,12 +79,12 @@ class ThemeConstants {
 }
 
 class CompanyConstants {
-  // static const name = 'Jayawardena Enterprises (Pvt) Ltd';
-  // static const distribute = 'Distributor of Litro Gas Lanka Limited';
-  // static const address = 'No 142, Colombo Road, Biyagama';
-  // static const phoneNumber = 'Tel: 011 2488003';
-  // static const email = 'Email: jayaentlitro@gmail.com';
-  // static const vatNumber = 'Our Vat No - 104648479-7000';
+  static const name = 'Jayawardena Enterprises (Pvt) Ltd';
+  static const distribute = 'Distributor of Litro Gas Lanka Limited';
+  static const address = 'No 142, Colombo Road, Biyagama';
+  static const phoneNumber = 'Tel: 011 2488003';
+  static const email = 'Email: jayaentlitro@gmail.com';
+  static const vatNumber = 'Our Vat No - 104648479-7000';
 
   // static const name = 'Jayawardena Agencies (Pvt) Ltd';
   // static const distribute = 'Distributor of Litro Gas Lanka Limited';
@@ -107,12 +107,12 @@ class CompanyConstants {
   // static const email = 'Email: cjtradingcompany99@gmail.com';
   // static const vatNumber = 'Our Vat No - 109812617-7000';
 
-  static const name = 'H.J. Trading Company (Pvt) Ltd';
-  static const distribute = 'Distributor of Litro Gas Lanka Limited';
-  static const address = 'Pahala Galkandegama, Poonewa, Medawachchiya';
-  static const phoneNumber = 'Tel: 024-2054830';
-  static const email = 'Email: hjtrading.vavuniya@gmail.com';
-  static const vatNumber = 'Our Vat No - 102899156-7000';
+  // static const name = 'H.J. Trading Company (Pvt) Ltd';
+  // static const distribute = 'Distributor of Litro Gas Lanka Limited';
+  // static const address = 'Pahala Galkandegama, Poonewa, Medawachchiya';
+  // static const phoneNumber = 'Tel: 024-2054830';
+  // static const email = 'Email: hjtrading.vavuniya@gmail.com';
+  // static const vatNumber = 'Our Vat No - 102899156-7000';
 
   static companyDetails(bool hasOurVatNumber) => [
         pw.Text(

@@ -20,7 +20,7 @@ class InvoiceModel {
   final int? status;
   CustomerModel? customer;
   final EmployeeModel? employee;
-  final String? createdAt;
+  final DateTime? createdAt;
   final List<InvoiceItemModel>? invoiceItems;
   List<PaymentModel>? payments;
   List<CreditPaymentModel>? previousPayments;
@@ -69,7 +69,9 @@ class InvoiceModel {
                 : json["creditValue"],
         employeeId: json["employeeId"],
         status: json["status"],
-        createdAt: json["createdAt"],
+        createdAt: json["createdAt"] is String
+            ? DateTime.parse(json["createdAt"])
+            : json["createdAt"],
         customer: json["customer"] == null
             ? null
             : CustomerModel.fromJson(json["customer"]),
@@ -107,7 +109,7 @@ class InvoiceModel {
         "status": status,
         "customer": customer?.toJson(),
         "invoiceItems": invoiceItems,
-        "createdAt": createdAt,
+        "createdAt": createdAt?.toIso8601String(),
       };
 
   Map<String, dynamic> toJsonWithId() => {
@@ -124,6 +126,6 @@ class InvoiceModel {
         "status": status,
         "customer": customer?.toJson(),
         "invoiceItems": invoiceItems,
-        "createdAt": createdAt,
+        "createdAt": createdAt?.toIso8601String(),
       };
 }
