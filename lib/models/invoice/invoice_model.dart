@@ -100,6 +100,7 @@ class InvoiceModel {
         routeCard: json["routeCard"] == null
             ? null
             : RouteCardModel.fromJson(json["routeCard"]),
+        chequeId: json["chequeId"],
       );
 
   Map<String, dynamic> toJson() => {
