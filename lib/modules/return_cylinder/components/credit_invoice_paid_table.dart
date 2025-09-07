@@ -60,7 +60,7 @@ class _CreditInvoicePaidTableState extends State<CreditInvoicePaidTable> {
                                 align: TextAlign.start,
                               ),
                               cell(
-                                invoice.issuedInvoice.createdAt?.toString().split(' ')[0] ?? 'No Date',
+                                invoice.issuedInvoice.routeCard?.date?.toString().split(' ')[0] ?? 'No Date',
                                 align: TextAlign.center,
                               ),
                               cell(invoice.issuedInvoice.invoiceNo),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/invoice/invoice_model.dart';
 import 'package:gsr/models/issued_invoice_paid_model/issued_invoice_paid.dart';
+import 'package:gsr/modules/return_cylinder/providers/return_cylinder_provider.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/services/invoice_service.dart';
 import 'package:provider/provider.dart';
@@ -37,13 +39,21 @@ class SelectCreditInvoiceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addPaidIssuedInvoice() {
+  void addPaidOverPaymentInvoice(BuildContext context) {
+    final returnCylinderProvider =
+        Provider.of<ReturnCylinderProvider>(context, listen: false);
+    double paymentAmount =
+        double.parse(paidAmountController.text.replaceAll(',', ''));
+    if (returnCylinderProvider.grandPrice - totalInvoicePaymentAmount <
+        paymentAmount) {
+      toast('Selected amount exceeded the grand price', toastState: TS.error);
+      return;
+    }
     paidIssuedInvoices.add(IssuedInvoicePaidModel(
       chequeId: selectedCreditInvoice!.chequeId,
       creditAmount: selectedCreditInvoice!.creditValue,
       issuedInvoice: selectedCreditInvoice!,
-      paymentAmount:
-          double.parse(paidAmountController.text.replaceAll(',', '')),
+      paymentAmount: paymentAmount,
     ));
     notifyListeners();
   }

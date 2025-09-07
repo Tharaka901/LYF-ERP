@@ -21,23 +21,24 @@ class ReturnCylinderProvider extends ChangeNotifier {
   String returnCylinderInvoiceNumber = '';
   double customerVatPercentage = 0;
 
-  double get totalItemAmount => selectedItems.isEmpty 
-      ? 0.0 
+  double get totalItemAmount => selectedItems.isEmpty
+      ? 0.0
       : selectedItems
           .map((e) => e.salePrice * e.itemQty!)
           .reduce((value, element) => value + element);
-          
-  double get nonVatAmount => selectedItems.isEmpty 
-      ? 0.0 
+
+  double get nonVatAmount => selectedItems.isEmpty
+      ? 0.0
       : selectedItems
           .map((e) => e.nonVatAmount! * e.itemQty!)
           .reduce((value, element) => value + element);
-          
+
   double get subtotal => totalItemAmount + nonVatAmount;
-  
+
   double get vatAmount => subtotal * customerVatPercentage / 100;
-  
-  double get grandPrice => subtotal + vatAmount;
+
+  double get grandPrice =>
+      double.parse((subtotal + vatAmount).toStringAsFixed(2));
 
   void setCustomerVatPercentage(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
@@ -189,7 +190,7 @@ class ReturnCylinderProvider extends ChangeNotifier {
             selectCreditInvoiceProvider.clearIssuedInvoices();
             dataProvider.setSelectedCustomer(null);
             dataProvider.setSelectedVoucher(null);
-            dataProvider.setCurrentInvoice(null);
+            selectCreditInvoiceProvider.selectedCreditInvoice = null;
           });
         }
         toast('Success', toastState: TS.success);

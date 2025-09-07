@@ -213,6 +213,34 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
 
                   pw.SizedBox(height: 15.0),
 
+                  //! Summary section
+                  pw.Container(
+                    width: double.infinity,
+                    padding: const pw.EdgeInsets.all(10.0),
+                    decoration: pw.BoxDecoration(
+                      border: pw.Border.all(color: PdfColors.grey),
+                    ),
+                    child: pw.Column(
+                      children: [
+                        PdfSummaryRow.create(
+                            label: 'Sub Total:', value: price(totalItemAmount)),
+                        pw.SizedBox(height: 5.0),
+                        PdfSummaryRow.create(
+                            label: 'VAT (18%):', value: price(vatAmount)),
+                        pw.SizedBox(height: 5.0),
+                        PdfSummaryRow.create(
+                            label: 'Non VAT Item Total  :',
+                            value: price(nonVatAmount)),
+                        pw.SizedBox(height: 5.0),
+                        PdfSummaryRow.create(
+                            label: 'Grand Total:', value: price(totalAmount)),
+                        pw.SizedBox(height: 5.0),
+                      ],
+                    ),
+                  ),
+
+                  pw.SizedBox(height: 20.0),
+
                   //! Paid Issued Invoices section
                   if (paidIssuedInvoices.isNotEmpty) ...[
                     pw.SizedBox(height: 10.0),
@@ -270,22 +298,11 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                               textAlign: pw.TextAlign.center,
                             ),
                           ),
-                          pw.Expanded(
-                            flex: 1,
-                            child: pw.Text(
-                              'Cheque ID',
-                              style: pw.TextStyle(
-                                fontSize: 12.0,
-                                fontWeight: pw.FontWeight.bold,
-                              ),
-                              textAlign: pw.TextAlign.center,
-                            ),
-                          ),
                         ],
                       ),
                     ),
 
-                    // Paid Invoices Table Body
+                    //! Paid Invoices Table Body
                     ...paidIssuedInvoices.map((paidInvoice) => pw.Container(
                           width: double.infinity,
                           padding: const pw.EdgeInsets.all(8.0),
@@ -330,14 +347,6 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                                   textAlign: pw.TextAlign.center,
                                 ),
                               ),
-                              pw.Expanded(
-                                flex: 1,
-                                child: pw.Text(
-                                  paidInvoice.chequeId?.toString() ?? '-',
-                                  style: const pw.TextStyle(fontSize: 12.0),
-                                  textAlign: pw.TextAlign.center,
-                                ),
-                              ),
                             ],
                           ),
                         )),
@@ -345,75 +354,27 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                     //! Total Payment Amount Row
                     pw.Container(
                       width: double.infinity,
-                      padding: const pw.EdgeInsets.all(8.0),
+                      padding: const pw.EdgeInsets.all(10.0),
                       decoration: pw.BoxDecoration(
-                        color: PdfColors.grey200,
                         border: pw.Border.all(color: PdfColors.grey),
                       ),
-                      child: pw.Row(
+                      child: pw.Column(
                         children: [
-                          pw.Expanded(
-                            flex: 4,
-                            child: pw.Text(
-                              'Total Payment Amount:',
-                              style: pw.TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: pw.FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          pw.Expanded(
-                            flex: 1,
-                            child: pw.Text(
-                              price(totalInvoicePaymentAmount),
-                              style: pw.TextStyle(
-                                fontSize: 14.0,
-                                fontWeight: pw.FontWeight.bold,
-                              ),
-                              textAlign: pw.TextAlign.center,
-                            ),
-                          ),
-                          pw.Expanded(
-                            flex: 1,
-                            child: pw.Text(
-                              '',
-                              style: const pw.TextStyle(fontSize: 12.0),
-                            ),
-                          ),
+                          PdfSummaryRow.create(
+                              label: 'Total Payment Amount:',
+                              value: price(totalInvoicePaymentAmount)),
+                          pw.SizedBox(height: 5.0),
+                          PdfSummaryRow.create(
+                              label: 'Balance Amount:',
+                              value: price(
+                                  totalAmount - totalInvoicePaymentAmount)),
+                          pw.SizedBox(height: 5.0),
                         ],
                       ),
                     ),
                   ],
 
                   pw.SizedBox(height: 10.0),
-
-                  //! Summary section
-                  pw.Container(
-                    width: double.infinity,
-                    padding: const pw.EdgeInsets.all(10.0),
-                    decoration: pw.BoxDecoration(
-                      border: pw.Border.all(color: PdfColors.grey),
-                    ),
-                    child: pw.Column(
-                      children: [
-                        PdfSummaryRow.create(
-                            label: 'Sub Total:', value: price(totalItemAmount)),
-                        pw.SizedBox(height: 5.0),
-                        PdfSummaryRow.create(
-                            label: 'VAT (18%):', value: price(vatAmount)),
-                        pw.SizedBox(height: 5.0),
-                        PdfSummaryRow.create(
-                            label: 'Non VAT Item Total  :',
-                            value: price(nonVatAmount)),
-                        pw.SizedBox(height: 5.0),
-                        PdfSummaryRow.create(
-                            label: 'Grand Total:', value: price(totalAmount)),
-                        pw.SizedBox(height: 5.0),
-                      ],
-                    ),
-                  ),
-
-                  pw.SizedBox(height: 20.0),
 
                   // Footer
                   pw.Divider(thickness: 0.5),

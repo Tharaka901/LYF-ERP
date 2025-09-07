@@ -352,7 +352,7 @@ class _InvoicePaidTable extends StatelessWidget {
                       align: TextAlign.start,
                     ),
                     cell(
-                      'invoice.issuedInvoice.createdAt!',
+                      invoice.issuedInvoice.routeCard?.date?.toString().split(' ')[0] ?? 'No Date',
                       align: TextAlign.center,
                     ),
                     cell(invoice.issuedInvoice.invoiceNo),

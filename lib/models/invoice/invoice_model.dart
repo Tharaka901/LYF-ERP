@@ -1,6 +1,7 @@
 import 'package:gsr/models/credit_payment/credit_payment_model.dart';
 import 'package:gsr/models/customer/customer_model.dart';
 import 'package:gsr/models/payment/payment_model.dart';
+import 'package:gsr/models/route_card/route_card_model.dart';
 
 import '../employee/employee_model.dart';
 import '../invoice_item/invoice_item_model.dart';
@@ -25,6 +26,7 @@ class InvoiceModel {
   List<PaymentModel>? payments;
   List<CreditPaymentModel>? previousPayments;
   final int? chequeId;
+  final RouteCardModel? routeCard;
 
   InvoiceModel({
     this.invoiceId,
@@ -46,6 +48,7 @@ class InvoiceModel {
     this.payments,
     this.previousPayments,
     this.chequeId,
+    this.routeCard,
   });
 
   factory InvoiceModel.fromJson(Map<dynamic, dynamic> json) => InvoiceModel(
@@ -94,6 +97,9 @@ class InvoiceModel {
                 json["previousPayments"]!
                     .map((x) => CreditPaymentModel.fromJson(x)),
               ),
+        routeCard: json["routeCard"] == null
+            ? null
+            : RouteCardModel.fromJson(json["routeCard"]),
       );
 
   Map<String, dynamic> toJson() => {

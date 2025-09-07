@@ -98,7 +98,7 @@ class _PreviousAddPaymentScreenState extends State<PreviousAddPaymentScreen> {
               children: [
                 DetailCard(
                   detailKey: 'Date',
-                  detailvalue: date(DateTime.now(), format: 'dd.MM.yyyy'),
+                  detailvalue: dataProvider.currentRouteCard?.date?.toString().split(' ')[0] ?? 'No Date',
                 ),
                 DetailCard(
                   detailKey: 'Customer name',

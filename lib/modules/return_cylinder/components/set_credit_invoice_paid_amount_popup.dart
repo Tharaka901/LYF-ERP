@@ -57,11 +57,6 @@ class _SetCreditInvoicePaidAmountPopupState
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
-                    // inputFormatters: [
-                    //   ThousandsFormatter(
-                    //     allowFraction: true,
-                    //   ),
-                    // ],
                     controller:
                         selectCreditInvoiceProvider!.paidAmountController,
                     validator: (text) {
@@ -91,8 +86,7 @@ class _SetCreditInvoicePaidAmountPopupState
                 ),
                 OutlinedButton(
                   onPressed: () {
-                    // if (formKey.currentState!.validate()) {
-                    selectCreditInvoiceProvider!.addPaidIssuedInvoice();
+                    selectCreditInvoiceProvider!.addPaidOverPaymentInvoice(context);
                     pop(context);
                     // }
                   },

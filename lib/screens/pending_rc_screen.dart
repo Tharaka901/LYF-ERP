@@ -41,7 +41,7 @@ class _PendingRCScreenState extends State<PendingRCScreen> {
                               final routeCard = snapshot.data![index];
                               return OptionCard(
                                 title:
-                                    '${routeCard.date} : ${routeCard.routeCardNo} - ${routeCard.route?.routeName}',
+                                    '${routeCard.date?.toString().split(' ')[0]} : ${routeCard.routeCardNo} - ${routeCard.route?.routeName}',
                                 titleFontSize: 20,
                                 height: 30.0,
                                 trailing: routeCard.status == 0
