@@ -94,7 +94,6 @@ class _PreviousScreenState extends State<PreviousScreen> {
                     return TextField(
                       controller: controller,
                       focusNode: focusNode,
-                      obscureText: true,
                       decoration: InputDecoration(
                         labelText: 'Search customer',
                         fillColor: Colors.grey,
