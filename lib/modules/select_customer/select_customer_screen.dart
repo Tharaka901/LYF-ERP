@@ -58,7 +58,7 @@ class _SelectCustomerViewState extends State<SelectCustomerView> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            '${routeCard.route?.routeName} - ${routeCard.date}',
+            '${routeCard.route?.routeName} - ${routeCard.date?.toString().split(' ')[0]}',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),

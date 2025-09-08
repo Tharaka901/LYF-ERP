@@ -25,8 +25,8 @@ class _SetCreditInvoicePaidAmountPopupState
         Provider.of<SelectCreditInvoiceProvider>(context, listen: false);
     selectedCreditInvoice = selectCreditInvoiceProvider!.selectedCreditInvoice;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      selectCreditInvoiceProvider!
-          .setPaidAmount(selectedCreditInvoice!.creditValue!.toString());
+      selectCreditInvoiceProvider!.paidAmountController.text = 
+          selectedCreditInvoice!.creditValue!.toString();
     });
   }
 

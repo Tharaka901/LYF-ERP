@@ -19,7 +19,7 @@ class AboutRCScreen extends StatelessWidget {
     final routeCard = dataProvider.currentRouteCard!;
     return Scaffold(
       appBar: AppBar(
-        title: Text('${routeCard.routeCardNo} - ${routeCard.date}'),
+        title: Text('${routeCard.routeCardNo} - ${routeCard.date?.toString().split(' ')[0]}'),
       ),
       body: Padding(
         padding: defaultPadding,

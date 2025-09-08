@@ -78,54 +78,56 @@ class PrintInvoiceView extends StatelessWidget {
                   //! Company details
                   ...CompanyConstants.companyDetails(true),
 
-                  //! Invoice details
-                  if (invoiceNo != '0') ...[
-                    pw.SizedBox(height: 5.0),
-                    pw.Text(
-                      'Tax Invoice',
-                      style: ThemeConstants.boldStyleForPdf,
-                    ),
-                    pw.SizedBox(height: 5.0),
-                    pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.start,
-                      children: [
-                        pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
-                          children: [
-                            pw.Text(
-                              'Bill to: ${issuedInvoice?.customer?.businessName ?? dataProvider.selectedCustomer!.businessName}',
-                              style: const pw.TextStyle(
-                                fontSize: 22.0,
-                              ),
+                  pw.SizedBox(height: 5.0),
+                  pw.Text(
+                    'Tax Invoice',
+                    style: ThemeConstants.boldStyleForPdf,
+                  ),
+                  pw.SizedBox(height: 5.0),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.start,
+                    children: [
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text(
+                            'Bill to: ${issuedInvoice?.customer?.businessName ?? dataProvider.selectedCustomer!.businessName}',
+                            style: const pw.TextStyle(
+                              fontSize: 22.0,
                             ),
-                            pw.Text(
-                              'Address: ${issuedInvoice?.customer?.address ?? dataProvider.selectedCustomer!.address}',
-                              style: const pw.TextStyle(
-                                fontSize: 22.0,
-                              ),
+                          ),
+                          pw.Text(
+                            'Address: ${issuedInvoice?.customer?.address ?? dataProvider.selectedCustomer!.address}',
+                            style: const pw.TextStyle(
+                              fontSize: 22.0,
                             ),
-                            pw.Text(
-                              'Customer Vat No: ${issuedInvoice?.customer?.customerVat ?? dataProvider.selectedCustomer!.customerVat ?? '-'}',
-                              style: const pw.TextStyle(
-                                fontSize: 22.0,
-                              ),
+                          ),
+                          pw.Text(
+                            'Customer Vat No: ${issuedInvoice?.customer?.customerVat ?? dataProvider.selectedCustomer!.customerVat ?? '-'}',
+                            style: const pw.TextStyle(
+                              fontSize: 22.0,
                             ),
-                            pw.Text(
-                              'Date: ${dataProvider.currentRouteCard!.date?.toString().split(' ')[0] ?? 'No Date'}',
-                              style: const pw.TextStyle(
-                                fontSize: 22.0,
-                              ),
+                          ),
+                          pw.Text(
+                            'Date: ${dataProvider.currentRouteCard!.date?.toString().split(' ')[0] ?? 'No Date'}',
+                            style: const pw.TextStyle(
+                              fontSize: 22.0,
                             ),
+                          ),
+                          if (invoiceNo != '0')
                             pw.Text(
                               'Invoice No: $invoiceNo',
                               style: const pw.TextStyle(
                                 fontSize: 22.0,
                               ),
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  //! Invoice details
+                  if (invoiceNo != '0') ...[
                     pw.SizedBox(height: 5.0),
                     pw.Table(
                       children: [
@@ -544,7 +546,9 @@ class PrintInvoiceView extends StatelessWidget {
                           return pw.TableRow(
                             children: [
                               pwcell(
-                                  dp.issuedInvoice.createdAt.toString().split(' ')[0],
+                                dp.issuedInvoice.createdAt
+                                    .toString()
+                                    .split(' ')[0],
                                 align: pw.TextAlign.left,
                               ),
                               pwcell(

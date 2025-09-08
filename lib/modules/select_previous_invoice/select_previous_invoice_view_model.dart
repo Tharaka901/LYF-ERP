@@ -34,9 +34,10 @@ class SelectPreviousInvoiceViewModel {
           dataProvider.selectedDeposite?.createdAt.toString() ?? '',
       crediteInvoiceValue: dataProvider.selectedInvoice!.creditValue!,
       chequeId: dataProvider.selectedInvoice!.chequeId,
-      depositeReceiptNo: dataProvider.selectedDeposite?.status == 2
-          ? dataProvider.selectedDeposite!.receiptNo
-          : null,
+      depositeReceiptNo: dataProvider.selectedDeposite!.receiptNo,
+      // depositeReceiptNo: dataProvider.selectedDeposite?.status == 2
+      //     ? dataProvider.selectedDeposite!.receiptNo
+      //     : null,
     );
 
     if (hiveDBProvider.isInternetConnected) {
