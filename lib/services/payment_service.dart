@@ -304,19 +304,19 @@ class PaymentService {
               "status": 2
             });
           } else {
-            try {
-              if (kDebugMode) {
-                print(invoice.issuedInvoice.toJsonWithId());
-              }
-              await respo('invoice/update', method: Method.put, data: {
-                "invoiceId": invoice.issuedInvoice.invoiceId,
-                "creditValue": invoice.creditAmount! - invoice.paymentAmount
-              });
-            } catch (e) {
-              if (kDebugMode) {
-                print(e);
-              }
-            }
+            // try {
+            //   if (kDebugMode) {
+            //     print(invoice.issuedInvoice.toJsonWithId());
+            //   }
+            //   await respo('invoice/update', method: Method.put, data: {
+            //     "invoiceId": invoice.issuedInvoice.invoiceId,
+            //     "creditValue": invoice.creditAmount! - invoice.paymentAmount
+            //   });
+            // } catch (e) {
+            //   if (kDebugMode) {
+            //     print(e);
+            //   }
+            // }
           }
           if (invoice.chequeId != null) {
             if (invoice.creditAmount! <= invoice.paymentAmount) {
