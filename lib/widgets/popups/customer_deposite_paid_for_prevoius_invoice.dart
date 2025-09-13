@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import '../../commons/common_consts.dart';
 import '../../models/invoice/invoice_model.dart';
 import '../../modules/view_receipt/invoice_receipt_view_model.dart';
-import '../../services/customer_service.dart';
 
 class CustomerDepositePaidForPriviousInvoice extends StatefulWidget {
   final TextEditingController paymentController;
@@ -32,7 +31,6 @@ class _CustomerDepositePaidForPriviousInvoiceState
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    final customerService = CustomerService();
     final invoiceReceiptViewModel = InvoiceReceiptViewModel();
     return SingleChildScrollView(
       child: Form(

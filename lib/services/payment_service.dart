@@ -674,7 +674,7 @@ class PaymentService {
             creditInvoicePayFromDipositesDataModel.creditInvoiceId,
         "receiptNo": creditInvoicePayFromDipositesDataModel.depositeReceiptNo,
         "status": creditInvoicePayFromDipositesDataModel.chequeId != null
-            ? 5
+            ? creditInvoicePayFromDipositesDataModel.depositeStatus == 1 ? 5 : 8
             : creditInvoicePayFromDipositesDataModel.depositeStatus == 2
                 ? 6
                 : 1,
@@ -683,7 +683,18 @@ class PaymentService {
             ? "return-cheque"
             : 'default'
       };
-      await respo('credit-payment/create', method: Method.post, data: data);
+      try {
+       final response = await respo('credit-payment/create', method: Method.post, data: data);
+       if (kDebugMode) {
+          print(response.data);
+          print(response.error);
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print(e);
+        }
+      }
+      
 
       if (creditInvoicePayFromDipositesDataModel.crediteInvoiceValue <=
               creditInvoicePayFromDipositesDataModel.payValue &&

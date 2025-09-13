@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gsr/modules/previous_add_payment/previous_add_payment_screen.dart';
 import 'package:provider/provider.dart';
@@ -227,15 +228,15 @@ class _InvoiceDropdown extends StatelessWidget {
                               if (formKey.currentState!.validate()) {
                                 data.addPaidIssuedInvoice(
                                   IssuedInvoicePaidModel(
-                                    chequeId:
-                                        dataProvider.selectedInvoice!.chequeId,
-                                    creditAmount:
-                                        data.selectedInvoice!.creditValue,
-                                    issuedInvoice: data.selectedInvoice!,
-                                    paymentAmount: doub(amountController.text
-                                        .replaceAll(',', '')),
-                                    invoiceId: data.selectedInvoice?.invoiceId
-                                  ),
+                                      chequeId: dataProvider
+                                          .selectedInvoice!.chequeId,
+                                      creditAmount:
+                                          data.selectedInvoice!.creditValue,
+                                      issuedInvoice: data.selectedInvoice!,
+                                      paymentAmount: doub(amountController.text
+                                          .replaceAll(',', '')),
+                                      invoiceId:
+                                          data.selectedInvoice?.invoiceId),
                                 );
                                 data.setSelectedInvoice(null);
                                 pop(context);
@@ -294,7 +295,9 @@ class _OverPaymentSettleButton extends StatelessWidget {
                   selectPreviousInvoiceViewModel.payFromDeposite(
                       context, paymentController);
                 } catch (e) {
-                  print(e.toString());
+                  if (kDebugMode) {
+                    print(e.toString());
+                  }
                 }
               }
             },
@@ -352,7 +355,10 @@ class _InvoicePaidTable extends StatelessWidget {
                       align: TextAlign.start,
                     ),
                     cell(
-                      invoice.issuedInvoice.routeCard?.date?.toString().split(' ')[0] ?? 'No Date',
+                      invoice.issuedInvoice.routeCard?.date
+                              ?.toString()
+                              .split(' ')[0] ??
+                          'No Date',
                       align: TextAlign.center,
                     ),
                     cell(invoice.issuedInvoice.invoiceNo),

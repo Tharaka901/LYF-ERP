@@ -57,8 +57,12 @@ class SelectPreviousInvoiceViewModel {
           creditInvoicePayFromDepositesData);
     }
     paymentController.clear();
-    pop(context);
-    Navigator.pushReplacement(context,
-        MaterialPageRoute(builder: (context) => SelectPreviousInvoiceScreen()));
+    if (context.mounted) {
+      pop(context);
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const SelectPreviousInvoiceScreen()));
+    }
   }
 }
