@@ -2,8 +2,8 @@ import '../item/item_model.dart';
 
 class RouteCardSoldLoanItemModel {
   final int itemId;
-  final double issuedStock;
-  final double receivedStock;
+  final int issuedStock;
+  final int receivedStock;
   final ItemModel item;
 
   RouteCardSoldLoanItemModel({
@@ -16,8 +16,8 @@ class RouteCardSoldLoanItemModel {
   factory RouteCardSoldLoanItemModel.fromJson(Map<dynamic, dynamic> json) {
     return RouteCardSoldLoanItemModel(
       itemId: json['itemId'],
-      issuedStock: (json['issuedStock'] as num).toDouble(),
-      receivedStock: (json['receivedStock'] as num).toDouble(),
+      issuedStock: (json['issuedStock'] as num).toInt(),
+      receivedStock: (json['receivedStock'] as num).toInt(),
       item: ItemModel.fromJson(json['item']),
     );
   }
