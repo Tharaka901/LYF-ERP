@@ -827,7 +827,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                           align: TextAlign.center,
                                         ),
                                         cell(invoice
-                                            .issuedDeposite.paymentInvoiceId
+                                            .issuedDeposite.receiptNo
                                             .toString()),
                                         cell(
                                           price(invoice.paymentAmount)

@@ -291,8 +291,7 @@ class PaymentService {
             "value": invoice.paymentAmount,
             "paymentInvoiceId": invoiceId,
             "routecardId": paymentDataModel.currentRouteCard.routeCardId,
-            "creditInvoiceId":
-                invoice.chequeId ?? invoice.invoiceId,
+            "creditInvoiceId": invoice.chequeId ?? invoice.invoiceId,
             "receiptNo": rn,
             "status": invoice.chequeId != null ? 3 : 1,
             "type": invoice.chequeId != null ? "return-cheque" : 'default'
@@ -674,7 +673,9 @@ class PaymentService {
             creditInvoicePayFromDipositesDataModel.creditInvoiceId,
         "receiptNo": creditInvoicePayFromDipositesDataModel.depositeReceiptNo,
         "status": creditInvoicePayFromDipositesDataModel.chequeId != null
-            ? creditInvoicePayFromDipositesDataModel.depositeStatus == 1 ? 5 : 8
+            ? creditInvoicePayFromDipositesDataModel.depositeStatus == 1
+                ? 5
+                : 8
             : creditInvoicePayFromDipositesDataModel.depositeStatus == 2
                 ? 6
                 : 1,
@@ -684,17 +685,12 @@ class PaymentService {
             : 'default'
       };
       try {
-       final response = await respo('credit-payment/create', method: Method.post, data: data);
-       if (kDebugMode) {
-          print(response.data);
-          print(response.error);
-        }
+        await respo('credit-payment/create', method: Method.post, data: data);
       } catch (e) {
         if (kDebugMode) {
           print(e);
         }
       }
-      
 
       if (creditInvoicePayFromDipositesDataModel.crediteInvoiceValue <=
               creditInvoicePayFromDipositesDataModel.payValue &&
