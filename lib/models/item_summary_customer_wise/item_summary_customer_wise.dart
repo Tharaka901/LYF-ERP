@@ -144,13 +144,13 @@ class Customer {
         address: json["address"],
         contactNumber: json["contactNumber"],
         homeDelivery: json["homeDelivery"],
-        creditLimit: double.parse(json["creditLimit"].toString()),
+        creditLimit: json["creditLimit"] != null ? double.parse(json["creditLimit"].toString()) : 0.0,
         paymentMethodId: json["paymentMethodId"],
         customerTypeId: json["customerTypeId"],
         priceLevelId: json["priceLevelId"],
         routeId: json["routeId"],
         employeeId: json["employeeId"],
-        depositBalance:double.parse(json["depositBalance"].toString()), 
+        depositBalance: json["depositBalance"] != null ? double.parse(json["depositBalance"].toString()) : 0.0, 
         status: json["status"],
       );
 

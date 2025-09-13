@@ -6,7 +6,7 @@
     </intent>
   </queries>
     <application
-        android:label="gsr"
+        android:label="DSR Billing App"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
