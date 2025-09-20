@@ -31,7 +31,6 @@ class StartViewModel {
                 ?.clear();
             await hiveDBProvider.employeeBox
                 ?.put(employee.employeeId, employee);
-            print(hiveDBProvider.employeeBox!.values.first);
             dataProvider.setCurrentEmployee(EmployeeModel.fromJson(respo.data));
             Navigator.pushReplacementNamed(
               context,

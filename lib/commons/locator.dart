@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:gsr/core/api_client.dart';
 import 'package:gsr/modules/receipt_summary/receipt_summary_view_model.dart';
 import 'package:gsr/services/payment_service.dart';
 
@@ -7,6 +8,12 @@ import '../services/route_card_service.dart';
 
 final locator = GetIt.I;
 void setupLocator() {
+  // Initialize API client
+  final apiClient = ApiClient();
+  apiClient.initialize();
+  locator.registerSingleton<ApiClient>(apiClient);
+  
+  // Register services
   locator.registerSingleton<PaymentService>(PaymentService());
   locator.registerSingleton<InvoiceService>(InvoiceService());
   locator.registerSingleton<ReceiptSummaryViewModel>(ReceiptSummaryViewModel());
