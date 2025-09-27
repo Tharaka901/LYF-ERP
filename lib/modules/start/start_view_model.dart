@@ -1,61 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../commons/common_methods.dart';
-import '../../models/employee/employee_model.dart';
 import '../../providers/data_provider.dart';
 import '../../providers/hive_db_provider.dart';
 import '../home/home_view.dart';
 import '../../screens/login_screen.dart';
-import '../../services/database.dart';
+import '../../services/employee_service.dart';
+import '../../widgets/popups/loading_popup.dart';
+import '../../core/error_handler.dart';
 
 class StartViewModel {
   Future<void> initLoad(BuildContext context) async {
     final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     await hiveDBProvider.openHiveBoxes();
+    final employeeService = EmployeeService();
+
     String? username = hiveDBProvider.sharedPreferences?.getString('username');
     String? password = hiveDBProvider.sharedPreferences?.getString('password');
     if (username != null && password != null) {
-      waiting(context, body: 'Authenticating...');
+      if (context.mounted) LoadingPopup.show(context);
       if (hiveDBProvider.isInternetConnected) {
-        await loginStart(
-          context,
-          contactNumber: username,
-          password: password,
-        ).then((respo) async {
-          pop(context);
-          if (respo.success) {
-            final employee = EmployeeModel.fromJson(respo.data);
-            await hiveDBProvider.employeeBox
-                ?.clear();
-            await hiveDBProvider.employeeBox
-                ?.put(employee.employeeId, employee);
-            dataProvider.setCurrentEmployee(EmployeeModel.fromJson(respo.data));
-            Navigator.pushReplacementNamed(
-              context,
-              HomeScreen.routeId,
-            );
-          } else {
-            Navigator.pushReplacementNamed(
-              context,
-              LoginScreen.routeId,
-            );
+        final response = await employeeService.login(username, password);
+        if (response.success) {
+          final employee = response.data!;
+          await hiveDBProvider.employeeBox?.clear();
+          await hiveDBProvider.employeeBox?.put(employee.employeeId, employee);
+          dataProvider.setCurrentEmployee(employee);
+          if (context.mounted) LoadingPopup.hide(context);
+          if (context.mounted) {
+            Navigator.pushReplacementNamed(context, HomeScreen.routeId);
           }
-        });
+        } else {
+          if (context.mounted) {
+            ErrorHandler.handleApiError(context, response,
+                customMessage: response.error);
+          }
+        }
       } else {
-        dataProvider
-            .setCurrentEmployee(hiveDBProvider.employeeBox!.values.first);
-        Navigator.pushReplacementNamed(
-          context,
-          HomeScreen.routeId,
-        );
+        if (context.mounted) {
+          LoadingPopup.hide(context);
+          dataProvider
+              .setCurrentEmployee(hiveDBProvider.employeeBox!.values.first);
+          Navigator.pushReplacementNamed(context, HomeScreen.routeId);
+        }
       }
     } else {
-      Navigator.pushReplacementNamed(
-        context,
-        LoginScreen.routeId,
-      );
+      if (context.mounted) {
+        LoadingPopup.hide(context);
+        Navigator.pushReplacementNamed(context, LoginScreen.routeId);
+      }
     }
   }
 }

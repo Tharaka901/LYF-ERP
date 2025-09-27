@@ -439,65 +439,6 @@ class PaymentService {
   }) async {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     try {
-      //! Update over payment
-      if (paymentDataModel.issuedDepositePaidList.isNotEmpty) {
-        await respo(
-          'over-payment/update',
-          method: Method.put,
-          data: {
-            "overPaymentsPayList": [
-              ...paymentDataModel.issuedDepositePaidList.map((e) => {
-                    "value": (e.depositeValue! - e.paymentAmount).toInt(),
-                    "customerId": paymentDataModel.selectedCustomer.customerId,
-                    "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
-                  })
-            ]
-          },
-        );
-        paymentDataModel.issuedDepositePaidList.forEach((element) async {
-          final data = {
-            "value": element.paymentAmount,
-            "paymentInvoiceId": element.issuedDeposite.paymentInvoiceId,
-            "routecardId": paymentDataModel.currentRouteCard.routeCardId,
-            "creditInvoiceId": paymentDataModel.invoiceId,
-            "receiptNo": element.issuedDeposite.receiptNo,
-            "status": 1
-          };
-          await respo('credit-payment/create', method: Method.post, data: data);
-        });
-        await respo(
-          'customers/update',
-          method: Method.put,
-          data: {
-            "customerId": paymentDataModel.selectedCustomer.customerId,
-            "depositBalance":
-                paymentDataModel.selectedCustomer.depositBalance! -
-                    paymentDataModel.issuedDepositePaidList
-                        .map((e) => e.paymentAmount)
-                        .reduce((value, element) => value + element),
-          },
-        );
-      }
-
-      if (isOnlySave ?? false) {
-        dataProvider.issuedDepositePaidList.clear();
-      }
-
-      //! Update invoice
-      await respo(
-        'invoice/update',
-        method: Method.put,
-        data: {
-          "invoiceId": paymentDataModel.invoiceId,
-          "status": paymentDataModel.balance < 0 ? 1 : 2,
-          "creditValue":
-              paymentDataModel.balance < 0 ? -paymentDataModel.balance : 0.0
-        },
-      );
-      if (isOnlySave ?? false) {
-        dataProvider.itemList.clear();
-      }
-
       //! Create receipt number
       final rn = paymentDataModel.receiptNo;
 
@@ -590,6 +531,66 @@ class PaymentService {
           );
         }
       }
+
+      //! Update over payment
+      if (paymentDataModel.issuedDepositePaidList.isNotEmpty) {
+        await respo(
+          'over-payment/update',
+          method: Method.put,
+          data: {
+            "overPaymentsPayList": [
+              ...paymentDataModel.issuedDepositePaidList.map((e) => {
+                    "value": (e.depositeValue! - e.paymentAmount).toInt(),
+                    "customerId": paymentDataModel.selectedCustomer.customerId,
+                    "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
+                  })
+            ]
+          },
+        );
+        paymentDataModel.issuedDepositePaidList.forEach((element) async {
+          final data = {
+            "value": element.paymentAmount,
+            "paymentInvoiceId": element.issuedDeposite.paymentInvoiceId,
+            "routecardId": paymentDataModel.currentRouteCard.routeCardId,
+            "creditInvoiceId": paymentDataModel.invoiceId,
+            "receiptNo": element.issuedDeposite.receiptNo,
+            "status": 1
+          };
+          await respo('credit-payment/create', method: Method.post, data: data);
+        });
+        await respo(
+          'customers/update',
+          method: Method.put,
+          data: {
+            "customerId": paymentDataModel.selectedCustomer.customerId,
+            "depositBalance":
+                paymentDataModel.selectedCustomer.depositBalance! -
+                    paymentDataModel.issuedDepositePaidList
+                        .map((e) => e.paymentAmount)
+                        .reduce((value, element) => value + element),
+          },
+        );
+      }
+
+      if (isOnlySave ?? false) {
+        dataProvider.issuedDepositePaidList.clear();
+      }
+
+      //! Update invoice
+      await respo(
+        'invoice/update',
+        method: Method.put,
+        data: {
+          "invoiceId": paymentDataModel.invoiceId,
+          "status": paymentDataModel.balance < 0 ? 1 : 2,
+          "creditValue":
+              paymentDataModel.balance < 0 ? -paymentDataModel.balance : 0.0
+        },
+      );
+      if (isOnlySave ?? false) {
+        dataProvider.itemList.clear();
+      }
+
       if (paymentDataModel.balance > 0) {
         await respo(
           'customers/update',
