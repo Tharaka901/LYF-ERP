@@ -50,6 +50,8 @@ class ApiClient {
   }
 
   Future<ApiResponse> post(String endpoint, {Map<String, dynamic>? data}) async {
+    print('data');
+    print(data);
     try {
       final response = await _dio.post(
         endpoint,
@@ -60,6 +62,8 @@ class ApiClient {
           responseType: ResponseType.json,
         ),
       );
+      print('response1');
+      print(response.data);
       return ApiResponse.fromJson(response.data);
     } catch (e) {
       return ApiResponse(
@@ -123,8 +127,10 @@ class ApiClient {
     return ApiResponseSingle<T>.fromJson(response.toJson());
   }
 
-  Future<ApiResponseSingle<T>> postSingle<T>(String endpoint, {Map<String, dynamic>? data}) async {
+  Future<ApiResponseSingle<T>> postSingle<T>(String endpoint, {Map<String, dynamic>? data, T Function(Map<String, dynamic>)? fromJsonConverter}) async {
     final response = await post(endpoint, data: data);
-    return ApiResponseSingle<T>.fromJson(response.toJson());
+    print('response');
+    print(response.toJson());
+    return ApiResponseSingle<T>.fromJson(response.toJson(), fromJsonConverter: fromJsonConverter);
   }
 }

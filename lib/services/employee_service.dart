@@ -7,9 +7,9 @@ class EmployeeService {
 
   Future<ApiResponse<EmployeeModel>> login(
       String contactNumber, String password) async {
-    return _apiClient.postSingle<EmployeeModel>('employees/login', data: {
+    return _apiClient.postSingle<EmployeeModel>('/employees/login', data: {
       'contactNumber': contactNumber,
       'password': password,
-    });
+    }, fromJsonConverter: (json) => EmployeeModel.fromJson(json));
   }
 }

@@ -79,10 +79,20 @@ class ApiResponseSingle<T> extends ApiResponse<T> {
     super.statusCode,
   });
 
-  factory ApiResponseSingle.fromJson(Map<String, dynamic> json) {
+  factory ApiResponseSingle.fromJson(Map<String, dynamic> json, {T Function(Map<String, dynamic>)? fromJsonConverter}) {
+    T? convertedData;
+    if (json['data'] != null && fromJsonConverter != null) {
+      try {
+        convertedData = fromJsonConverter(json['data']);
+      } catch (e) {
+        // If conversion fails, data will remain null
+        print('Error converting data: $e');
+      }
+    }
+    
     return ApiResponseSingle<T>(
       success: json['success'] ?? false,
-      data: json['data'],
+      data: convertedData,
       message: json['message'],
       error: json['error'],
       statusCode: json['statusCode'],
