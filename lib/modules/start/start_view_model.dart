@@ -29,7 +29,15 @@ class StartViewModel {
           dataProvider.setCurrentEmployee(employee);
           if (context.mounted) LoadingPopup.hide(context);
           if (context.mounted) {
-            Navigator.pushReplacementNamed(context, HomeScreen.routeId);
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (context.mounted) {
+                Navigator.pushNamedAndRemoveUntil(
+                  context, 
+                  HomeScreen.routeId, 
+                  (route) => false
+                );
+              }
+            });
           }
         } else {
           if (context.mounted) {
@@ -42,13 +50,29 @@ class StartViewModel {
           LoadingPopup.hide(context);
           dataProvider
               .setCurrentEmployee(hiveDBProvider.employeeBox!.values.first);
-          Navigator.pushReplacementNamed(context, HomeScreen.routeId);
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) {
+              Navigator.pushNamedAndRemoveUntil(
+                context, 
+                HomeScreen.routeId, 
+                (route) => false
+              );
+            }
+          });
         }
       }
     } else {
       if (context.mounted) {
         LoadingPopup.hide(context);
-        Navigator.pushReplacementNamed(context, LoginScreen.routeId);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (context.mounted) {
+            Navigator.pushNamedAndRemoveUntil(
+              context, 
+              LoginScreen.routeId, 
+              (route) => false
+            );
+          }
+        });
       }
     }
   }
