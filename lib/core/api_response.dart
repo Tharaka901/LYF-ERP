@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class ApiResponse<T> {
   final bool success;
   final T? data;
@@ -36,7 +38,7 @@ class ApiResponse<T> {
   // Helper methods
   bool get isSuccess => success;
   bool get isError => !success;
-  
+
   // For backward compatibility with existing Respo model
   factory ApiResponse.fromRespo(dynamic respo) {
     if (respo is Map<String, dynamic>) {
@@ -79,17 +81,20 @@ class ApiResponseSingle<T> extends ApiResponse<T> {
     super.statusCode,
   });
 
-  factory ApiResponseSingle.fromJson(Map<String, dynamic> json, {T Function(Map<String, dynamic>)? fromJsonConverter}) {
+  factory ApiResponseSingle.fromJson(Map<String, dynamic> json,
+      {T Function(Map<String, dynamic>)? fromJsonConverter}) {
     T? convertedData;
     if (json['data'] != null && fromJsonConverter != null) {
       try {
         convertedData = fromJsonConverter(json['data']);
       } catch (e) {
         // If conversion fails, data will remain null
-        print('Error converting data: $e');
+        if (kDebugMode) {
+          print('Error converting data: $e');
+        }
       }
     }
-    
+
     return ApiResponseSingle<T>(
       success: json['success'] ?? false,
       data: convertedData,

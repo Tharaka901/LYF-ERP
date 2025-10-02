@@ -728,7 +728,7 @@ class PaymentService {
               "invoiceNo":
                   creditInvoicePayFromDipositesDataModel.depositeReceiptNo,
               "balance":
-                  creditInvoicePayFromDipositesDataModel.crediteInvoiceValue -
+                  creditInvoicePayFromDipositesDataModel.depositeValue -
                       creditInvoicePayFromDipositesDataModel.payValue,
               "status": creditInvoicePayFromDipositesDataModel.depositeValue -
                           creditInvoicePayFromDipositesDataModel.payValue ==

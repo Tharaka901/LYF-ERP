@@ -129,8 +129,6 @@ class ApiClient {
 
   Future<ApiResponseSingle<T>> postSingle<T>(String endpoint, {Map<String, dynamic>? data, T Function(Map<String, dynamic>)? fromJsonConverter}) async {
     final response = await post(endpoint, data: data);
-    print('response');
-    print(response.toJson());
     return ApiResponseSingle<T>.fromJson(response.toJson(), fromJsonConverter: fromJsonConverter);
   }
 }
