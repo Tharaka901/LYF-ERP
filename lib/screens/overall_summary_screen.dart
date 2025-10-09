@@ -59,8 +59,8 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                     }
                     return Column(
                       children: [
-                        SizedBox(
-                          width: double.infinity,
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
                           child: Table(
                             defaultColumnWidth: const IntrinsicColumnWidth(),
                             children: [
@@ -162,8 +162,8 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                     }
                     return Column(
                       children: [
-                        SizedBox(
-                          width: double.infinity,
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
                           child: Table(
                             defaultColumnWidth: const IntrinsicColumnWidth(),
                             children: [
@@ -267,8 +267,8 @@ class _OverallSummaryScreenState extends State<OverallSummaryScreen> {
                     }
                     return Column(
                       children: [
-                        SizedBox(
-                          width: double.infinity,
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
                           child: Table(
                             defaultColumnWidth: const IntrinsicColumnWidth(),
                             children: [
