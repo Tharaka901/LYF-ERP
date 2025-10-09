@@ -25,8 +25,11 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
   void initState() {
     final invoiceProvider =
         Provider.of<InvoiceProvider>(context, listen: false);
-    if (invoiceProvider.invoiceNu == null)
+    final isManual = (ModalRoute.of(context)!.settings.arguments
+        as Map<String, dynamic>)['isManual'];
+    if (invoiceProvider.invoiceNu == null && !(isManual ?? false)) {
       invoiceProvider.getInvoiceNu(context);
+    }
     super.initState();
   }
 
@@ -45,7 +48,7 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
       ),
       floatingActionButton: Consumer<InvoiceProvider>(
         builder: ((context, ip, child) => ip.invoiceNu == null
-            ? CircularProgressIndicator()
+            ? const CircularProgressIndicator()
             : FloatingActionButton(
                 onPressed: () async {
                   if (isManual ?? false) {
@@ -53,20 +56,25 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                       waiting(context, body: 'Sending...');
                       await invoiceProvider.createInvoiceDB(
                           context, invoiceNoController.text.trim());
-                      pop(context);
-                      Navigator.pushNamed(context, AddPaymentScreen.routeId,
-                          arguments: {
-                            'invoiceRes': invoiceProvider.invoiceRes,
-                            'isManual': isManual
-                          });
+                      if (context.mounted) {
+                        pop(context);
+                        Navigator.pushNamed(context, AddPaymentScreen.routeId,
+                            arguments: {
+                              'invoiceRes': invoiceProvider.invoiceRes,
+                              'isManual': isManual
+                            });
+                      }
                     }
                   } else {
                     waiting(context, body: 'Sending...');
                     await invoiceProvider.createInvoiceDB(context, null);
-                    pop(context);
-                    print(invoiceProvider.invoiceRes);
-                    Navigator.pushNamed(context, AddPaymentScreen.routeId,
-                        arguments: {'invoiceRes': invoiceProvider.invoiceRes});
+                    if (context.mounted) {
+                      pop(context);
+                      Navigator.pushNamed(context, AddPaymentScreen.routeId,
+                          arguments: {
+                            'invoiceRes': invoiceProvider.invoiceRes
+                          });
+                    }
                   }
                 },
                 child: const Icon(
@@ -215,48 +223,49 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                     ),
                   ],
                 ),
-                Row(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.all(5.0),
-                      child: Text(
-                        'Invoice number:',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20.0,
+                if (!(isManual ?? false))
+                  Row(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.all(5.0),
+                        child: Text(
+                          'Invoice number:',
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.0,
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Consumer<InvoiceProvider>(
-                        builder: (context, ip, _) {
-                          return ip.invoiceNu != null
-                              ? Text(ip.invoiceNu!,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 16.0,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.clip)
-                              : const Text(
-                                  'Generating...',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                );
-                        },
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Consumer<InvoiceProvider>(
+                          builder: (context, ip, _) {
+                            return ip.invoiceNu != null
+                                ? Text(ip.invoiceNu!,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 16.0,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.clip)
+                                : const Text(
+                                    'Generating...',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  );
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
                 SizedBox(
                   width: double.infinity,
                   child: Consumer<DataProvider>(
                     builder: (context, data, _) => Table(
-                      border: TableBorder.symmetric(),
+                      border: const TableBorder.symmetric(),
                       defaultColumnWidth: const IntrinsicColumnWidth(),
                       children: [
                         const TableRow(
@@ -442,7 +451,7 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 if (isManual ?? false)
                   TextFormField(
                     controller: invoiceNoController,

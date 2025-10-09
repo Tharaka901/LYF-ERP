@@ -97,7 +97,10 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(5.0),
                                   child: Text(
-                                    date(DateTime.now(), format: 'dd.MM.yyyy'),
+                                    date(
+                                        dataProvider.currentRouteCard?.date ??
+                                            DateTime.now(),
+                                        format: 'dd.MM.yyyy'),
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(fontSize: 18.0),
                                   ),
@@ -118,7 +121,9 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    dataProvider.selectedCustomer!.businessName ?? '',
+                                    dataProvider
+                                            .selectedCustomer!.businessName ??
+                                        '',
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(fontSize: 18.0),
                                     maxLines: 2,
@@ -826,8 +831,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                               format: 'dd-MM-yyyy'),
                                           align: TextAlign.center,
                                         ),
-                                        cell(invoice
-                                            .issuedDeposite.receiptNo
+                                        cell(invoice.issuedDeposite.receiptNo
                                             .toString()),
                                         cell(
                                           price(invoice.paymentAmount)
@@ -920,7 +924,9 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                           align: TextAlign.start,
                                         ),
                                         cell(
-                                          invoice.issuedInvoice.createdAt.toString().split(' ')[0],
+                                          invoice.issuedInvoice.createdAt
+                                              .toString()
+                                              .split(' ')[0],
                                           align: TextAlign.center,
                                         ),
                                         cell(invoice.issuedInvoice.invoiceNo),

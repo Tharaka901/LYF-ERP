@@ -35,7 +35,7 @@ class ReturnCylinderProvider extends ChangeNotifier {
 
   double get subtotal => totalItemAmount + nonVatAmount;
 
-  double get vatAmount => subtotal * customerVatPercentage / 100;
+  double get vatAmount => totalItemAmount * customerVatPercentage / 100;
 
   double get grandPrice =>
       double.parse((subtotal + vatAmount).toStringAsFixed(2));

@@ -128,7 +128,7 @@ class StockViewModel extends ChangeNotifier {
   }) async {
     if (hiveDBProvider.isInternetConnected) {
       return await routeCardService
-          .getReturnCylinderSummaryCustomerWiseLeak(routeCardId);
+          .getReturnCylinderSummaryCustomerWiseLeak(routeCardId, isCustomerWise: false);
     } else {
       final box = hiveDBProvider.returnCylinderSummaryCustomerWiseLeakBox;
       final raw = box?.get(routeCardId) ?? [];

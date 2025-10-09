@@ -273,7 +273,7 @@ class PaymentService {
       "invoice": {
         "invoiceNo": paymentDataModel.invoiceNo,
         "routecardId": paymentDataModel.currentRouteCard.routeCardId,
-        "amount": paymentDataModel.totalPayment,
+        "amount": 0,
         "customerId": selectedCustomer.customerId,
         "creditValue": 0,
         "vat": 0,

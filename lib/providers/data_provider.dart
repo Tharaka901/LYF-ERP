@@ -51,7 +51,7 @@ class DataProvider extends ChangeNotifier {
   double get nonVatItemTotal => itemList.isEmpty
       ? 0
       : itemList
-          .map((e) => e.item.nonVatAmount ?? 0 * e.quantity)
+          .map((e) => (e.item.nonVatAmount ?? 0) * e.quantity)
           .reduce((value, element) => value + element);
 
   //! Calculate total amount of VAT
