@@ -49,7 +49,7 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
         title: const Text('Invoice'),
       ),
       floatingActionButton: Consumer<InvoiceProvider>(
-        builder: ((context, ip, child) => ip.invoiceNu == null
+        builder: ((context, ip, child) => (ip.invoiceNu == null && !isManual)
             ? const CircularProgressIndicator()
             : FloatingActionButton(
                 onPressed: () async {
