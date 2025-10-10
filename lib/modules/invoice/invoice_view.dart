@@ -23,14 +23,16 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
 
   @override
   void initState() {
-    final invoiceProvider =
-        Provider.of<InvoiceProvider>(context, listen: false);
-    final isManual = (ModalRoute.of(context)!.settings.arguments
-        as Map<String, dynamic>)['isManual'];
-    if (invoiceProvider.invoiceNu == null && !(isManual ?? false)) {
-      invoiceProvider.getInvoiceNu(context);
-    }
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final invoiceProvider =
+          Provider.of<InvoiceProvider>(context, listen: false);
+      final isManual = (ModalRoute.of(context)!.settings.arguments
+          as Map<String, dynamic>)['isManual'];
+      if (invoiceProvider.invoiceNu == null && !(isManual ?? false)) {
+        invoiceProvider.getInvoiceNu(context);
+      }
+    });
   }
 
   @override
