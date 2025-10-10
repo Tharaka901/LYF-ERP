@@ -215,7 +215,7 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                     Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Text(
-                        date(DateTime.now(), format: 'dd.MM.yyyy'),
+                        date(dataProvider.currentRouteCard!.date!, format: 'dd.MM.yyyy'),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 16.0,

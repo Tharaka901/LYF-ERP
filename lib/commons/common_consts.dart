@@ -17,7 +17,7 @@ const baseUrl = 'https://api.ravonbakers.lk/api';
 
 const defaultAcceptColor = Colors.green;
 
-final defaultBackgroundColor = Colors.grey[300];
+const defaultBackgroundColor = Colors.white;
 
 final defaultBorderRadius = BorderRadius.circular(10.0);
 
