@@ -235,7 +235,7 @@ class DataProvider extends ChangeNotifier {
     return totalAmount;
   }
 
-  getTotalChequeAmount() {
+  double getTotalChequeAmount() {
     double totalAmount = 0.0;
     for (var cheque in _chequeList) {
       totalAmount += cheque.chequeAmount;

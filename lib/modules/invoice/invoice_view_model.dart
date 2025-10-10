@@ -27,8 +27,7 @@ class InvoiceViewModel {
             : double.parse((dataProvider.grandTotal).toStringAsFixed(2)),
         subTotal:
             double.parse((dataProvider.getTotalAmount()).toStringAsFixed(2)),
-        vat: double.parse(
-            (((dataProvider.getTotalAmount() / 100) * 18)).toStringAsFixed(2)),
+        vat: dataProvider.vat,
         nonVatItemTotal: dataProvider.nonVatItemTotal,
         customerId: selectedCustomer.customerId,
         creditValue: double.parse((dataProvider.grandTotal).toStringAsFixed(2)),

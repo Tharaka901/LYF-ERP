@@ -827,7 +827,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                         ),
                                         cell(
                                           date(
-                                              invoice.issuedDeposite.createdAt!,
+                                              dataProvider.currentRouteCard!.date!,
                                               format: 'dd-MM-yyyy'),
                                           align: TextAlign.center,
                                         ),

@@ -226,9 +226,9 @@ class PrintInvoiceView extends StatelessWidget {
                             ),
                           ),
                           pwtitleCell(
-                              formatPrice(double.parse((issuedInvoice?.vat ??
-                                      (dataProvider.getTotalAmount() * 0.18))
-                                  .toStringAsFixed(2))),
+                              formatPrice(double.parse(
+                                  (issuedInvoice?.vat ?? dataProvider.vat)
+                                      .toStringAsFixed(2))),
                               align: pw.TextAlign.left,
                               mainAxisAlignment:
                                   pw.MainAxisAlignment.spaceBetween,
@@ -281,7 +281,7 @@ class PrintInvoiceView extends StatelessWidget {
                               formatPrice(double.parse((issuedInvoice?.amount ??
                                       (dataProvider.getTotalAmount() +
                                           dataProvider.nonVatItemTotal +
-                                          dataProvider.getTotalAmount() * 0.18))
+                                          dataProvider.vat))
                                   .toStringAsFixed(2))),
                               align: pw.TextAlign.left,
                               mainAxisAlignment:
@@ -395,64 +395,67 @@ class PrintInvoiceView extends StatelessWidget {
                           ),
                         ]),
                     pw.SizedBox(height: 2.0),
-                    pw.Table(
-                      children: [
-                        pw.TableRow(
-                          decoration: const pw.BoxDecoration(
-                            color: PdfColor.fromInt(0xFFFFFFFF),
-                          ),
-                          children: [
-                            pwtitleCell(
-                              'Method',
-                              align: pw.TextAlign.left,
-                            ),
-                            pwtitleCell('Cheque No'),
-                            pwtitleCell(
-                              'Amount',
-                              align: pw.TextAlign.right,
-                              mainAxisAlignment: pw.MainAxisAlignment.end,
-                            ),
-                          ],
-                        ),
-                        if (cash != null && cash != 0)
+                    if ((dataProvider.getTotalChequeAmount() + (cash ?? 0)) !=
+                        0)
+                      pw.Table(
+                        children: [
                           pw.TableRow(
+                            decoration: const pw.BoxDecoration(
+                              color: PdfColor.fromInt(0xFFFFFFFF),
+                            ),
                             children: [
-                              pwcell(
-                                'Cash',
+                              pwtitleCell(
+                                'Method',
                                 align: pw.TextAlign.left,
                               ),
-                              pwcell(
-                                '-',
-                                align: pw.TextAlign.left,
-                              ),
-                              pwcell(
-                                formatPrice(cash ?? 0),
-                                align: pw.TextAlign.end,
+                              pwtitleCell('Cheque No'),
+                              pwtitleCell(
+                                'Amount',
+                                align: pw.TextAlign.right,
+                                mainAxisAlignment: pw.MainAxisAlignment.end,
                               ),
                             ],
                           ),
-                        if ((cheques ?? dataProvider.chequeList).isNotEmpty)
-                          ...(cheques ?? dataProvider.chequeList).map((m) {
-                            return pw.TableRow(
+                          if (cash != null && cash != 0)
+                            pw.TableRow(
                               children: [
                                 pwcell(
-                                  'Cheque',
+                                  'Cash',
                                   align: pw.TextAlign.left,
                                 ),
                                 pwcell(
-                                  m.chequeNumber,
+                                  '-',
                                   align: pw.TextAlign.left,
                                 ),
                                 pwcell(
-                                  formatPrice(m.chequeAmount),
+                                  formatPrice(cash ?? 0),
                                   align: pw.TextAlign.end,
                                 ),
                               ],
-                            );
-                          }),
-                      ],
-                    ),
+                            ),
+                          if ((cheques ?? dataProvider.chequeList).isNotEmpty)
+                            ...(cheques ?? dataProvider.chequeList).map((m) {
+                              return pw.TableRow(
+                                children: [
+                                  pwcell(
+                                    'Cheque',
+                                    align: pw.TextAlign.left,
+                                  ),
+                                  pwcell(
+                                    m.chequeNumber,
+                                    align: pw.TextAlign.left,
+                                  ),
+                                  pwcell(
+                                    formatPrice(m.chequeAmount),
+                                    align: pw.TextAlign.end,
+                                  ),
+                                ],
+                              );
+                            }),
+                        ],
+                      ),
                     pw.Divider(thickness: 0.5),
+                    if ((dataProvider.getTotalChequeAmount() + (cash ?? 0)) != 0)
                     pw.Padding(
                       padding: const pw.EdgeInsets.all(0),
                       child: pw.Row(
@@ -468,7 +471,7 @@ class PrintInvoiceView extends StatelessWidget {
                           ),
                           pwtitleCell(
                               formatPrice(double.parse(
-                                  '${issuedInvoice != null ? _totalPayment() : (dataProvider.getTotalChequeAmount() + cash)}')),
+                                  '${issuedInvoice != null ? _totalPayment() : (dataProvider.getTotalChequeAmount() + (cash ?? 0))}')),
                               align: pw.TextAlign.left,
                               mainAxisAlignment:
                                   pw.MainAxisAlignment.spaceBetween,

@@ -70,7 +70,7 @@ class LeakNotePrintScreen extends StatelessWidget {
                             style: const pw.TextStyle(fontSize: 22.0),
                           ),
                           pw.Text(
-                            'Date: ${date(DateTime.now(), format: 'dd.MM.yyyy')}',
+                            'Date: ${date(dataProvider.currentRouteCard!.date!, format: 'dd.MM.yyyy')}',
                             style: const pw.TextStyle(fontSize: 22.0),
                           ),
                           pw.Text(
