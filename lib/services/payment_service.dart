@@ -547,7 +547,7 @@ class PaymentService {
             ]
           },
         );
-        paymentDataModel.issuedDepositePaidList.forEach((element) async {
+        for (var element in paymentDataModel.issuedDepositePaidList) {
           final data = {
             "value": element.paymentAmount,
             "paymentInvoiceId": element.issuedDeposite.id,
@@ -557,7 +557,7 @@ class PaymentService {
             "status": 7
           };
           await respo('credit-payment/create', method: Method.post, data: data);
-        });
+        }
         await respo(
           'customers/update',
           method: Method.put,
