@@ -698,6 +698,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                     formKey: formKey,
                                     callBack: callBack,
                                     balance: currentBalance,
+                                    invoiceId : invoiceProvider.invoiceRes?.data['invoice']['invoiceId']
                                   ),
                                   onConfirm: () {
                                     if (formKey.currentState!.validate()) {

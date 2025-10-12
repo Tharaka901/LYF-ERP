@@ -554,7 +554,7 @@ class PaymentService {
             "routecardId": paymentDataModel.currentRouteCard.routeCardId,
             "creditInvoiceId": paymentDataModel.invoiceId,
             "receiptNo": element.issuedDeposite.receiptNo,
-            "status": 1
+            "status": 7
           };
           await respo('credit-payment/create', method: Method.post, data: data);
         });
@@ -679,8 +679,8 @@ class PaymentService {
                 : 8
             : creditInvoicePayFromDipositesDataModel.depositeStatus == 2
                 ? 6
-                : 1,
-        "createdAt": creditInvoicePayFromDipositesDataModel.depositeCreatedDate,
+                : 7,
+        "createdAt": DateTime.now().toString(),
         "type": creditInvoicePayFromDipositesDataModel.chequeId != null
             ? "return-cheque"
             : 'default'
