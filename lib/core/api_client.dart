@@ -50,8 +50,6 @@ class ApiClient {
   }
 
   Future<ApiResponse> post(String endpoint, {Map<String, dynamic>? data}) async {
-    print('data');
-    print(data);
     try {
       final response = await _dio.post(
         endpoint,
@@ -62,8 +60,6 @@ class ApiClient {
           responseType: ResponseType.json,
         ),
       );
-      print('response1');
-      print(response.data);
       return ApiResponse.fromJson(response.data);
     } catch (e) {
       return ApiResponse(

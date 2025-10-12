@@ -351,7 +351,7 @@ class PrintInvoiceView extends StatelessWidget {
                                 align: pw.TextAlign.center,
                               ),
                               pwcell(
-                                dp.issuedDeposite.paymentInvoiceId.toString(),
+                                dp.issuedDeposite.receiptNo ?? '-',
                                 align: pw.TextAlign.center,
                               ),
                               pwcell(
@@ -382,8 +382,8 @@ class PrintInvoiceView extends StatelessWidget {
                   // //! Payment section
                   if (issuedInvoice?.payments?.isNotEmpty ??
                       false ||
-                          cash != null ||
-                          dataProvider.chequeList.isNotEmpty) ...[
+                          (dataProvider.getTotalChequeAmount() + (cash ?? 0)) !=
+                              0) ...[
                     pw.Divider(thickness: 0.5),
                     pw.Row(
                         mainAxisAlignment: pw.MainAxisAlignment.start,
@@ -455,30 +455,31 @@ class PrintInvoiceView extends StatelessWidget {
                         ],
                       ),
                     pw.Divider(thickness: 0.5),
-                    if ((dataProvider.getTotalChequeAmount() + (cash ?? 0)) != 0)
-                    pw.Padding(
-                      padding: const pw.EdgeInsets.all(0),
-                      child: pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                        children: [
-                          pw.Text(
-                            'Total: ',
-                            textAlign: pw.TextAlign.center,
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                              fontSize: 22.0,
+                    if ((dataProvider.getTotalChequeAmount() + (cash ?? 0)) !=
+                        0)
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(0),
+                        child: pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text(
+                              'Total: ',
+                              textAlign: pw.TextAlign.center,
+                              style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                                fontSize: 22.0,
+                              ),
                             ),
-                          ),
-                          pwtitleCell(
-                              formatPrice(double.parse(
-                                  '${issuedInvoice != null ? _totalPayment() : (dataProvider.getTotalChequeAmount() + (cash ?? 0))}')),
-                              align: pw.TextAlign.left,
-                              mainAxisAlignment:
-                                  pw.MainAxisAlignment.spaceBetween,
-                              color: const PdfColor.fromInt(0xFF000000)),
-                        ],
-                      ),
-                    )
+                            pwtitleCell(
+                                formatPrice(double.parse(
+                                    '${issuedInvoice != null ? _totalPayment() : (dataProvider.getTotalChequeAmount() + (cash ?? 0))}')),
+                                align: pw.TextAlign.left,
+                                mainAxisAlignment:
+                                    pw.MainAxisAlignment.spaceBetween,
+                                color: const PdfColor.fromInt(0xFF000000)),
+                          ],
+                        ),
+                      )
                   ],
 
                   // //! Over payment or credit
@@ -497,8 +498,8 @@ class PrintInvoiceView extends StatelessWidget {
                             ),
                           ),
                           pwtitleCell(
-                            (balance > 0 ? 1 * balance : -1 * balance)
-                                .toStringAsFixed(2),
+                            formatPrice(
+                                (balance > 0 ? 1 * balance : -1 * balance)),
                             align: pw.TextAlign.left,
                             mainAxisAlignment:
                                 pw.MainAxisAlignment.spaceBetween,
