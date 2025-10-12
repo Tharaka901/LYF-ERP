@@ -550,7 +550,7 @@ class PaymentService {
         paymentDataModel.issuedDepositePaidList.forEach((element) async {
           final data = {
             "value": element.paymentAmount,
-            "paymentInvoiceId": element.issuedDeposite.paymentInvoiceId,
+            "paymentInvoiceId": element.issuedDeposite.id,
             "routecardId": paymentDataModel.currentRouteCard.routeCardId,
             "creditInvoiceId": paymentDataModel.invoiceId,
             "receiptNo": element.issuedDeposite.receiptNo,
