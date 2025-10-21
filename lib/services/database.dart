@@ -469,6 +469,7 @@ Future<List<InvoiceModel>> creditInvoices(BuildContext context,
 
   final response = await respo(url);
   List<dynamic> list = response.data;
+  print(list);
   return list
       .where((element) => element['status'] == 1 || element['status'] == 99)
       .map((e) {
@@ -497,17 +498,21 @@ Future<List<CustomerDeposite>> getCustomerDeposites(BuildContext context,
 
 Future<List<InvoiceModel>> getIssuedInvoices(BuildContext context) async {
   try {
-  final response = await respo(
-      'invoice/get?routecardId=${context.read<DataProvider>().currentRouteCard!.routeCardId}');
-  List<dynamic> list = response.data ?? [];
-  List<InvoiceModel> selectedInvoiceList = [];
-  final allInvoiceList = list.map((e) => InvoiceModel.fromJson(e)).toList();
-  for (var element in allInvoiceList) {
-    if (element.status != 3) {
-      selectedInvoiceList.add(element);
+    final routeCard = context.read<DataProvider>().currentRouteCard;
+    if (routeCard == null) {
+      throw Exception('No current route card available');
     }
-  }
-    selectedInvoiceList.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
+    final response = await respo(
+        'invoice/get?routecardId=${routeCard.routeCardId}');
+    List<dynamic> list = response.data ?? [];
+    List<InvoiceModel> selectedInvoiceList = [];
+    final allInvoiceList = list.map((e) => InvoiceModel.fromJson(e)).toList();
+    for (var element in allInvoiceList) {
+      if (element.status != 3) {
+        selectedInvoiceList.add(element);
+      }
+    }
+    selectedInvoiceList.sort((a, b) => a.createdAt?.compareTo(b.createdAt ?? DateTime.now()) ?? 0);
     return selectedInvoiceList;
   } catch (e) {
     print(e);

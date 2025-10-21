@@ -659,7 +659,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                   height: 10.0,
                 ),
                 SizedBox(height: 5),
-                if (isManual)
+                if (isManual && (dataProvider.getTotalChequeAmount() + cash) > 0)
                   TextFormField(
                     controller: receiptNoController,
                     decoration: InputDecoration(
@@ -694,12 +694,12 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                   context,
                                   title: 'Previous Invoice',
                                   body: CreditInvoice(
-                                    paymentController: paymentController,
-                                    formKey: formKey,
-                                    callBack: callBack,
-                                    balance: currentBalance,
-                                    invoiceId : invoiceProvider.invoiceRes?.data['invoice']['invoiceId']
-                                  ),
+                                      paymentController: paymentController,
+                                      formKey: formKey,
+                                      callBack: callBack,
+                                      balance: currentBalance,
+                                      invoiceId: invoiceProvider.invoiceRes
+                                          ?.data['invoice']['invoiceId']),
                                   onConfirm: () {
                                     if (formKey.currentState!.validate()) {
                                       paymentController.clear();
@@ -828,7 +828,9 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                         ),
                                         cell(
                                           date(
-                                              invoice.issuedDeposite.createdAt!,
+                                              invoice.issuedDeposite.routeCard
+                                                      ?.date ??
+                                                  DateTime.now(),
                                               format: 'dd-MM-yyyy'),
                                           align: TextAlign.center,
                                         ),

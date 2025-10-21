@@ -13,14 +13,20 @@ import '../providers/data_provider.dart';
 
 class PaymentService {
   Future<int> getReceiptCount(BuildContext context) async {
-    final routeCard = context.read<DataProvider>().currentRouteCard!;
+    final routeCard = context.read<DataProvider>().currentRouteCard;
+    if (routeCard == null) {
+      throw Exception('No current route card available');
+    }
     final response = await respo('payment/count/?id=${routeCard.routeCardId}');
     final int count = response.data;
     return count;
   }
 
   Future<String> getReceiptNumber(BuildContext context) async {
-    final routeCard = context.read<DataProvider>().currentRouteCard!;
+    final routeCard = context.read<DataProvider>().currentRouteCard;
+    if (routeCard == null) {
+      throw Exception('No current route card available');
+    }
     final response = await respo('payment/count/?id=${routeCard.routeCardId}');
     final int count = response.data;
     return 'R/${routeCard.routeCardNo}/${count + 1}';

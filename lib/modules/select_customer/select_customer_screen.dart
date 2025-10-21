@@ -8,6 +8,7 @@ import 'package:gsr/models/customer/customer_model.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/screens/add_items_screen.dart';
 import 'package:gsr/modules/return_cylinder/screens/return_cylinder_add_item_screen.dart';
+import 'package:gsr/screens/qr_scan_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -245,12 +246,12 @@ class _SelectCustomerViewState extends State<SelectCustomerView> {
                     height: 50.0,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        // Navigator.pushReplacement(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //         builder: (context) => const QRScanScreen(
-                        //               screen: 'Billing',
-                        //             )));
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const QRScanScreen(
+                                      screen: 'Billing',
+                                    )));
                       },
                       icon: const Icon(
                         Icons.qr_code_rounded,

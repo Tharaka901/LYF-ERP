@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:gsr/models/route_card/route_card_model.dart';
+
 CustomerDeposite customerDepositeFromJson(String str) =>
     CustomerDeposite.fromJson(json.decode(str));
 
@@ -15,6 +17,7 @@ class CustomerDeposite {
   final String? receiptNo;
   final int? customerId;
   final DateTime? createdAt;
+  final RouteCardModel? routeCard;
 
   CustomerDeposite({
     this.id,
@@ -25,6 +28,7 @@ class CustomerDeposite {
     this.receiptNo,
     this.customerId,
     this.createdAt,
+    this.routeCard,
   });
 
   factory CustomerDeposite.fromJson(Map<dynamic, dynamic> json) =>
@@ -39,6 +43,9 @@ class CustomerDeposite {
         createdAt: json["createdAt"] == null
             ? null
             : DateTime.parse(json["createdAt"]),
+        routeCard: json["routecard"] == null
+            ? null
+            : RouteCardModel.fromJson(json["routecard"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -50,5 +57,6 @@ class CustomerDeposite {
         "receiptNo": receiptNo,
         "customerId": customerId,
         "createdAt": createdAt?.toIso8601String(),
+        "routecard": routeCard?.toJson(),
       };
 }

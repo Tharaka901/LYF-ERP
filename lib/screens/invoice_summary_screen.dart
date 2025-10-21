@@ -24,7 +24,7 @@ class InvoiceSummaryScreen extends StatelessWidget {
             title: const Text('Issued Invoices'),
           ),
           floatingActionButton:
-              snapshot.hasData && dataProvider.currentRouteCard!.status == 1
+              snapshot.hasData && dataProvider.currentRouteCard?.status == 1
                   ? FloatingActionButton(
                       onPressed: () {
                         Navigator.push(
@@ -90,7 +90,7 @@ class InvoiceSummaryScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                snapshot.hasData
+                snapshot.hasData && snapshot.data != null
                     ? snapshot.data!.isNotEmpty
                         ? Expanded(
                             child: ListView.builder(

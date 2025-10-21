@@ -27,15 +27,23 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    final routeCard = dataProvider.currentRouteCard!;
+    final routeCard = dataProvider.currentRouteCard;
+    if (routeCard == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('No Route Card')),
+        body: const Center(
+          child: Text('No current route card available'),
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '${routeCard.route?.routeName} - ${date(routeCard.date!, format: 'dd.MM.yyyy')}',
+          '${routeCard.route?.routeName} - ${date(routeCard.date ?? DateTime.now(), format: 'dd.MM.yyyy')}',
         ),
       ),
       floatingActionButton: Consumer<DataProvider>(
-        builder: (context, data, _) => data.currentRouteCard!.status != 0
+        builder: (context, data, _) => data.currentRouteCard?.status != 0
             ? FloatingActionButton(
                 onPressed: () => Navigator.pushNamed(
                   context,

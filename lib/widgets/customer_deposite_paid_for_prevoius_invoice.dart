@@ -157,6 +157,7 @@ class _CustomerDepositePaidForPriviousInvoiceState
                         }).toList()
                       : [],
                   onChanged: (deposite) {
+                    print(deposite);
                     dataProvider.setSelectedDeposite(deposite);
                   },
                 );
