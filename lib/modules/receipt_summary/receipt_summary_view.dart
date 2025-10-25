@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 
 class ReceiptSummaryView extends StatefulWidget {
   final CreditPaymentModel creditPayment;
-  const ReceiptSummaryView({Key? key, required this.creditPayment});
+  const ReceiptSummaryView({super.key, required this.creditPayment});
 
   @override
   State<ReceiptSummaryView> createState() => _ReceiptSummaryViewState();
@@ -31,7 +31,7 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
           title: const Text('Receipt Summary'),
           actions: [
             IconButton(
-              icon: Icon(Icons.print),
+              icon: const Icon(Icons.print),
               onPressed: () {
                 receiptSummaryProvider!.onPressedPrintButton(context);
               },
@@ -41,7 +41,7 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
         body: Consumer(
           builder: (context, rsp, _) => receiptSummaryProvider!.receiptModel ==
                   null
-              ? Center(child: CircularProgressIndicator())
+              ? const Center(child: CircularProgressIndicator())
               : FutureBuilder<List<CreditPaymentModel>>(
                   future: getCreditPaymentsByReceipt(
                       receiptNo: widget.creditPayment.receiptNo!),
@@ -146,7 +146,10 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
                                               align: TextAlign.start,
                                             ),
                                             cell(
-                                              invoice.creditInvoice?.createdAt?.toString().split(' ')[0] ?? '',
+                                              invoice.creditInvoice?.createdAt
+                                                      ?.toString()
+                                                      .split(' ')[0] ??
+                                                  '',
                                               align: TextAlign.center,
                                             ),
                                             cell(invoice
@@ -248,7 +251,7 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
                                               .map((e) => e.value!)
                                               .toList()
                                               .reduce((value, current) =>
-                                                  value! + current!))),
+                                                  value + current))),
                                         ],
                                       ),
                                     ],

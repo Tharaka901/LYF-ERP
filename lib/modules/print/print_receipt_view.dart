@@ -47,6 +47,34 @@ class PrintReceiptView extends StatelessWidget {
                     'Receipt',
                     style: ThemeConstants.boldStyleForPdf,
                   ),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.start,
+                    children: [
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text(
+                            'Bill to: ${receiptModel.businessName}',
+                            style: const pw.TextStyle(
+                              fontSize: 22.0,
+                            ),
+                          ),
+                          pw.Text(
+                            'Customer Vat No: ${receiptModel.customerVatNu ?? '-'}',
+                            style: const pw.TextStyle(
+                              fontSize: 22.0,
+                            ),
+                          ),
+                          pw.Text(
+                            'Date: ${receiptModel.billingDate}',
+                            style: const pw.TextStyle(
+                              fontSize: 22.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                   pw.SizedBox(height: 5.0),
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.start,

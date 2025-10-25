@@ -684,7 +684,7 @@ class PaymentService {
                 ? 5
                 : 8
             : creditInvoicePayFromDipositesDataModel.depositeStatus == 2
-                ? 6
+                ? 7
                 : 7,
         "createdAt": DateTime.now().toString(),
         "type": creditInvoicePayFromDipositesDataModel.chequeId != null

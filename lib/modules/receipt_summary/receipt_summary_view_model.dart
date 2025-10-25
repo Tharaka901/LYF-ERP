@@ -22,6 +22,8 @@ class ReceiptSummaryViewModel {
             ? '-'
             : date(payments[0].createdAt!, format: 'dd.MM.yyyy'),
         receiptNo: payments[0].receiptNo ?? '',
+        customerVatNu: creditPaymentModel.creditInvoice?.customer?.customerVat ?? '-',
+        businessName: creditPaymentModel.creditInvoice?.customer?.businessName ?? '-',
         invoicess: payments
             .map((i) => InvoiceModel(
                 invoiceNo: i.creditInvoice!.invoiceNo,
