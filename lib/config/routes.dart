@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gsr/modules/receipt_list/receipt_list_view.dart';
 import '../screens/screens.dart';
 import '../modules/invoice/invoice_view.dart';
 import '../modules/view_receipt/invoice_receipt_screen.dart';
@@ -24,5 +25,7 @@ class AppRoutes {
         RouteCardScreen.routeId: (context) => const RouteCardScreen(),
         ViewInvoiceScreen.routeId: (context) => const ViewInvoiceScreen(),
         InvoiceReceiptScreen.routeId: (context) => const InvoiceReceiptScreen(),
+        ViewReceiptListScreen.routeId: (context) =>
+            const ViewReceiptListScreen(),
       };
 }

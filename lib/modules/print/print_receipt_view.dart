@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gsr/modules/receipt_list/receipt_list_view.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -21,7 +22,10 @@ class PrintReceiptView extends StatelessWidget {
         automaticallyImplyLeading: false,
       ),
       body: PdfPreview(
-        onPrinted: (context) async {},
+        onPrinted: (context) async {
+          Navigator.of(context)
+              .popUntil(ModalRoute.withName(ViewReceiptListScreen.routeId));
+        },
         build: (format) => _generatePdf(receiptModel),
       ),
     );

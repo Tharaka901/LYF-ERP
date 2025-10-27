@@ -9,6 +9,7 @@ import '../../models/credit_payment/credit_payment_model.dart';
 import '../../services/database.dart';
 
 class ViewReceiptListScreen extends StatefulWidget {
+  static const routeId = 'RECEIPT_LIST';
   const ViewReceiptListScreen({Key? key}) : super(key: key);
 
   @override

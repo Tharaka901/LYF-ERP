@@ -556,11 +556,11 @@ class PaymentService {
         for (var element in paymentDataModel.issuedDepositePaidList) {
           final data = {
             "value": element.paymentAmount,
-            "paymentInvoiceId": element.issuedDeposite.id,
+            "paymentInvoiceId": element.issuedDeposite.paymentInvoiceId,
             "routecardId": paymentDataModel.currentRouteCard.routeCardId,
             "creditInvoiceId": paymentDataModel.invoiceId,
             "receiptNo": element.issuedDeposite.receiptNo,
-            "status": 7
+            "status": element.issuedDeposite.status == 2 ? 6 : 7
           };
           await respo('credit-payment/create', method: Method.post, data: data);
         }
@@ -684,7 +684,7 @@ class PaymentService {
                 ? 5
                 : 8
             : creditInvoicePayFromDipositesDataModel.depositeStatus == 2
-                ? 7
+                ? 6
                 : 7,
         "createdAt": DateTime.now().toString(),
         "type": creditInvoicePayFromDipositesDataModel.chequeId != null
