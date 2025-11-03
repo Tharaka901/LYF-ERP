@@ -38,8 +38,8 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
             )
           ],
         ),
-        body: Consumer(
-          builder: (context, rsp, _) => receiptSummaryProvider!.receiptModel ==
+        body: Consumer<ReceiptSummaryProvider>(
+          builder: (context, rsp, _) => rsp.receiptModel ==
                   null
               ? const Center(child: CircularProgressIndicator())
               : FutureBuilder<List<CreditPaymentModel>>(

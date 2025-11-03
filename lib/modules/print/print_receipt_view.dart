@@ -23,8 +23,11 @@ class PrintReceiptView extends StatelessWidget {
       ),
       body: PdfPreview(
         onPrinted: (context) async {
-          Navigator.of(context)
-              .popUntil(ModalRoute.withName(ViewReceiptListScreen.routeId));
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => const ViewReceiptListScreen(),
+              ),
+              (route) => false);
         },
         build: (format) => _generatePdf(receiptModel),
       ),

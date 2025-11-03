@@ -453,6 +453,30 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                         ],
                       ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Row(
+                        children: [
+                          const Text(
+                            'Balance:',
+                            textAlign: TextAlign.end,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18.0,
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            price(dataProvider.getTotalBalance(cash)),
+                            textAlign: TextAlign.end,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

@@ -345,7 +345,7 @@ class PrintInvoiceView extends StatelessWidget {
                               ),
                               pwcell(
                                 date(
-                                    dp.issuedDeposite.createdAt ??
+                                    dp.issuedDeposite.routeCard?.date ??
                                         DateTime.now(),
                                     format: 'dd-MM-yyyy'),
                                 align: pw.TextAlign.center,
@@ -582,6 +582,17 @@ class PrintInvoiceView extends StatelessWidget {
                                     .toList()
                                     .reduce((value, element) => value + element)
                                 : dataProvider.getTotalInvoicePaymentAmount()),
+                            style: const pw.TextStyle(fontSize: 22)),
+                      ],
+                    ),
+                    pw.Row(
+                      children: [
+                        pw.Text('Balance:',
+                            style: const pw.TextStyle(fontSize: 22)),
+                        pw.Spacer(),
+                        pw.Text(
+                            formatPrice(
+                                dataProvider.getTotalBalance(cash ?? 0)),
                             style: const pw.TextStyle(fontSize: 22)),
                       ],
                     ),

@@ -10,7 +10,7 @@ import '../../services/database.dart';
 
 class ViewReceiptListScreen extends StatefulWidget {
   static const routeId = 'RECEIPT_LIST';
-  const ViewReceiptListScreen({Key? key}) : super(key: key);
+  const ViewReceiptListScreen({super.key});
 
   @override
   State<ViewReceiptListScreen> createState() => _ViewReceiptListScreenState();
@@ -42,9 +42,11 @@ class _ViewReceiptListScreenState extends State<ViewReceiptListScreen> {
                               dataProvider.currentRouteCard!.routeCardId!,
                           status: 2,
                         ).then((value) {
-                          pop(context);
-                          pop(context);
-                          pop(context);
+                          if (context.mounted) {
+                            pop(context);
+                            pop(context);
+                            pop(context);
+                          }
                         });
                       }, confirmText: 'Finish'),
                       icon: const Icon(Icons.done),

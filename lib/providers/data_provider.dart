@@ -75,7 +75,6 @@ class DataProvider extends ChangeNotifier {
       (getTotalAmount() + vat + nonVatItemTotal).toStringAsFixed(2));
 
   //! Calculate total payment amount
-  
 
   setCurrentEmployee(EmployeeModel currentEmployee) {
     _currentEmployee = currentEmployee;
@@ -242,6 +241,13 @@ class DataProvider extends ChangeNotifier {
       totalAmount += cheque.chequeAmount;
     }
     return totalAmount;
+  }
+
+  double getTotalBalance(double cash) {
+    return cash +
+        getTotalDepositePaymentAmount() +
+        getTotalChequeAmount() -
+        getTotalInvoicePaymentAmount();
   }
 
   clearItemList() {
