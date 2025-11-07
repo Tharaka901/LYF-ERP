@@ -138,7 +138,9 @@ class PrintReceiptView extends StatelessWidget {
                   ),
                   PdfTile.basic(
                       label: 'Total: ',
-                      value: formatPrice(receiptModel.totalPayment)),
+                      value: formatPrice(receiptModel.paymentMethods
+                          .map((m) => double.parse(m.amount!))
+                          .reduce((a, b) => a + b))),
                   pw.Divider(thickness: 0.5),
 
                   //! Previous payments invoicess

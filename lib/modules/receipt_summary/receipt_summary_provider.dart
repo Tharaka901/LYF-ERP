@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gsr/models/credit_payment/credit_payment_model.dart';
 import 'package:gsr/models/receipt/receipt_print_model.dart';
@@ -27,11 +28,15 @@ class ReceiptSummaryProvider extends ChangeNotifier {
       final payments = await paymentService.getCreditPayments(
           receiptNo: creditPaymentModel.receiptNo!);
 
-      receiptModel = receiptSummaryViewModel.getReceiptModel(
-          context, payments, creditPaymentModel);
-      notifyListeners();
+      if (context.mounted) {
+        receiptModel = receiptSummaryViewModel.getReceiptModel(
+            context, payments, creditPaymentModel);
+        notifyListeners();
+      }
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 }
