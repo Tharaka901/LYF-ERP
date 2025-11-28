@@ -20,21 +20,22 @@ class InvoiceViewModel {
     final selectedCustomer = dataProvider.selectedCustomer!;
     final invoiceNo = invoiceProvider.invoiceNu;
     return InvoiceModel(
-        invoiceNo: invoiceNu ?? invoiceNo!,
-        routecardId: dataProvider.currentRouteCard!.routeCardId,
-        amount: (onlyPayment ?? false)
-            ? paymentDataModel?.totalPayment
-            : double.parse((dataProvider.grandTotal).toStringAsFixed(2)),
-        subTotal:
-            double.parse((dataProvider.getTotalAmount()).toStringAsFixed(2)),
-        vat: dataProvider.vat,
-        nonVatItemTotal: dataProvider.nonVatItemTotal,
-        customerId: selectedCustomer.customerId,
-        creditValue: double.parse((dataProvider.grandTotal).toStringAsFixed(2)),
-        employeeId: dataProvider.currentEmployee!.employeeId,
-        status: 1,
-        invoiceItems: setInvoiceItems(context),
-        createdAt: DateTime.now());
+      invoiceNo: invoiceNu ?? invoiceNo!,
+      routecardId: dataProvider.currentRouteCard!.routeCardId,
+      amount: (onlyPayment ?? false)
+          ? paymentDataModel?.totalPayment
+          : double.parse((dataProvider.grandTotal).toStringAsFixed(2)),
+      subTotal:
+          double.parse((dataProvider.getTotalAmount()).toStringAsFixed(2)),
+      vat: dataProvider.vat,
+      nonVatItemTotal: dataProvider.nonVatItemTotal,
+      customerId: selectedCustomer.customerId,
+      creditValue: double.parse((dataProvider.grandTotal).toStringAsFixed(2)),
+      employeeId: dataProvider.currentEmployee!.employeeId,
+      status: 1,
+      invoiceItems: setInvoiceItems(context),
+      // createdAt: DateTime.now(),
+    );
   }
 
   List<InvoiceItemModel> setInvoiceItems(BuildContext context) {

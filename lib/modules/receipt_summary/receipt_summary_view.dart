@@ -39,8 +39,7 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
           ],
         ),
         body: Consumer<ReceiptSummaryProvider>(
-          builder: (context, rsp, _) => rsp.receiptModel ==
-                  null
+          builder: (context, rsp, _) => rsp.receiptModel == null
               ? const Center(child: CircularProgressIndicator())
               : FutureBuilder<List<CreditPaymentModel>>(
                   future: getCreditPaymentsByReceipt(
@@ -247,8 +246,9 @@ class _ReceiptSummaryViewState extends State<ReceiptSummaryView> {
                                             align: TextAlign.end,
                                           ),
                                           const Spacer(),
-                                          text(formatPrice(snapshot.data!
-                                              .map((e) => e.value!)
+                                          text(formatPrice(snapshot
+                                              .data![0].payments!
+                                              .map((e) => e.amount!)
                                               .toList()
                                               .reduce((value, current) =>
                                                   value + current))),

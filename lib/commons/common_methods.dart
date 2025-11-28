@@ -211,6 +211,15 @@ String formatPrice(double price) {
   ).output.symbolOnLeft;
 }
 
+double parsePrice(String formattedPrice) {
+  // Remove currency symbol (Rs. or -Rs.)
+  String cleaned = formattedPrice.replaceAll(RegExp(r'^-?Rs\.?\s*'), '');
+  // Remove thousand separators (commas)
+  cleaned = cleaned.replaceAll(',', '');
+  // Parse to double
+  return double.parse(cleaned);
+}
+
 pwcell(String value, {pw.TextAlign? align}) => pw.Padding(
       padding: const pw.EdgeInsets.all(1),
       child: pw.Text(

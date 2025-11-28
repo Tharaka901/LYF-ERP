@@ -550,9 +550,10 @@ class PrintInvoiceView extends StatelessWidget {
                           return pw.TableRow(
                             children: [
                               pwcell(
-                                dp.issuedInvoice.createdAt
-                                    .toString()
-                                    .split(' ')[0],
+                                dp.issuedInvoice.routeCard?.date
+                                        ?.toString()
+                                        .split(' ')[0] ??
+                                    'No Date',
                                 align: pw.TextAlign.left,
                               ),
                               pwcell(
@@ -585,17 +586,18 @@ class PrintInvoiceView extends StatelessWidget {
                             style: const pw.TextStyle(fontSize: 22)),
                       ],
                     ),
-                    pw.Row(
-                      children: [
-                        pw.Text('Balance:',
-                            style: const pw.TextStyle(fontSize: 22)),
-                        pw.Spacer(),
-                        pw.Text(
-                            formatPrice(
-                                dataProvider.getTotalBalance(cash ?? 0)),
-                            style: const pw.TextStyle(fontSize: 22)),
-                      ],
-                    ),
+                    if (dataProvider.getTotalBalance(cash ?? 0) != 0)
+                      pw.Row(
+                        children: [
+                          pw.Text('Balance:',
+                              style: const pw.TextStyle(fontSize: 22)),
+                          pw.Spacer(),
+                          pw.Text(
+                              formatPrice(
+                                  dataProvider.getTotalBalance(cash ?? 0)),
+                              style: const pw.TextStyle(fontSize: 22)),
+                        ],
+                      ),
                   ],
 
                   pw.Divider(thickness: 0.5),

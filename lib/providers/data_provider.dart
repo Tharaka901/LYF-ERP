@@ -247,7 +247,8 @@ class DataProvider extends ChangeNotifier {
     return cash +
         getTotalDepositePaymentAmount() +
         getTotalChequeAmount() -
-        getTotalInvoicePaymentAmount();
+        getTotalInvoicePaymentAmount() -
+        grandTotal;
   }
 
   clearItemList() {
