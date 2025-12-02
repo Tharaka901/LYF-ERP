@@ -91,19 +91,19 @@ class PrintInvoiceView extends StatelessWidget {
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           pw.Text(
-                            'Bill to: ${issuedInvoice?.customer?.businessName ?? dataProvider.selectedCustomer!.businessName}',
+                            'Bill to: ${issuedInvoice?.customer?.businessName ?? dataProvider.selectedCustomer?.businessName ?? '-'}',
                             style: const pw.TextStyle(
                               fontSize: 22.0,
                             ),
                           ),
                           pw.Text(
-                            'Address: ${issuedInvoice?.customer?.address ?? dataProvider.selectedCustomer!.address}',
+                            'Address: ${issuedInvoice?.customer?.address ?? dataProvider.selectedCustomer?.address ?? '-'}',
                             style: const pw.TextStyle(
                               fontSize: 22.0,
                             ),
                           ),
                           pw.Text(
-                            'Customer Vat No: ${issuedInvoice?.customer?.customerVat ?? dataProvider.selectedCustomer!.customerVat ?? '-'}',
+                            'Customer Vat No: ${issuedInvoice?.customer?.customerVat ?? dataProvider.selectedCustomer?.customerVat ?? '-'}',
                             style: const pw.TextStyle(
                               fontSize: 22.0,
                             ),

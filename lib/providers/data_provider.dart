@@ -56,7 +56,7 @@ class DataProvider extends ChangeNotifier {
 
   //! Calculate total amount of VAT
   double get vat => double.parse(((getTotalAmount() / 100) *
-          double.parse(selectedCustomer!.vat?.vatAmount ?? '0'))
+          double.parse(selectedCustomer?.vat?.vatAmount ?? '0'))
       .toStringAsFixed(2));
 
   //! Calculate total amount of items
