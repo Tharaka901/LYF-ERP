@@ -2,12 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:gsr/models/invoice/invoice_model.dart';
 import 'package:gsr/models/invoice_item/invoice_item_model.dart';
 import 'package:provider/provider.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 import '../../models/payment_data/payment_data_model.dart';
 import '../../providers/data_provider.dart';
 import 'invoice_provider.dart';
 
 class InvoiceViewModel {
+  /// Get current DateTime in Sri Lanka timezone (Asia/Colombo, UTC+5:30)
+  /// Returns as UTC DateTime for proper database serialization
+  DateTime _getSriLankaDateTime() {
+    final sriLankaTime = tz.TZDateTime.now(tz.getLocation('Asia/Colombo'));
+    // Convert TZDateTime to UTC DateTime for proper JSON serialization
+    // This preserves the exact moment in time
+    return sriLankaTime.toUtc();
+  }
+
   InvoiceModel setInvoiceObject(
     BuildContext context, {
     String? invoiceNu,
@@ -34,7 +44,7 @@ class InvoiceViewModel {
       employeeId: dataProvider.currentEmployee!.employeeId,
       status: 1,
       invoiceItems: setInvoiceItems(context),
-      // createdAt: DateTime.now(),
+      createdAt: _getSriLankaDateTime(),
     );
   }
 
@@ -53,8 +63,9 @@ class InvoiceViewModel {
   }
 
   dynamic setInvoiceCreateRequest(BuildContext context, {String? invoiceNu}) {
+    final invoice = setInvoiceObject(context, invoiceNu: invoiceNu);
     return {
-      "invoice": setInvoiceObject(context, invoiceNu: invoiceNu),
+      "invoice": invoice.toJson(),
       "invoiceItems": setInvoiceItems(context)
     };
   }
