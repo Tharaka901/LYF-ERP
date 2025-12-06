@@ -21,11 +21,7 @@ class ApiClient {
     ));
 
     // Add interceptors if needed
-    _dio.interceptors.add(LogInterceptor(
-      requestBody: true,
-      responseBody: true,
-      error: true,
-    ));
+    // LogInterceptor removed to reduce console logs
   }
 
   Future<ApiResponse> get(String endpoint, {Map<String, dynamic>? queryParameters}) async {

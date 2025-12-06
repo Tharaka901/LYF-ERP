@@ -88,7 +88,6 @@ class HomeProvider extends ChangeNotifier {
         final routeCardDataMap = {
           for (var e in pendingRouteCards) e.routeCardId: e
         };
-        print(routeCardDataMap);
         await hiveDBProvider.routeCardBox!.clear();
         await hiveDBProvider.routeCardBox!.putAll(routeCardDataMap);
 
@@ -182,6 +181,13 @@ class HomeProvider extends ChangeNotifier {
         int invoiceCountLocalDb = hiveDBProvider.invoiceBox!.length;
         await hiveDBProvider.dataBox!.put(
             'invoiceCount', (invoiceCount + invoiceCountLocalDb).toString());
+
+        //!Get receipt count and save to local DB
+        int receiptCount = await paymentService
+            .getReceiptCount(pendingRouteCards[0].routeCardId!);
+        int receiptCountLocalDb = hiveDBProvider.paymentsBox!.length;
+        await hiveDBProvider.dataBox!.put(
+            'receiptCount', (receiptCount + receiptCountLocalDb).toString());
 
         //! Save loan items to local DB
         final loanItems = await routeCardService

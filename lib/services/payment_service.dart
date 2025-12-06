@@ -10,19 +10,16 @@ import '../models/payment_data/payment_data_model.dart';
 import '../models/payments.dart';
 import '../modules/invoice/invoice_provider.dart';
 import '../providers/data_provider.dart';
+import '../providers/hive_db_provider.dart';
 
 class PaymentService {
-  Future<int> getReceiptCount(BuildContext context) async {
-    final routeCard = context.read<DataProvider>().currentRouteCard;
-    if (routeCard == null) {
-      throw Exception('No current route card available');
-    }
-    final response = await respo('payment/count/?id=${routeCard.routeCardId}');
+  Future<int> getReceiptCount(int routeCardId) async {
+    final response = await respo('payment/count/?id=$routeCardId');
     final int count = response.data;
     return count;
   }
 
-  Future<String> getReceiptNumber(BuildContext context) async {
+  Future<String> getReceiptNumberFromAPI(BuildContext context) async {
     final routeCard = context.read<DataProvider>().currentRouteCard;
     if (routeCard == null) {
       throw Exception('No current route card available');
@@ -30,6 +27,22 @@ class PaymentService {
     final response = await respo('payment/count/?id=${routeCard.routeCardId}');
     final int count = response.data;
     return 'R/${routeCard.routeCardNo}/${count + 1}';
+  }
+
+  Future<String> getReceiptNumberFromLocal(BuildContext context) async {
+    final routeCard = context.read<DataProvider>().currentRouteCard;
+    if (routeCard == null) {
+      throw Exception('No current route card available');
+    }
+    
+    final hiveDBProvider = context.read<HiveDBProvider>();
+    
+    // Get saved receipt count from local DB (server count + local count at sync time)
+    int savedReceiptCount = int.parse(
+        hiveDBProvider.dataBox?.get('receiptCount') ?? '0');
+    
+    // Use saved count directly (similar to invoice count pattern)
+    return 'R/${routeCard.routeCardNo}/${savedReceiptCount + 1}';
   }
 
   Future<List<CreditPaymentModel>> getCreditPayments({
