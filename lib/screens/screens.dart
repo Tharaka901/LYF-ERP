@@ -7,7 +7,7 @@ export '../modules/home/home_view.dart';
 export 'invoice_summary_screen.dart';
 export 'login_screen.dart';
 export 'overall_summary_screen.dart';
-export 'pending_rc_screen.dart';
+export '../modules/route_card/pending_rc_screen.dart';
 export 'previous_add_payment_screen.dart';
 export '../modules/previous_customer_select/previous_screen.dart';
 export 'route_card_screen.dart';

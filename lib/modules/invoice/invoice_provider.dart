@@ -35,7 +35,6 @@ class InvoiceProvider extends ChangeNotifier {
       //!Save invoice number in local DB
       await hiveDBProvider.dataBox!
           .put('invoiceCount', (invoiceCount + invoiceCountLocalDb).toString());
-      notifyListeners();
     } else {
       int invoiceCount =
           int.parse(hiveDBProvider.dataBox!.get('invoiceCount') ?? '0');
@@ -45,6 +44,7 @@ class InvoiceProvider extends ChangeNotifier {
     if (context.mounted) {
       setCurrentInvoice(context);
     }
+    notifyListeners();
   }
 
   Future<void> createInvoiceDB(
@@ -61,11 +61,11 @@ class InvoiceProvider extends ChangeNotifier {
           Provider.of<HiveDBProvider>(context, listen: false);
       final dataProvider = Provider.of<DataProvider>(context, listen: false);
       if (hiveDBProvider.isInternetConnected) {
-        if(invoiceNo != null) {
+        if (invoiceNo != null) {
           invoiceNu = invoiceNo;
         }
-        final invoiceRequest =
-            invoiceViewModel.setInvoiceCreateRequest(context, invoiceNu: invoiceNo);
+        final invoiceRequest = invoiceViewModel.setInvoiceCreateRequest(context,
+            invoiceNu: invoiceNo);
         invoiceRes = await invoiceService.createInvoice(invoiceRequest);
         //! Update local DB invoice number
         int serverCount = await invoiceService

@@ -51,7 +51,7 @@ class RouteCardModel {
         vehicleId: json["vehicleId"],
         vehicle: json["vehicle"] == null
             ? null
-            : Vehicle.fromJson(json["vehicle"]),
+            : Vehicle.fromJson(Map<String, dynamic>.from(json["vehicle"])),
         status: json["status"],
         route:
             json["route"] == null ? null : RouteModel.fromJson(json["route"]),

@@ -11,7 +11,7 @@ import '../../models/customer/customer_model.dart';
 import '../../models/local_db_models/6_customer_deposites_adapter.dart';
 import '../../providers/data_provider.dart';
 import '../../providers/hive_db_provider.dart';
-import '../../screens/pending_rc_screen.dart';
+import '../route_card/pending_rc_screen.dart';
 import '../../services/customer_service.dart';
 import '../../services/item_service.dart';
 import '../../services/payment_service.dart';
@@ -28,35 +28,39 @@ class HomeProvider extends ChangeNotifier {
   List<RouteCardModel>? pendingRouteCards;
 
   bool isSyncingFromDB = false;
+  bool isLoadingRouteCards = false;
 
   HomeProvider({required this.routeCardService});
 
-  Future<void> onPressedPendingRouteCardsButton(BuildContext context) async {
-    waiting(context, body: 'Checking...');
+  Future<void> getPendingRouteCards(BuildContext context) async {
+    isLoadingRouteCards = true;
+    notifyListeners();
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
 
-    if (hiveDBProvider.isInternetConnected) {
-      pendingRouteCards =
-          await routeCardService.getPendingAndAcceptedRouteCards(
-              dataProvider.currentEmployee!.employeeId!);
-    } else {
-      pendingRouteCards = hiveDBProvider.routeCardBox?.values.toList() ?? [];
-    }
-    if (context.mounted) {
-      pop(context);
-    }
-    if (pendingRouteCards!.isNotEmpty) {
-      if (context.mounted) {
-        Navigator.pushNamed(
-          context,
-          PendingRCScreen.routeId,
-        );
+    try {
+      if (hiveDBProvider.isInternetConnected) {
+        pendingRouteCards =
+            await routeCardService.getPendingAndAcceptedRouteCards(
+                dataProvider.currentEmployee!.employeeId!);
+      } else {
+        pendingRouteCards = hiveDBProvider.routeCardBox?.values.toList() ?? [];
       }
-    } else {
-      toast(
-        'No routecards available',
-        toastState: TS.error,
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error refreshing route cards: $e');
+      }
+    } finally {
+      isLoadingRouteCards = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> onPressedPendingRouteCardsButton(BuildContext context) async {
+    if (context.mounted) {
+      Navigator.pushNamed(
+        context,
+        PendingRCScreen.routeId,
       );
     }
   }
@@ -84,7 +88,7 @@ class HomeProvider extends ChangeNotifier {
         final routeCardDataMap = {
           for (var e in pendingRouteCards) e.routeCardId: e
         };
-
+        print(routeCardDataMap);
         await hiveDBProvider.routeCardBox!.clear();
         await hiveDBProvider.routeCardBox!.putAll(routeCardDataMap);
 

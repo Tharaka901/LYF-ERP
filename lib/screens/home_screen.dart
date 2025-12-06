@@ -3,7 +3,7 @@ import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/screens/completed_rc_screen.dart';
 import 'package:gsr/screens/login_screen.dart';
-import 'package:gsr/screens/pending_rc_screen.dart';
+import 'package:gsr/modules/route_card/pending_rc_screen.dart';
 import 'package:gsr/services/database.dart';
 import 'package:gsr/widgets/option_card.dart';
 import 'package:provider/provider.dart';

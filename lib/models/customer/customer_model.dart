@@ -70,7 +70,7 @@ class CustomerModel {
             ? json["depositBalance"]?.toDouble()
             : json["depositBalance"],
         status: json["status"],
-        vat: json["vat"] != null ? Vat.fromJson(json["vat"]) : null,
+        vat: json["vat"] != null ? Vat.fromJson(Map<String, dynamic>.from(json["vat"])) : null,
       );
 
   Map<String, dynamic> toJson() => {

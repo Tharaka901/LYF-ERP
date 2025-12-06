@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
-import 'package:gsr/models/cheque.dart';
 import 'package:gsr/models/cheque/cheque.dart';
 import 'package:gsr/models/response.dart';
 import 'package:gsr/models/voucher.dart';
@@ -32,10 +31,13 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    final Respo invoiceRes = (ModalRoute.of(context)!.settings.arguments
-        as Map<String, dynamic>)['invoiceRes'];
-    final isManual = (ModalRoute.of(context)!.settings.arguments
-        as Map<String, dynamic>)['isManual'];
+    final arguments = ModalRoute.of(context)?.settings.arguments;
+    final Respo? invoiceRes = arguments is Map<String, dynamic>
+        ? arguments['invoiceRes'] as Respo?
+        : null;
+    final isManual = arguments is Map<String, dynamic>
+        ? arguments['isManual'] as bool?
+        : widget.isManual;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -81,7 +83,7 @@ class _AddPaymentScreenState extends State<AddPaymentScreen> {
                 ),
                 DetailCard(
                   detailKey: 'Invoice No',
-                  detailvalue: invoiceRes.data['invoice']['invoiceNo'],
+                  detailvalue: invoiceRes?.data['invoice']['invoiceNo'] ?? '',
                 ),
                 DetailCard(
                   detailKey: 'Total amount',
