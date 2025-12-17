@@ -586,15 +586,15 @@ class PrintInvoiceView extends StatelessWidget {
                             style: const pw.TextStyle(fontSize: 22)),
                       ],
                     ),
-                    if (dataProvider.getTotalBalance(cash ?? 0) != 0)
+                    if (balance > 0)
                       pw.Row(
                         children: [
                           pw.Text('Balance:',
                               style: const pw.TextStyle(fontSize: 22)),
                           pw.Spacer(),
                           pw.Text(
-                              formatPrice(
-                                  dataProvider.getTotalBalance(cash ?? 0)),
+                              formatPrice( 
+                                  balance),
                               style: const pw.TextStyle(fontSize: 22)),
                         ],
                       ),

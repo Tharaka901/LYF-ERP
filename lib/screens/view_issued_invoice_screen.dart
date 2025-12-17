@@ -102,6 +102,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                                     e.creditInvoice?.invoiceNo.toString() ?? '',
                                 routecardId: 0,
                                 amount: e.value,
+                                routeCard: e.creditInvoice?.routeCard,
                                 customer: CustomerModel(
                                     customerId: 0,
                                     registrationId: '',
@@ -428,7 +429,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                                 invoice.creditInvoice?.createdAt != null
                                     ? date(
                                         DateTime.parse(
-                                            invoice.creditInvoice!.createdAt!.toIso8601String() ),
+                                            invoice.creditInvoice!.routeCard!.date!.toIso8601String() ),
                                         format: 'dd-MM-yyyy')
                                     : '',
                                 align: TextAlign.center,
