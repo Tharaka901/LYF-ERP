@@ -51,36 +51,13 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(
                 height: 50.0,
               ),
-              ClipOval(
-                child: Image.network(
-                  'https://learn.microsoft.com/answers/storage/attachments/209536-360-f-364211147-1qglvxv1tcq0ohz3fawufrtonzz8nq3e.jpg',
-                  width: width * 0.4,
-                  height: width * 0.4,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return CircleAvatar(
-                      radius: width * 0.2,
-                      backgroundColor: Colors.grey[300],
-                      child: Icon(
-                        Icons.person,
-                        size: width * 0.3,
-                        color: Colors.grey[600],
-                      ),
-                    );
-                  },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return CircleAvatar(
-                      radius: width * 0.2,
-                      backgroundColor: Colors.grey[300],
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                            : null,
-                      ),
-                    );
-                  },
+              CircleAvatar(
+                radius: width * 0.2,
+                backgroundColor: Colors.grey[300],
+                child: Icon(
+                  Icons.person,
+                  size: width * 0.3,
+                  color: Colors.grey[600],
                 ),
               ),
               Text(

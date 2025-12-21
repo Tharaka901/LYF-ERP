@@ -140,7 +140,7 @@ waiting(
 }) =>
     showDialog(
       useSafeArea: true,
-      barrierDismissible: true,
+      barrierDismissible: false,
       context: context,
       builder: (context) => AlertDialog(
         scrollable: true,

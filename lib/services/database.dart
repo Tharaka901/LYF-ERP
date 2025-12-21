@@ -15,7 +15,7 @@ import 'package:gsr/models/voucher.dart';
 import 'package:gsr/modules/invoice/invoice_provider.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/modules/select_customer/select_customer_screen.dart';
-import 'package:gsr/screens/home_screen.dart';
+// import 'package:gsr/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/credit_payment/credit_payment_model.dart';
@@ -53,7 +53,7 @@ login(
                   toastState: TS.success,
                 );
                 pop(context);
-                Navigator.pushReplacementNamed(context, HomeScreen.routeId);
+                // Navigator.pushReplacementNamed(context, HomeScreen.routeId);
               })
             : await prefs.remove('password');
       });

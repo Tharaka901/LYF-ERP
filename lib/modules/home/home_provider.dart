@@ -66,12 +66,12 @@ class HomeProvider extends ChangeNotifier {
   }
 
   Future<void> onPreesedSyncDataFromDBButton(BuildContext context) async {
-    waiting(context, body: 'Sync...');
     final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    int currentRouteCardId = 0;
-
     if (hiveDBProvider.isInternetConnected) {
+      waiting(context, body: 'Sync...');
+
+      int currentRouteCardId = 0;
       try {
         //! Clear data
         await hiveDBProvider.customerDepositeBox!.clear();
