@@ -4,6 +4,7 @@ import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/commons/enums.dart';
 import 'package:gsr/models/item_summary_customer_wise/item_summary_customer_wise.dart';
 import 'package:gsr/providers/data_provider.dart';
+import 'package:gsr/providers/hive_db_provider.dart';
 import 'package:gsr/modules/route_card/about_rc_screen.dart';
 import 'package:gsr/screens/invoice_summary_screen.dart';
 import 'package:gsr/screens/overall_summary_screen.dart';
@@ -27,6 +28,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
+    final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
     final routeCard = dataProvider.currentRouteCard;
     if (routeCard == null) {
       return Scaffold(
@@ -114,7 +116,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                       });
                     });
                   },
-                  enabled: true,
+                  enabled: hiveDBProvider.isInternetConnected,
                   trailing: data.currentRouteCard!.status == 0
                       ? const Icon(
                           Icons.question_mark_rounded,
@@ -193,7 +195,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                       context,
                       OverallSummaryScreen.routeId,
                     ),
-                    enabled: data.currentRouteCard!.status == 1,
+                    enabled: data.currentRouteCard!.status == 1 && hiveDBProvider.isInternetConnected,
                     titleFontSize: 25.0,
                     height: 15,
                     elevation: 2,
@@ -215,7 +217,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                       dataProvider.setSelectedVoucher(null);
                       dataProvider.setCurrentInvoice(null);
                     }),
-                    enabled: true,
+                    enabled: hiveDBProvider.isInternetConnected,
                     titleFontSize: 25.0,
                     height: 15,
                     elevation: 2,
@@ -238,7 +240,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                       dataProvider.setSelectedVoucher(null);
                       dataProvider.setCurrentInvoice(null);
                     }),
-                    enabled: true,
+                    enabled: hiveDBProvider.isInternetConnected,
                     titleFontSize: 25.0,
                     height: 15,
                     elevation: 2,
@@ -260,7 +262,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                       dataProvider.setSelectedVoucher(null);
                       dataProvider.setCurrentInvoice(null);
                     }),
-                    enabled: true,
+                     enabled: hiveDBProvider.isInternetConnected,
                     titleFontSize: 25.0,
                     height: 15,
                     elevation: 2,
@@ -419,7 +421,7 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                         ),
                       );
                     },
-                    enabled: data.currentRouteCard!.status == 1,
+                    enabled: data.currentRouteCard!.status == 1 && hiveDBProvider.isInternetConnected,
                     titleFontSize: 25.0,
                     height: 15,
                     elevation: 2,
