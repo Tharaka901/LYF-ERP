@@ -12,6 +12,7 @@ import 'package:gsr/models/loanItem.dart';
 import 'package:gsr/models/loan_stock/loan_stock.dart' as ls;
 import 'package:gsr/models/response.dart';
 import 'package:gsr/models/voucher.dart';
+import 'package:gsr/modules/home/home_view.dart';
 import 'package:gsr/modules/invoice/invoice_provider.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/modules/select_customer/select_customer_screen.dart';
@@ -53,7 +54,7 @@ login(
                   toastState: TS.success,
                 );
                 pop(context);
-                // Navigator.pushReplacementNamed(context, HomeScreen.routeId);
+                Navigator.pushReplacementNamed(context, HomeScreen.routeId);
               })
             : await prefs.remove('password');
       });
