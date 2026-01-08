@@ -90,6 +90,9 @@ class HomeProvider extends ChangeNotifier {
         };
         await hiveDBProvider.routeCardBox!.clear();
         await hiveDBProvider.routeCardBox!.putAll(routeCardDataMap);
+        if (kDebugMode) {
+          print('routeCardDataMap: $routeCardDataMap');
+        }
 
         //! Get customers
         List<CustomerModel>? customers;
@@ -99,7 +102,9 @@ class HomeProvider extends ChangeNotifier {
         final customersDataMap = {for (var e in customers) e.customerId: e};
         await hiveDBProvider.customersBox!.clear();
         await hiveDBProvider.customersBox!.putAll(customersDataMap);
-
+        if (kDebugMode) {
+          print('customersDataMap: $customersDataMap');
+        }
         for (final customer in customers) {
           //!Save customer deposites data in local DB
           if (context.mounted) {
@@ -112,6 +117,9 @@ class HomeProvider extends ChangeNotifier {
                 CustomerDepositsModel(deposits: deposites);
             await hiveDBProvider.customerDepositeBox!
                 .put(customer.customerId, customerDeposites);
+            if (kDebugMode) {
+              print('customer deposites: ${deposites.length}');
+            }
           }
           //! Save customer credit invoice in local DB
           if (context.mounted) {
@@ -119,6 +127,9 @@ class HomeProvider extends ChangeNotifier {
                 cId: customer.customerId, type: 'with-cheque', invoiceId: 0);
             await hiveDBProvider.customerCreditBox!
                 .put(customer.customerId, credits);
+            if (kDebugMode) {
+              print('customer credits: ${credits.length}');
+            }
           }
         }
 
@@ -152,6 +163,11 @@ class HomeProvider extends ChangeNotifier {
             await hiveDBProvider.routeCardBasicItemBox!.put(id, basicItemList);
             await hiveDBProvider.routeCardNewItemBox!.put(id, newItems);
             await hiveDBProvider.routeCardOtherItemBox!.put(id, otherItems);
+            if (kDebugMode) {
+              print('basicItemList: ${basicItemList.length}');
+              print('newItems: ${newItems.length}');
+              print('otherItems: ${otherItems.length}');
+            }
           } catch (e) {
             if (kDebugMode) {
               print(e.toString());
@@ -166,7 +182,9 @@ class HomeProvider extends ChangeNotifier {
         await hiveDBProvider.routeCardIssuedItemsBox!.clear();
         await hiveDBProvider.routeCardIssuedItemsBox!
             .put(currentRouteCardId, routeCardItemsSummary);
-
+        if (kDebugMode) {
+          print('routeCardItemsSummary: ${routeCardItemsSummary.length}');
+        }
         //! Save route card sold items in local DB
         final routeCardSoldItems = await routeCardService.getRouteCardSoldItems(
           routeCardId: currentRouteCardId,
@@ -174,35 +192,47 @@ class HomeProvider extends ChangeNotifier {
         await hiveDBProvider.routeCardSoldItemsBox!.clear();
         await hiveDBProvider.routeCardSoldItemsBox!
             .put(currentRouteCardId, routeCardSoldItems);
-
+        if (kDebugMode) {
+          print('routeCardSoldItems: ${routeCardSoldItems.length}');
+        }
         //!Get invoice count and save to local DB
         int invoiceCount = await invoiceService
             .invoiceCount(pendingRouteCards[0].routeCardId!);
         int invoiceCountLocalDb = hiveDBProvider.invoiceBox!.length;
         await hiveDBProvider.dataBox!.put(
             'invoiceCount', (invoiceCount + invoiceCountLocalDb).toString());
-
+        if (kDebugMode) {
+          print('invoiceCount: $invoiceCount');
+          print('invoiceCountLocalDb: $invoiceCountLocalDb');
+        }
         //!Get receipt count and save to local DB
         int receiptCount = await paymentService
             .getReceiptCount(pendingRouteCards[0].routeCardId!);
         int receiptCountLocalDb = hiveDBProvider.paymentsBox!.length;
         await hiveDBProvider.dataBox!.put(
             'receiptCount', (receiptCount + receiptCountLocalDb).toString());
-
+        if (kDebugMode) {
+          print('receiptCount: $receiptCount');
+          print('receiptCountLocalDb: $receiptCountLocalDb');
+        }
         //! Save loan items to local DB
         final loanItems = await routeCardService
             .getRouteCardSoldLoanItems(pendingRouteCards[0].routeCardId!);
         await hiveDBProvider.routeCardSoldLoanItemsBox!.clear();
         await hiveDBProvider.routeCardSoldLoanItemsBox!
             .put(currentRouteCardId, loanItems);
-
+        if (kDebugMode) {
+          print('loanItems: ${loanItems.length}');
+        }
         //! Save sold leak items to local DB
         final soldLeakItems = await routeCardService
             .getRouteCardSoldLeakItems(pendingRouteCards[0].routeCardId!);
         await hiveDBProvider.routeCardSoldLeakItemsBox!.clear();
         await hiveDBProvider.routeCardSoldLeakItemsBox!
             .put(currentRouteCardId, soldLeakItems);
-
+        if (kDebugMode) {
+          print('soldLeakItems: ${soldLeakItems.length}');
+        }
         //! Save return cylinder summary customer wise leak to local DB
         final returnCylinderSummaryCustomerWiseLeak =
             await routeCardService.getReturnCylinderSummaryCustomerWiseLeak(
@@ -210,7 +240,9 @@ class HomeProvider extends ChangeNotifier {
         await hiveDBProvider.returnCylinderSummaryCustomerWiseLeakBox!.clear();
         await hiveDBProvider.returnCylinderSummaryCustomerWiseLeakBox!
             .put(currentRouteCardId, returnCylinderSummaryCustomerWiseLeak);
-
+        if (kDebugMode) {
+          print('returnCylinderSummaryCustomerWiseLeak: ${returnCylinderSummaryCustomerWiseLeak.length}');
+        }
         if (context.mounted) {
           pop(context);
         }

@@ -26,7 +26,6 @@ class CustomerService {
       final response = await respo(
           'customers/get-all${routeId != null ? '?routeId=$routeId' : ''}');
 
-      print('response: ${response.data}');
 
       if (response.data == null) {
         return [];
@@ -66,13 +65,9 @@ class CustomerService {
       return filteredCustomers;
     } catch (e) {
       if (kDebugMode) {
-        print('Error in getCustomers: $e');
+        print(e);
       }
-      toast(
-        'Connection error',
-        toastState: TS.error,
-      );
-      return [];
+      rethrow;
     }
   }
 
