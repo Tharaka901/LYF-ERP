@@ -15,6 +15,7 @@ import 'package:gsr/models/voucher.dart';
 import 'package:gsr/modules/home/home_view.dart';
 import 'package:gsr/modules/invoice/invoice_provider.dart';
 import 'package:gsr/providers/data_provider.dart';
+import 'package:gsr/providers/hive_db_provider.dart';
 import 'package:gsr/modules/select_customer/select_customer_screen.dart';
 // import 'package:gsr/screens/home_screen.dart';
 import 'package:provider/provider.dart';
@@ -372,7 +373,7 @@ Future<List<RouteCardItemModel>> getNewItems({
     }
   }
   return rcNewItems;
-}
+} 
 
 Future<List<RouteCardModel>> getRouteCards(int uid,
     {RC? rcStatus = RC.pending}) async {
@@ -519,6 +520,70 @@ Future<List<InvoiceModel>> getIssuedInvoices(BuildContext context) async {
     print(e);
     rethrow;
   }
+}
+
+List<InvoiceModel> getIssuedInvoicesFromLocal(BuildContext context) {
+  final routeCard = context.read<DataProvider>().currentRouteCard;
+  if (routeCard == null) {
+    throw Exception('No current route card available');
+  }
+  final hiveDBProvider = context.read<HiveDBProvider>();
+  final invoiceBox = hiveDBProvider.invoiceBox;
+  final customersBox = hiveDBProvider.customersBox;
+  
+  if (invoiceBox == null) {
+    return [];
+  }
+  
+  // Get all invoices from local DB that match the route card ID
+  final List<InvoiceModel> allInvoices = invoiceBox.values
+      .where((invoice) => invoice.routecardId == routeCard.routeCardId)
+      .toList();
+  
+  // Populate customer data from customersBox if customer is null
+  for (var invoice in allInvoices) {
+    if (invoice.customer == null && invoice.customerId != null && customersBox != null) {
+      final customer = customersBox.get(invoice.customerId);
+      if (customer != null) {
+        invoice.customer = customer;
+      }
+    }
+    
+    // Populate item data for invoice items from routeCardIssuedItemsBox
+    if (invoice.invoiceItems != null && invoice.invoiceItems!.isNotEmpty) {
+      final routeCardItemsBox = hiveDBProvider.routeCardIssuedItemsBox;
+      if (routeCardItemsBox != null) {
+        final routeCardItems = routeCardItemsBox.get(routeCard.routeCardId) ?? [];
+        final List<RouteCardItemModel> items = routeCardItems.map((e) => e as RouteCardItemModel).toList();
+        
+        for (var invoiceItem in invoice.invoiceItems!) {
+          if (invoiceItem.item == null && invoiceItem.itemId != null) {
+            try {
+              final routeCardItem = items.firstWhere(
+                (item) => item.itemId == invoiceItem.itemId,
+              );
+              if (routeCardItem.item != null) {
+                invoiceItem.item = routeCardItem.item;
+              }
+            } catch (e) {
+              // Item not found in route card items, skip
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Filter out invoices with status 3 (same logic as API)
+  final List<InvoiceModel> selectedInvoiceList = allInvoices
+      .where((invoice) => invoice.status != 3)
+      .toList();
+  
+  // Sort by createdAt
+  selectedInvoiceList.sort((a, b) => 
+      a.createdAt?.compareTo(b.createdAt ?? DateTime.now()) ?? 0);
+  
+  return selectedInvoiceList;
 }
 
 Future<List<BalancePayment>> getBalancePayments(BuildContext context,

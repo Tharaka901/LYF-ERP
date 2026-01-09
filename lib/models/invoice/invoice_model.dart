@@ -81,9 +81,17 @@ class InvoiceModel {
         employee: json["employee"] == null
             ? null
             : EmployeeModel.fromJson(json["employee"]),
-        invoiceItems: json["items"] != null
+        invoiceItems: (json["items"] != null || json["invoiceItems"] != null)
             ? List<InvoiceItemModel>.from(
-                json["items"].map((x) => InvoiceItemModel.fromJson(x)),
+                (json["items"] ?? json["invoiceItems"] ?? []).map((x) {
+                  if (x is InvoiceItemModel) {
+                    return x;
+                  } else if (x is Map) {
+                    return InvoiceItemModel.fromJson(x);
+                  } else {
+                    return InvoiceItemModel.fromJson(Map<String, dynamic>.from(x));
+                  }
+                }),
               )
             : [],
         payments: json["payments"] == null
@@ -132,7 +140,7 @@ class InvoiceModel {
         "employeeId": employeeId,
         "status": status,
         "customer": customer?.toJson(),
-        "invoiceItems": invoiceItems,
+        "items": invoiceItems?.map((x) => x.toJson()).toList(),
         "createdAt": createdAt?.toIso8601String(),
       };
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/added_item.dart';
 import 'package:gsr/providers/data_provider.dart';
@@ -26,15 +25,16 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
   }
 
   dynamic _balance() {
-    if (issuedInvoice.previousPayments!.isNotEmpty) {
-      return issuedInvoice.amount! +
-          issuedInvoice.previousPayments!
-              .map((e) => e.value!)
+    final previousPayments = issuedInvoice.previousPayments ?? [];
+    if (previousPayments.isNotEmpty) {
+      return (issuedInvoice.amount ?? 0.0) +
+          previousPayments
+              .map((e) => e.value ?? 0.0)
               .toList()
               .reduce((value, element) => value + element) -
           _totalPayment();
     } else {
-      return issuedInvoice.amount! - _totalPayment();
+      return (issuedInvoice.amount ?? 0.0) - _totalPayment();
     }
   }
 
@@ -46,27 +46,29 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () {
-                final cash = issuedInvoice.payments!
+                final payments = issuedInvoice.payments ?? [];
+                final cash = payments
                         .where((p) => p.paymentMethod == 1)
                         .isNotEmpty
-                    ? issuedInvoice.payments!
+                    ? payments
                         .where((p) => p.paymentMethod == 1)
                         .toList()
                         .first
-                        .amount
+                        .amount ?? 0.0
                     : 0.0;
+                final invoiceItems = issuedInvoice.invoiceItems ?? [];
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => PrintInvoiceView(
                       invoiceNo: issuedInvoice.invoiceNo,
-                      rn: issuedInvoice.payments!.isNotEmpty
-                          ? issuedInvoice.payments![0].receiptNo ?? ''
+                      rn: payments.isNotEmpty
+                          ? payments[0].receiptNo ?? ''
                           : '',
                       cash: cash,
                       balance: -(_balance()),
                       issuedInvoice: issuedInvoice,
-                      items: issuedInvoice.invoiceItems!
+                      items: invoiceItems
                           .map((e) => AddedItem(
                               item: ItemModel(
                                   id: 0,
@@ -290,11 +292,11 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      ...issuedInvoice.invoiceItems!.map(
+                      ...(issuedInvoice.invoiceItems ?? []).map(
                         (item) => TableRow(
                           children: [
                             cell(
-                              item.item?.itemName ?? '',
+                              item.item?.itemName ?? item.itemName ?? '',
                               align: TextAlign.start,
                             ),
                             cell(
@@ -374,7 +376,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
               const Divider(
                 color: Colors.black,
               ),
-              if (issuedInvoice.previousPayments!.isNotEmpty)
+              if ((issuedInvoice.previousPayments ?? []).isNotEmpty)
                 Column(children: [
                   const Text(
                     'Previous Payments',
@@ -415,11 +417,11 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        ...issuedInvoice.previousPayments!.map(
+                        ...(issuedInvoice.previousPayments ?? []).map(
                           (invoice) => TableRow(
                             children: [
                               cell(
-                                (issuedInvoice.previousPayments!
+                                ((issuedInvoice.previousPayments ?? [])
                                             .indexOf(invoice) +
                                         1)
                                     .toString(),
@@ -434,7 +436,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                                     : '',
                                 align: TextAlign.center,
                               ),
-                              cell(invoice.creditInvoice!.invoiceNo),
+                              cell(invoice.creditInvoice?.invoiceNo ?? ''),
                               cell(
                                 invoice.value != null
                                     ? formatPrice(invoice.value!)
@@ -455,15 +457,15 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                     children: [
                       text('Total Previous Payment'),
                       const Spacer(),
-                      text(formatPrice(issuedInvoice.previousPayments!
-                          .map((e) => e.value!)
+                      text(formatPrice((issuedInvoice.previousPayments ?? [])
+                          .map((e) => e.value ?? 0.0)
                           .toList()
-                          .reduce((value, element) => value! + element!))),
+                          .reduce((value, element) => value + element))),
                     ],
                   ),
                 ]),
               const Divider(),
-              issuedInvoice.payments!.isNotEmpty
+              (issuedInvoice.payments ?? []).isNotEmpty
                   ? Column(
                       children: [
                         const Text(
@@ -480,7 +482,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                               Row(
                                 children: [
                                   text('Receipt No:'),
-                                  text(issuedInvoice.payments![0].receiptNo ??
+                                  text((issuedInvoice.payments ?? [])[0].receiptNo ??
                                       ''),
                                 ],
                               ),
@@ -510,7 +512,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              ...issuedInvoice.payments!.map(
+                              ...(issuedInvoice.payments ?? []).map(
                                 (payment) => TableRow(
                                   children: [
                                     Padding(
@@ -573,21 +575,20 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                                     align: TextAlign.end,
                                   ),
                                   const Spacer(),
-                                  if (issuedInvoice
-                                      .previousPayments!.isNotEmpty)
+                                  if ((issuedInvoice.previousPayments ?? []).isNotEmpty)
                                     text(
-                                      formatPrice(issuedInvoice.amount! +
-                                          issuedInvoice.previousPayments!
-                                              .map((e) => e.value!)
+                                      formatPrice((issuedInvoice.amount ?? 0.0) +
+                                          (issuedInvoice.previousPayments ?? [])
+                                              .map((e) => e.value ?? 0.0)
                                               .toList()
                                               .reduce((value, element) =>
                                                   value + element) -
                                           _totalPayment()),
                                       align: TextAlign.end,
                                     ),
-                                  if (issuedInvoice.previousPayments!.isEmpty)
+                                  if ((issuedInvoice.previousPayments ?? []).isEmpty)
                                     text(
-                                      formatPrice(issuedInvoice.amount! -
+                                      formatPrice((issuedInvoice.amount ?? 0.0) -
                                           _totalPayment()),
                                       align: TextAlign.end,
                                     ),

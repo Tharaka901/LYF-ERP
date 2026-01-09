@@ -3,6 +3,7 @@ import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/invoice/invoice_model.dart';
 import 'package:gsr/modules/route_card/route_card_cash_view.dart';
 import 'package:gsr/providers/data_provider.dart';
+import 'package:gsr/providers/hive_db_provider.dart';
 import 'package:gsr/screens/view_issued_invoice_screen.dart';
 import 'package:gsr/modules/receipt_list/receipt_list_view.dart';
 import 'package:gsr/services/database.dart';
@@ -16,8 +17,19 @@ class InvoiceSummaryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
+    final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
+    
+    // Get invoices from API or local DB based on internet connectivity
+    Future<List<InvoiceModel>> getInvoices() async {
+      if (hiveDBProvider.isInternetConnected) {
+        return await getIssuedInvoices(context);
+      } else {
+        return Future.value(getIssuedInvoicesFromLocal(context));
+      }
+    }
+    
     return FutureBuilder<List<InvoiceModel>>(
-      future: getIssuedInvoices(context),
+      future: getInvoices(),
       builder: (context, AsyncSnapshot<List<InvoiceModel>> snapshot) {
         return Scaffold(
           appBar: AppBar(
@@ -64,17 +76,21 @@ class InvoiceSummaryScreen extends StatelessWidget {
                   width: double.infinity,
                   height: 60.0,
                   child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const ViewReceiptListScreen()),
-                      );
-                    },
+                    onPressed: hiveDBProvider.isInternetConnected
+                        ? () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ViewReceiptListScreen()),
+                            );
+                          }
+                        : null,
                     style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(Colors.green[700]),
+                      backgroundColor: MaterialStateProperty.all(
+                          hiveDBProvider.isInternetConnected
+                              ? Colors.green[700]
+                              : Colors.grey),
                       shape: MaterialStateProperty.all(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
@@ -98,7 +114,7 @@ class InvoiceSummaryScreen extends StatelessWidget {
                                 final issuedInvoice = snapshot.data![index];
                                 return OptionCard(
                                   title:
-                                      '${issuedInvoice.invoiceNo} (${issuedInvoice.customer?.businessName})',
+                                      '${issuedInvoice.invoiceNo} (${issuedInvoice.customer?.businessName ?? ''})',
                                   subtitle: issuedInvoice.amount != null
                                       ? formatPrice(issuedInvoice.amount!)
                                       : '',
