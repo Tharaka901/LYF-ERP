@@ -28,6 +28,8 @@ import '../models/payment/payment_model.dart';
 import '../models/payments.dart';
 import '../models/route_card/route_card_model.dart';
 import '../models/route_card_item/route_card_item_model.dart';
+import '../models/payment_data/payment_data_model.dart';
+import '../models/cheque/cheque.dart';
 
 login(
   BuildContext context, {
@@ -567,6 +569,74 @@ List<InvoiceModel> getIssuedInvoicesFromLocal(BuildContext context) {
               }
             } catch (e) {
               // Item not found in route card items, skip
+            }
+          }
+        }
+      }
+    }
+    
+    // Populate payments from paymentsBox
+    if (invoice.payments == null || invoice.payments!.isEmpty) {
+      final paymentsBox = hiveDBProvider.paymentsBox;
+      if (paymentsBox != null) {
+        final paymentData = paymentsBox.get(invoice.invoiceNo);
+        if (paymentData != null) {
+          final List<PaymentModel> payments = [];
+          
+          // Add cash payment if cash > 0
+          if (paymentData.cash > 0) {
+            payments.add(PaymentModel(
+              invoiceId: invoice.invoiceId,
+              amount: paymentData.cash,
+              receiptNo: paymentData.receiptNo,
+              paymentMethod: 1, // Cash
+              routecardId: paymentData.currentRouteCard.routeCardId,
+              routeId: paymentData.currentRouteCard.routeId,
+              customerId: paymentData.selectedCustomer.customerId,
+              customerTypeId: paymentData.selectedCustomer.customerTypeId,
+              priceLevelId: paymentData.selectedCustomer.priceLevelId,
+              employeeId: paymentData.currentEmployee.employeeId,
+              status: 1,
+            ));
+          }
+          
+          // Add cheque payments
+          for (var cheque in paymentData.chequeList) {
+            payments.add(PaymentModel(
+              invoiceId: invoice.invoiceId,
+              amount: cheque.chequeAmount,
+              receiptNo: paymentData.receiptNo,
+              paymentMethod: 2, // Cheque
+              chequeNo: cheque.chequeNumber,
+              routecardId: paymentData.currentRouteCard.routeCardId,
+              routeId: paymentData.currentRouteCard.routeId,
+              customerId: paymentData.selectedCustomer.customerId,
+              customerTypeId: paymentData.selectedCustomer.customerTypeId,
+              priceLevelId: paymentData.selectedCustomer.priceLevelId,
+              employeeId: paymentData.currentEmployee.employeeId,
+              status: 1,
+            ));
+          }
+          
+          if (payments.isNotEmpty) {
+            invoice.payments = payments;
+          }
+          
+          // Populate previousPayments from issuedInvoicePaidList
+          if (paymentData.issuedInvoicePaidList != null && paymentData.issuedInvoicePaidList!.isNotEmpty) {
+            final List<CreditPaymentModel> previousPayments = [];
+            for (var issuedInvoicePaid in paymentData.issuedInvoicePaidList!) {
+              previousPayments.add(CreditPaymentModel(
+                value: issuedInvoicePaid.paymentAmount,
+                creditInvoice: issuedInvoicePaid.issuedInvoice,
+                paymentInvoiceId: invoice.invoiceId,
+                receiptNo: paymentData.receiptNo,
+                routecardId: invoice.routecardId,
+                status: 1,
+              ));
+            }
+            if (previousPayments.isNotEmpty) {
+              invoice.previousPayments = previousPayments;
             }
           }
         }
