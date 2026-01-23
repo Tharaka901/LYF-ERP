@@ -54,8 +54,18 @@ class PaymentDataModel {
           : [],
       selectedVoucher: json['selectedVoucher'],
       invoiceId: json['invoiceId'],
-      issuedInvoicePaidList:
-          List<IssuedInvoicePaidModel>.from(json['issuedInvoicePaidList']),
+      issuedInvoicePaidList: json['issuedInvoicePaidList'] != null
+          ? List<IssuedInvoicePaidModel>.from(
+              json['issuedInvoicePaidList'].map((x) {
+                if (x is IssuedInvoicePaidModel) {
+                  return x;
+                } else if (x is Map) {
+                  return IssuedInvoicePaidModel.fromJson(x);
+                } else {
+                  return IssuedInvoicePaidModel.fromJson(Map<String, dynamic>.from(x));
+                }
+              }))
+          : null,
       invoiceNo: json["invoiceNo"],
       isDirectPrevoius: json["isDirectPrevoius"],
     );

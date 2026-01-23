@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/balance.dart';
 import 'package:gsr/providers/data_provider.dart';
-import 'package:gsr/services/database.dart';
+import 'package:gsr/modules/view_receipt/invoice_receipt_view_model.dart';
 import 'package:provider/provider.dart';
 import '../models/invoice/invoice_model.dart';
 import '../models/issued_invoice_paid_model/issued_invoice_paid.dart';
@@ -39,7 +39,7 @@ class _CreditInvoiceState extends State<CreditInvoice> {
           mainAxisSize: MainAxisSize.min,
           children: [
             FutureBuilder<List<InvoiceModel>>(
-              future: creditInvoices(
+              future: InvoiceReceiptViewModel().getCreditInvoices(
                 context,
                 cId: dataProvider.selectedCustomer!.customerId,
                 type: 'with-cheque',

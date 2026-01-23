@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/added_item.dart';
 import 'package:gsr/providers/data_provider.dart';
+import 'package:gsr/providers/hive_db_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../models/cheque/cheque.dart';
+import '../models/credit_payment/credit_payment_model.dart';
 import '../models/customer/customer_model.dart';
 import '../models/invoice/invoice_model.dart';
 import '../models/issued_invoice_paid_model/issued_invoice_paid.dart';
 import '../models/item/item_model.dart';
+import '../models/payment/payment_model.dart';
 import '../modules/print/print_invoice_view.dart';
 
 class ViewIssuedInvoiceScreen extends StatelessWidget {
@@ -19,7 +22,7 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
   _totalPayment() {
     var total = 0.0;
     for (var payment in issuedInvoice.payments ?? []) {
-      total += payment.amount;
+      total += payment.amount ?? 0.0;
     }
     return total;
   }
@@ -40,6 +43,72 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // If invoice was loaded from local DB (or API without nested payments),
+    // hydrate payments + previousPayments from Hive when missing.
+    final hiveDBProvider = context.read<HiveDBProvider>();
+    if ((issuedInvoice.payments ?? []).isEmpty ||
+        (issuedInvoice.previousPayments ?? []).isEmpty) {
+      final paymentData = hiveDBProvider.paymentsBox?.get(issuedInvoice.invoiceNo);
+      if (paymentData != null) {
+        // payments
+        if ((issuedInvoice.payments ?? []).isEmpty) {
+          final List<PaymentModel> payments = [];
+          if (paymentData.cash > 0) {
+            payments.add(PaymentModel(
+              invoiceId: issuedInvoice.invoiceId,
+              amount: paymentData.cash,
+              receiptNo: paymentData.receiptNo,
+              paymentMethod: 1,
+              routecardId: paymentData.currentRouteCard.routeCardId,
+              routeId: paymentData.currentRouteCard.routeId,
+              customerId: paymentData.selectedCustomer.customerId,
+              customerTypeId: paymentData.selectedCustomer.customerTypeId,
+              priceLevelId: paymentData.selectedCustomer.priceLevelId,
+              employeeId: paymentData.currentEmployee.employeeId,
+              status: 1,
+            ));
+          }
+          for (final cheque in paymentData.chequeList) {
+            payments.add(PaymentModel(
+              invoiceId: issuedInvoice.invoiceId,
+              amount: cheque.chequeAmount,
+              receiptNo: paymentData.receiptNo,
+              paymentMethod: 2,
+              chequeNo: cheque.chequeNumber,
+              routecardId: paymentData.currentRouteCard.routeCardId,
+              routeId: paymentData.currentRouteCard.routeId,
+              customerId: paymentData.selectedCustomer.customerId,
+              customerTypeId: paymentData.selectedCustomer.customerTypeId,
+              priceLevelId: paymentData.selectedCustomer.priceLevelId,
+              employeeId: paymentData.currentEmployee.employeeId,
+              status: 1,
+            ));
+          }
+          if (payments.isNotEmpty) {
+            issuedInvoice.payments = payments;
+          }
+        }
+
+        // previousPayments
+        if ((issuedInvoice.previousPayments ?? []).isEmpty &&
+            (paymentData.issuedInvoicePaidList ?? []).isNotEmpty) {
+          issuedInvoice.previousPayments =
+              (paymentData.issuedInvoicePaidList ?? [])
+                  .map(
+                    (p) => CreditPaymentModel(
+                      value: p.paymentAmount,
+                      creditInvoice: p.issuedInvoice,
+                      paymentInvoiceId: issuedInvoice.invoiceId,
+                      receiptNo: paymentData.receiptNo,
+                      routecardId: issuedInvoice.routecardId,
+                      status: 1,
+                    ),
+                  )
+                  .toList();
+        }
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(issuedInvoice.invoiceNo),
@@ -428,12 +497,15 @@ class ViewIssuedInvoiceScreen extends StatelessWidget {
                                 align: TextAlign.start,
                               ),
                               cell(
-                                invoice.creditInvoice?.createdAt != null
+                                invoice.creditInvoice?.routeCard?.date != null
                                     ? date(
-                                        DateTime.parse(
-                                            invoice.creditInvoice!.routeCard!.date!.toIso8601String() ),
+                                        invoice.creditInvoice!.routeCard!.date!,
                                         format: 'dd-MM-yyyy')
-                                    : '',
+                                    : invoice.creditInvoice?.createdAt != null
+                                        ? date(
+                                            invoice.creditInvoice!.createdAt!,
+                                            format: 'dd-MM-yyyy')
+                                        : '',
                                 align: TextAlign.center,
                               ),
                               cell(invoice.creditInvoice?.invoiceNo ?? ''),
