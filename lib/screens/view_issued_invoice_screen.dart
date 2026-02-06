@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/added_item.dart';
+import 'package:gsr/models/payment_data/payment_data_model.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/providers/hive_db_provider.dart';
 import 'package:provider/provider.dart';
@@ -14,108 +15,143 @@ import '../models/item/item_model.dart';
 import '../models/payment/payment_model.dart';
 import '../modules/print/print_invoice_view.dart';
 
-class ViewIssuedInvoiceScreen extends StatelessWidget {
+class ViewIssuedInvoiceScreen extends StatefulWidget {
   static const routeId = 'ISSUED_INVOICE';
   final InvoiceModel issuedInvoice;
   const ViewIssuedInvoiceScreen({super.key, required this.issuedInvoice});
 
-  _totalPayment() {
+  @override
+  State<ViewIssuedInvoiceScreen> createState() => _ViewIssuedInvoiceScreenState();
+}
+
+class _ViewIssuedInvoiceScreenState extends State<ViewIssuedInvoiceScreen> {
+  /// Get payment data from Hive: by key (invoiceNo) or by iterating box and matching invoiceNo.
+  static PaymentDataModel? _getPaymentDataForInvoice(
+    HiveDBProvider hiveDBProvider,
+    String? invoiceNo,
+  ) {
+    if (invoiceNo == null || invoiceNo.isEmpty) return null;
+    final box = hiveDBProvider.paymentsBox;
+    if (box == null) return null;
+    final trimmed = invoiceNo.trim();
+    PaymentDataModel? data = box.get(trimmed) ?? box.get(invoiceNo);
+    if (data != null) return data;
+    for (final key in box.keys) {
+      final pd = box.get(key);
+      if (pd == null) continue;
+      if (key == trimmed || key == invoiceNo) return pd;
+      if (pd.invoiceNo == trimmed || pd.invoiceNo == invoiceNo) return pd;
+    }
+    return null;
+  }
+
+  void _hydrateFromHive() {
+    final invoice = widget.issuedInvoice;
+    if ((invoice.payments ?? []).isNotEmpty &&
+        (invoice.previousPayments ?? []).isNotEmpty) return;
+    final hiveDBProvider = context.read<HiveDBProvider>();
+    final paymentData =
+        _getPaymentDataForInvoice(hiveDBProvider, invoice.invoiceNo);
+    if (paymentData == null) return;
+
+    if ((invoice.payments ?? []).isEmpty) {
+      final List<PaymentModel> payments = [];
+      if (paymentData.cash > 0) {
+        payments.add(PaymentModel(
+          invoiceId: invoice.invoiceId,
+          amount: paymentData.cash,
+          receiptNo: paymentData.receiptNo,
+          paymentMethod: 1,
+          routecardId: paymentData.currentRouteCard.routeCardId,
+          routeId: paymentData.currentRouteCard.routeId,
+          customerId: paymentData.selectedCustomer.customerId,
+          customerTypeId: paymentData.selectedCustomer.customerTypeId,
+          priceLevelId: paymentData.selectedCustomer.priceLevelId,
+          employeeId: paymentData.currentEmployee.employeeId,
+          status: 1,
+        ));
+      }
+      for (final cheque in paymentData.chequeList) {
+        payments.add(PaymentModel(
+          invoiceId: invoice.invoiceId,
+          amount: cheque.chequeAmount,
+          receiptNo: paymentData.receiptNo,
+          paymentMethod: 2,
+          chequeNo: cheque.chequeNumber,
+          routecardId: paymentData.currentRouteCard.routeCardId,
+          routeId: paymentData.currentRouteCard.routeId,
+          customerId: paymentData.selectedCustomer.customerId,
+          customerTypeId: paymentData.selectedCustomer.customerTypeId,
+          priceLevelId: paymentData.selectedCustomer.priceLevelId,
+          employeeId: paymentData.currentEmployee.employeeId,
+          status: 1,
+        ));
+      }
+      if (payments.isNotEmpty) {
+        invoice.payments = payments;
+      }
+    }
+
+    if ((invoice.previousPayments ?? []).isEmpty &&
+        (paymentData.issuedInvoicePaidList ?? []).isNotEmpty) {
+      invoice.previousPayments = (paymentData.issuedInvoicePaidList ?? [])
+          .map(
+            (p) => CreditPaymentModel(
+              value: p.paymentAmount,
+              creditInvoice: p.issuedInvoice,
+              paymentInvoiceId: invoice.invoiceId,
+              receiptNo: paymentData.receiptNo,
+              routecardId: invoice.routecardId,
+              status: 1,
+            ),
+          )
+          .toList();
+    }
+
+    if (mounted) setState(() {});
+  }
+
+  double _totalPayment() {
     var total = 0.0;
-    for (var payment in issuedInvoice.payments ?? []) {
+    for (var payment in widget.issuedInvoice.payments ?? []) {
       total += payment.amount ?? 0.0;
     }
     return total;
   }
 
   dynamic _balance() {
-    final previousPayments = issuedInvoice.previousPayments ?? [];
+    final invoice = widget.issuedInvoice;
+    final previousPayments = invoice.previousPayments ?? [];
     if (previousPayments.isNotEmpty) {
-      return (issuedInvoice.amount ?? 0.0) +
+      return (invoice.amount ?? 0.0) +
           previousPayments
               .map((e) => e.value ?? 0.0)
               .toList()
               .reduce((value, element) => value + element) -
           _totalPayment();
     } else {
-      return (issuedInvoice.amount ?? 0.0) - _totalPayment();
+      return (invoice.amount ?? 0.0) - _totalPayment();
     }
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _hydrateFromHive();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // If invoice was loaded from local DB (or API without nested payments),
-    // hydrate payments + previousPayments from Hive when missing.
-    final hiveDBProvider = context.read<HiveDBProvider>();
-    if ((issuedInvoice.payments ?? []).isEmpty ||
-        (issuedInvoice.previousPayments ?? []).isEmpty) {
-      final paymentData = hiveDBProvider.paymentsBox?.get(issuedInvoice.invoiceNo);
-      if (paymentData != null) {
-        // payments
-        if ((issuedInvoice.payments ?? []).isEmpty) {
-          final List<PaymentModel> payments = [];
-          if (paymentData.cash > 0) {
-            payments.add(PaymentModel(
-              invoiceId: issuedInvoice.invoiceId,
-              amount: paymentData.cash,
-              receiptNo: paymentData.receiptNo,
-              paymentMethod: 1,
-              routecardId: paymentData.currentRouteCard.routeCardId,
-              routeId: paymentData.currentRouteCard.routeId,
-              customerId: paymentData.selectedCustomer.customerId,
-              customerTypeId: paymentData.selectedCustomer.customerTypeId,
-              priceLevelId: paymentData.selectedCustomer.priceLevelId,
-              employeeId: paymentData.currentEmployee.employeeId,
-              status: 1,
-            ));
-          }
-          for (final cheque in paymentData.chequeList) {
-            payments.add(PaymentModel(
-              invoiceId: issuedInvoice.invoiceId,
-              amount: cheque.chequeAmount,
-              receiptNo: paymentData.receiptNo,
-              paymentMethod: 2,
-              chequeNo: cheque.chequeNumber,
-              routecardId: paymentData.currentRouteCard.routeCardId,
-              routeId: paymentData.currentRouteCard.routeId,
-              customerId: paymentData.selectedCustomer.customerId,
-              customerTypeId: paymentData.selectedCustomer.customerTypeId,
-              priceLevelId: paymentData.selectedCustomer.priceLevelId,
-              employeeId: paymentData.currentEmployee.employeeId,
-              status: 1,
-            ));
-          }
-          if (payments.isNotEmpty) {
-            issuedInvoice.payments = payments;
-          }
-        }
-
-        // previousPayments
-        if ((issuedInvoice.previousPayments ?? []).isEmpty &&
-            (paymentData.issuedInvoicePaidList ?? []).isNotEmpty) {
-          issuedInvoice.previousPayments =
-              (paymentData.issuedInvoicePaidList ?? [])
-                  .map(
-                    (p) => CreditPaymentModel(
-                      value: p.paymentAmount,
-                      creditInvoice: p.issuedInvoice,
-                      paymentInvoiceId: issuedInvoice.invoiceId,
-                      receiptNo: paymentData.receiptNo,
-                      routecardId: issuedInvoice.routecardId,
-                      status: 1,
-                    ),
-                  )
-                  .toList();
-        }
-      }
-    }
-
+    final issuedInvoice = widget.issuedInvoice;
     return Scaffold(
       appBar: AppBar(
         title: Text(issuedInvoice.invoiceNo),
         actions: [
           IconButton(
               onPressed: () {
-                final payments = issuedInvoice.payments ?? [];
+                final payments = widget.issuedInvoice.payments ?? [];
                 final cash = payments
                         .where((p) => p.paymentMethod == 1)
                         .isNotEmpty

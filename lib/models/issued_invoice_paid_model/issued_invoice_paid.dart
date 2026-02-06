@@ -18,17 +18,29 @@ class IssuedInvoicePaidModel {
   });
 
   factory IssuedInvoicePaidModel.fromJson(Map<dynamic, dynamic> json) {
+    final issuedInvoiceJson = json['issuedInvoice'];
+    final InvoiceModel issuedInvoice = issuedInvoiceJson is Map
+        ? InvoiceModel.fromJson(Map<dynamic, dynamic>.from(issuedInvoiceJson))
+        : InvoiceModel.fromJson(json['issuedInvoice'] as Map<dynamic, dynamic>);
+    final paymentAmount = json['paymentAmount'];
+    final num? paymentAmountNum =
+        paymentAmount is int ? paymentAmount.toDouble() : paymentAmount as num?;
+    final creditAmount = json['creditAmount'];
+    final double? creditAmountVal = creditAmount == null
+        ? null
+        : (creditAmount is int ? creditAmount.toDouble() : (creditAmount as num?)?.toDouble());
     return IssuedInvoicePaidModel(
-        issuedInvoice: InvoiceModel.fromJson(json['issuedInvoice']),
-        paymentAmount: json['paymentAmount'],
-        creditAmount: json['creditAmount'],
+        issuedInvoice: issuedInvoice,
+        paymentAmount: paymentAmountNum?.toDouble() ?? 0.0,
+        creditAmount: creditAmountVal,
         chequeId: json['chequeId'],
         invoiceId: json['invoiceId']);
   }
 
   Map<dynamic, dynamic> toJson() {
+    // Use toJsonWithId() so credit invoice invoiceId is persisted for sync-to-live-DB
     final Map<dynamic, dynamic> data = {
-      'issuedInvoice': issuedInvoice.toJson(),
+      'issuedInvoice': issuedInvoice.toJsonWithId(),
       'paymentAmount': paymentAmount,
     };
     if (creditAmount != null) data['creditAmount'] = creditAmount;

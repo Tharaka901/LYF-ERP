@@ -139,34 +139,40 @@ class PaymentService {
       final invoiceId = paymentDataModel.invoiceId;
 
       for (var invoice in paymentDataModel.issuedInvoicePaidList ?? []) {
+        final creditAmount = invoice.creditAmount ?? invoice.paymentAmount;
+        final creditInvoiceId = invoice.chequeId ??
+            invoice.issuedInvoice.invoiceId ??
+            invoice.invoiceId;
+        if (creditInvoiceId == null) continue;
         final data = {
           "value": invoice.paymentAmount,
           "paymentInvoiceId": invoiceId,
           "routecardId": paymentDataModel.currentRouteCard.routeCardId,
-          "creditInvoiceId":
-              invoice.chequeId ?? invoice.issuedInvoice.invoiceId,
+          "creditInvoiceId": creditInvoiceId,
           "receiptNo": rn,
           "status": invoice.chequeId != null ? 3 : 2,
           "type": invoice.chequeId != null ? "return-cheque" : 'default'
         };
         await respo('credit-payment/create', method: Method.post, data: data);
-        if (invoice.creditAmount! <= invoice.paymentAmount &&
-            invoice.chequeId == null) {
-          await respo('invoice/update', method: Method.put, data: {
-            "invoiceId": invoice.issuedInvoice.invoiceId,
-            "status": 2
-          });
+        if (creditAmount <= invoice.paymentAmount && invoice.chequeId == null) {
+          final issuedInvoiceId = invoice.issuedInvoice.invoiceId;
+          if (issuedInvoiceId != null) {
+            await respo('invoice/update', method: Method.put, data: {
+              "invoiceId": issuedInvoiceId,
+              "status": 2
+            });
+          }
         }
 
         if (invoice.chequeId != null) {
-          if (invoice.creditAmount! <= invoice.paymentAmount) {
+          if (creditAmount <= invoice.paymentAmount) {
             await respo('cheque/update',
                 method: Method.put,
                 data: {"id": invoice.chequeId, "isActive": 2, "balance": 0});
           } else {
             await respo('cheque/update', method: Method.put, data: {
               "id": invoice.chequeId,
-              "balance": invoice.creditAmount! - invoice.paymentAmount
+              "balance": creditAmount - invoice.paymentAmount
             });
           }
         }

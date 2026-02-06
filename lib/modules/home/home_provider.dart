@@ -272,25 +272,68 @@ class HomeProvider extends ChangeNotifier {
       //   await hiveDBProvider.invoiceBox!.clear();
       // await hiveDBProvider.paymentsBox!.clear();
       try {
-        for (final invoice in hiveDBProvider.invoiceBox!.values) {
+        final invoiceBox = hiveDBProvider.invoiceBox!;
+        final paymentsBox = hiveDBProvider.paymentsBox!;
+        // Iterate by invoice box KEY so we use the same key for payment lookup
+        // (offline payments are stored under invoice number = box key)
+        for (final invoiceNoKey in invoiceBox.keys) {
+          final invoice = invoiceBox.get(invoiceNoKey);
+          if (invoice == null) continue;
           final invoiceRes = await invoiceService.createInvoice({
             "invoice": invoice.toJson(),
             "invoiceItems": invoice.invoiceItems
           });
-          PaymentDataModel? paymentData = hiveDBProvider.paymentsBox!
-              .get(invoiceRes.data['invoice']['invoiceNo']);
-          paymentData?.invoiceId = invoiceRes.data['invoice']['invoiceId'];
-          if (paymentData != null) {
-            if ((paymentData.issuedInvoicePaidList ?? []).isNotEmpty &&
-                paymentData.isDirectPrevoius!) {
+          final data = invoiceRes.data;
+          final responseInvoiceNo = data is Map
+              ? (data['invoice'] is Map
+                  ? (data['invoice'] as Map)['invoiceNo']?.toString()
+                  : data['invoiceNo']?.toString())
+              : null;
+          final responseInvoiceId = data is Map
+              ? (data['invoice'] is Map
+                  ? ((data['invoice'] as Map)['invoiceId'] ??
+                      (data['invoice'] as Map)['id'])
+                  : (data['invoiceId'] ?? data['id']))
+              : null;
+          int? responseId;
+          if (responseInvoiceId is int) {
+            responseId = responseInvoiceId;
+          } else if (responseInvoiceId != null) {
+            responseId = int.tryParse(responseInvoiceId.toString());
+          }
+          PaymentDataModel? paymentData = paymentsBox.get(invoiceNoKey.toString().trim());
+          if (paymentData == null) {
+            paymentData = paymentsBox.get(invoice.invoiceNo.trim());
+          }
+          if (paymentData == null && responseInvoiceNo != null) {
+            paymentData = paymentsBox.get(responseInvoiceNo);
+          }
+          if (paymentData == null) {
+            for (final key in paymentsBox.keys) {
+              final pd = paymentsBox.get(key);
+              if (pd != null &&
+                  (key == invoiceNoKey ||
+                      key == invoice.invoiceNo ||
+                      pd.invoiceNo == invoice.invoiceNo)) {
+                paymentData = pd;
+                break;
+              }
+            }
+          }
+          if (paymentData != null && responseId != null) {
+            paymentData.invoiceId = responseId;
+            paymentData.invoiceNo = responseInvoiceNo ?? invoice.invoiceNo;
+            final hasPreviousPayments =
+                (paymentData.issuedInvoicePaidList ?? []).isNotEmpty;
+            final isDirectPrevious = paymentData.isDirectPrevoius ?? true;
+            if (hasPreviousPayments && isDirectPrevious) {
               if (context.mounted) {
                 await paymentService.payWithCreditInvoice(
                   context: context,
                   paymentDataModel: paymentData,
                 );
               }
-            } else if (!paymentData.isDirectPrevoius!) {
-              paymentData.invoiceNo = invoiceRes.data['invoice']['invoiceNo'];
+            } else if (paymentData.isDirectPrevoius == false) {
               if (context.mounted) {
                 await paymentService.sendCreditPayment(context, paymentData);
               }

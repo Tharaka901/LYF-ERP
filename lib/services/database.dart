@@ -575,11 +575,20 @@ List<InvoiceModel> getIssuedInvoicesFromLocal(BuildContext context) {
       }
     }
     
-    // Populate payments from paymentsBox
+    // Populate payments from paymentsBox (by key or by matching invoiceNo on value)
     if (invoice.payments == null || invoice.payments!.isEmpty) {
       final paymentsBox = hiveDBProvider.paymentsBox;
       if (paymentsBox != null) {
-        final paymentData = paymentsBox.get(invoice.invoiceNo);
+        PaymentDataModel? paymentData = paymentsBox.get(invoice.invoiceNo.trim());
+        if (paymentData == null) {
+          for (final key in paymentsBox.keys) {
+            final pd = paymentsBox.get(key);
+            if (pd != null && (key == invoice.invoiceNo || pd.invoiceNo == invoice.invoiceNo)) {
+              paymentData = pd;
+              break;
+            }
+          }
+        }
         if (paymentData != null) {
           final List<PaymentModel> payments = [];
           

@@ -29,7 +29,7 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
           Provider.of<InvoiceProvider>(context, listen: false);
       final isManual = (ModalRoute.of(context)!.settings.arguments
           as Map<String, dynamic>)['isManual'];
-      if (invoiceProvider.invoiceNu == null && !(isManual ?? false)) {
+      if (!(isManual ?? false)) {
         invoiceProvider.getInvoiceNu(context);
       }
     });
