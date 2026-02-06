@@ -5,6 +5,7 @@ import 'package:gsr/commons/enums.dart';
 import 'package:gsr/models/item_summary.dart' as item_summary;
 import 'package:gsr/models/item_summary_customer_wise/item_summary_customer_wise.dart' as item_summary_cw;
 import 'package:gsr/models/invoice/invoice_model.dart';
+import 'package:gsr/models/item/item_model.dart';
 import 'package:gsr/models/loan_stock/loan_stock.dart' as loan_stock;
 import 'package:gsr/models/route_card_item/rc_sold_loan_items_model.dart';
 import 'package:gsr/models/route_card_item/route_card_item_model.dart';
@@ -65,6 +66,111 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
         invoice: null,
       );
     }).toList();
+  }
+
+  /// Build ItemSummary list from local invoices (invoiceBox) for this route card.
+  /// Aggregates quantities by itemId for sales table merge.
+  List<item_summary.ItemSummary> getSalesItemSummaryFromLocalInvoices(
+      HiveDBProvider hiveDBProvider, int routeCardId) {
+    final invoiceBox = hiveDBProvider.invoiceBox;
+    if (invoiceBox == null) return [];
+    final invoices = invoiceBox.values
+        .where((inv) => inv.routecardId == routeCardId)
+        .toList();
+    final Map<int, double> qtyByItemId = {};
+    final Map<int, item_summary.Item?> itemInfoByItemId = {};
+    for (final invoice in invoices) {
+      for (final line in invoice.invoiceItems ?? []) {
+        final id = line.itemId;
+        if (id == null) continue;
+        qtyByItemId[id] = (qtyByItemId[id] ?? 0) + (line.itemQty ?? 0);
+        if (!itemInfoByItemId.containsKey(id) && line.item != null) {
+          itemInfoByItemId[id] = _itemModelToItemSummaryItem(line.item!);
+        } else if (!itemInfoByItemId.containsKey(id) && line.itemName != null) {
+          itemInfoByItemId[id] = item_summary.Item(
+            itemId: id,
+            itemName: line.itemName,
+            id: null,
+            itemRegNo: null,
+            costPrice: null,
+            salePrice: null,
+            openingQty: null,
+            vendorId: null,
+            priceLevelId: null,
+            itemTypeId: null,
+            stockId: null,
+            costAccId: null,
+            incomeAccId: null,
+            status: null,
+            isNew: null,
+          );
+        }
+      }
+    }
+    return qtyByItemId.entries.map((e) {
+      return item_summary.ItemSummary(
+        itemId: e.key,
+        selQty: e.value.toStringAsFixed(e.value.truncateToDouble() == e.value ? 0 : 1),
+        item: itemInfoByItemId[e.key],
+        invoice: null,
+      );
+    }).toList();
+  }
+
+  static item_summary.Item? _itemModelToItemSummaryItem(ItemModel im) {
+    return item_summary.Item(
+      id: im.id,
+      itemRegNo: im.itemRegNo,
+      itemName: im.itemName,
+      costPrice: im.costPrice.toDouble(),
+      salePrice: im.salePrice.toDouble(),
+      openingQty: im.openingQty?.toInt(),
+      vendorId: im.vendorId,
+      priceLevelId: im.priceLevelId,
+      itemTypeId: im.itemTypeId,
+      stockId: im.stockId,
+      costAccId: im.costAccId,
+      incomeAccId: im.incomeAccId,
+      status: im.status,
+      isNew: im.isNew,
+      itemId: im.itemId ?? im.id,
+    );
+  }
+
+  /// Merge live/API item summary with local invoice items (same itemId: add qty; new items: append).
+  List<item_summary.ItemSummary> mergeItemSummaryWithLocal(
+    List<item_summary.ItemSummary> live,
+    List<item_summary.ItemSummary> local,
+  ) {
+    if (local.isEmpty) return live;
+    final merged = <item_summary.ItemSummary>[];
+    final usedLocalItemIds = <int>{};
+    for (final s in live) {
+      final id = s.itemId;
+      final localSame = local.where((l) => l.itemId == id).toList();
+      if (localSame.isEmpty) {
+        merged.add(s);
+        continue;
+      }
+      double qty = double.tryParse(s.selQty ?? '0') ?? 0;
+      for (final l in localSame) {
+        qty += double.tryParse(l.selQty ?? '0') ?? 0;
+        usedLocalItemIds.add(l.itemId!);
+      }
+      merged.add(item_summary.ItemSummary(
+        selQty: qty.toStringAsFixed(qty.truncateToDouble() == qty ? 0 : 1),
+        itemId: id,
+        item: s.item,
+        invoice: s.invoice,
+      ));
+    }
+    for (final l in local) {
+      if (l.itemId != null && !usedLocalItemIds.contains(l.itemId!)) {
+        merged.add(l);
+        usedLocalItemIds.add(l.itemId!);
+      }
+    }
+    return merged;
   }
 
   // Helper function to get ItemSummaryCustomerWise from local DB for loan
@@ -558,6 +664,11 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
                             getReturnCylinderSummaryCustomerWiseLeakFromLocal(
                                 hiveDBProvider, routeCard.routeCardId!);
                       }
+                      // Merge local invoice items into sales (so Sales table = live + local DB)
+                      final localSalesItems = getSalesItemSummaryFromLocalInvoices(
+                          hiveDBProvider, routeCard.routeCardId!);
+                      itemSummary = mergeItemSummaryWithLocal(
+                          itemSummary, localSalesItems);
                       if (!context.mounted) return;
                       pop(context);
                       final List<item_summary_cw.ItemSummaryCustomerWiseFull> li = [];

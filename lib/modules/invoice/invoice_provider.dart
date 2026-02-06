@@ -76,6 +76,7 @@ class InvoiceProvider extends ChangeNotifier {
         await hiveDBProvider.dataBox!.put('invoiceCount', maxCount.toString());
       } else {
         //! Save invoice in local DB
+        if (invoiceNo != null) invoiceNu = invoiceNo;
         final invoice = invoiceViewModel.setInvoiceObject(context,
             onlyPayment: onlyPayment, paymentDataModel: paymentDataModel);
         await hiveDBProvider.invoiceBox!.put(invoiceNo ?? invoiceNu, invoice);

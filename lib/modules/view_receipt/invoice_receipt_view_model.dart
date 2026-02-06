@@ -116,8 +116,13 @@ class InvoiceReceiptViewModel {
           onlyPayment: true,
         );
       }
-      await hiveDBProvider.paymentsBox!
-          .put(invoiceProvider.invoiceNu, paymentDataModel);
+      final paymentKey = invoiceProvider.invoiceNu ??
+          paymentDataModel.invoiceNo ??
+          '';
+      if (paymentKey.toString().trim().isNotEmpty) {
+        await hiveDBProvider.paymentsBox!
+            .put(paymentKey.toString().trim(), paymentDataModel);
+      }
       //!Update receipt count
       int receiptCount =
           int.parse(hiveDBProvider.dataBox!.get('receiptCount') ?? '0');
