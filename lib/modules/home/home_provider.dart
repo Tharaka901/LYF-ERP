@@ -238,8 +238,11 @@ class HomeProvider extends ChangeNotifier {
             await routeCardService.getReturnCylinderSummaryCustomerWiseLeak(
                 pendingRouteCards[0].routeCardId!);
         await hiveDBProvider.returnCylinderSummaryCustomerWiseLeakBox!.clear();
-        await hiveDBProvider.returnCylinderSummaryCustomerWiseLeakBox!
-            .put(currentRouteCardId, returnCylinderSummaryCustomerWiseLeak);
+        await hiveDBProvider.returnCylinderSummaryCustomerWiseLeakBox!.put(
+            currentRouteCardId,
+            returnCylinderSummaryCustomerWiseLeak
+                .map((e) => e.toJson())
+                .toList());
         if (kDebugMode) {
           print('returnCylinderSummaryCustomerWiseLeak: ${returnCylinderSummaryCustomerWiseLeak.length}');
         }

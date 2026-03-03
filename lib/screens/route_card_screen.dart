@@ -380,8 +380,11 @@ class _RouteCardScreenState extends State<RouteCardScreen> {
       HiveDBProvider hiveDBProvider, int routeCardId) {
     final box = hiveDBProvider.returnCylinderSummaryCustomerWiseLeakBox;
     final raw = box?.get(routeCardId) ?? [];
-    final List<item_summary_cw.ItemSummaryCustomerWise> items =
-        (raw).map((e) => e as item_summary_cw.ItemSummaryCustomerWise).toList();
+    final List<item_summary_cw.ItemSummaryCustomerWise> items = (raw).map((e) {
+      if (e is item_summary_cw.ItemSummaryCustomerWise) return e;
+      return item_summary_cw.ItemSummaryCustomerWise.fromJson(
+          Map<String, dynamic>.from(e as Map));
+    }).toList();
     return items;
   }
 
