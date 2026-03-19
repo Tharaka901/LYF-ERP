@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/balance.dart';
+import 'package:gsr/modules/print/print_invoice_view_new.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/modules/print/print_invoice_view.dart';
 import 'package:gsr/providers/items_provider.dart';
@@ -1048,7 +1049,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                PrintInvoiceView(
+                                                PrintInvoiceViewNew(
                                               invoiceNo:
                                                   invoiceProvider.invoiceNu!,
                                               rn: receiptNoController.text
@@ -1083,7 +1084,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              PrintInvoiceView(
+                                              PrintInvoiceViewNew(
                                             invoiceNo:
                                                 invoiceProvider.invoiceNu!,
                                             rn: paymentProvider
@@ -1198,7 +1199,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                PrintInvoiceView(
+                                                PrintInvoiceViewNew(
                                               invoiceNo:
                                                   invoiceProvider.invoiceNu!,
                                               rn: receiptNoController.text
@@ -1227,7 +1228,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              PrintInvoiceView(
+                                              PrintInvoiceViewNew(
                                             invoiceNo:
                                                 invoiceProvider.invoiceNu!,
                                             rn: paymentProvider
