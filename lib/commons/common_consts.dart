@@ -85,6 +85,9 @@ class CompanyConstants {
   static const phoneNumber = 'Tel: 011 2488003';
   static const email = 'Email: jayaentlitro@gmail.com';
   static const vatNumber = 'Our Vat No - 104648479-7000';
+  // App-wise common prefix used in the Tax Invoice No format.
+  // Example: 26APR_ENTR_1
+  static const taxInvoiceAppCode = 'ENTR';
 
   // static const name = 'Jayawardena Agencies (Pvt) Ltd';
   // static const distribute = 'Distributor of Litro Gas Lanka Limited';

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -30,8 +31,15 @@ class InvoiceProvider extends ChangeNotifier {
       int invoiceCount = await invoiceService
           .invoiceCount(dataProvider.currentRouteCard!.routeCardId!);
       int invoiceCountLocalDb = hiveDBProvider.invoiceBox?.length ?? 0;
-      invoiceNu =
-          '${dataProvider.currentRouteCard!.routeCardNo}/${invoiceCount + invoiceCountLocalDb + 1}';
+      if (dataProvider.selectedCustomer?.isProForma == 0) {
+        invoiceNu =
+            '${dataProvider.currentRouteCard!.routeCardNo}/${invoiceCount + invoiceCountLocalDb + 1}';
+      } else {
+        invoiceNu = generateInvoiceNumber(
+            referenceDate: DateTime.now(),
+            invoiceCountBase: invoiceCount + invoiceCountLocalDb);
+      }
+
       //!Save invoice number in local DB
       await hiveDBProvider.dataBox!
           .put('invoiceCount', (invoiceCount + invoiceCountLocalDb).toString());

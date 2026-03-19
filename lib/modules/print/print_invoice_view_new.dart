@@ -257,7 +257,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
                     ),
                     pw.Container(
                       padding: const pw.EdgeInsets.symmetric(vertical: 4),
-                      alignment: pw.Alignment.centerRight,
+                      alignment: pw.Alignment.center,
                       child: pw.Text('Amount Excluding VAT',
                           style: pw.TextStyle(
                               fontSize: 12, fontWeight: pw.FontWeight.bold)),
@@ -340,43 +340,43 @@ class PrintInvoiceViewNew extends StatelessWidget {
               ),
               pw.SizedBox(height: 2.0),
               pw.Table(
+                border: pw.TableBorder.all(width: 0.8, color: PdfColors.black),
+                columnWidths: const {
+                  0: pw.FlexColumnWidth(1),
+                  1: pw.FlexColumnWidth(1.4),
+                  2: pw.FlexColumnWidth(1.4),
+                  3: pw.FlexColumnWidth(1.2),
+                },
                 children: [
                   pw.TableRow(
-                    decoration: const pw.BoxDecoration(),
+                    decoration: const pw.BoxDecoration(color: PdfColors.grey300),
                     children: [
-                      pwtitleCell('#', align: pw.TextAlign.start),
-                      pwtitleCell('Date', align: pw.TextAlign.center),
-                      pwtitleCell('Invoice No:', align: pw.TextAlign.center),
-                      pwtitleCell(
+                      _headerCellSmall('#', align: pw.TextAlign.left),
+                      _headerCellSmall('Date', align: pw.TextAlign.center),
+                      _headerCellSmall('Invoice No:', align: pw.TextAlign.center),
+                      _headerCellSmall(
                         'Payment',
                         align: pw.TextAlign.right,
-                        mainAxisAlignment: pw.MainAxisAlignment.end,
                       ),
                     ],
                   ),
                   ...dataProvider.issuedDepositePaidList.map((dp) {
+                    final idx = dataProvider.issuedDepositePaidList.indexOf(dp) + 1;
+                    final dateStr = date(
+                      dp.issuedDeposite.routeCard?.date ?? DateTime.now(),
+                      format: 'dd-MM-yyyy',
+                    );
+                    final amountStr =
+                        formatPrice(dp.paymentAmount).replaceAll('Rs.', '').trim();
                     return pw.TableRow(
                       children: [
-                        pwcell(
-                          (dataProvider.issuedDepositePaidList.indexOf(dp) + 1)
-                              .toString(),
-                          align: pw.TextAlign.start,
-                        ),
-                        pwcell(
-                          date(
-                            dp.issuedDeposite.routeCard?.date ?? DateTime.now(),
-                            format: 'dd-MM-yyyy',
-                          ),
-                          align: pw.TextAlign.center,
-                        ),
-                        pwcell(
+                        _bodyCellSmall(idx.toString(), align: pw.TextAlign.left),
+                        _bodyCellSmall(dateStr, align: pw.TextAlign.center),
+                        _bodyCellSmall(
                           dp.issuedDeposite.receiptNo ?? '-',
                           align: pw.TextAlign.center,
                         ),
-                        pwcell(
-                          formatPrice(dp.paymentAmount).replaceAll('Rs.', ''),
-                          align: pw.TextAlign.end,
-                        ),
+                        _bodyCellSmall(amountStr, align: pw.TextAlign.right),
                       ],
                     );
                   }),
@@ -409,49 +409,54 @@ class PrintInvoiceViewNew extends StatelessWidget {
                   pw.Text(
                     'Recipt No : $rn',
                     textAlign: pw.TextAlign.start,
-                    style: const pw.TextStyle(fontSize: 22.0),
+                    style: const pw.TextStyle(fontSize: 15.0),
                   ),
                 ],
               ),
               pw.SizedBox(height: 2.0),
               if ((dataProvider.getTotalChequeAmount() + (cash ?? 0)) != 0)
                 pw.Table(
+                  border: pw.TableBorder.all(width: 0.8, color: PdfColors.black),
+                  columnWidths: const {
+                    0: pw.FlexColumnWidth(1.1),
+                    1: pw.FlexColumnWidth(1.2),
+                    2: pw.FlexColumnWidth(1.0),
+                  },
                   children: [
                     pw.TableRow(
-                      decoration: const pw.BoxDecoration(
-                        color: PdfColor.fromInt(0xFFFFFFFF),
-                      ),
+                      decoration: const pw.BoxDecoration(color: PdfColors.grey300),
                       children: [
-                        pwtitleCell('Method', align: pw.TextAlign.left),
-                        pwtitleCell('Cheque No'),
-                        pwtitleCell(
+                        _headerCellSmall('Method', align: pw.TextAlign.left),
+                        _headerCellSmall('Cheque No', align: pw.TextAlign.center),
+                        _headerCellSmall(
                           'Amount',
                           align: pw.TextAlign.right,
-                          mainAxisAlignment: pw.MainAxisAlignment.end,
                         ),
                       ],
                     ),
                     if (cash != null && cash != 0)
                       pw.TableRow(
                         children: [
-                          pwcell('Cash', align: pw.TextAlign.left),
-                          pwcell('-', align: pw.TextAlign.left),
-                          pwcell(
-                            formatPrice(cash ?? 0),
-                            align: pw.TextAlign.end,
+                          _bodyCellSmall('Cash', align: pw.TextAlign.left),
+                          _bodyCellSmall('-', align: pw.TextAlign.left),
+                          _bodyCellSmall(
+                            formatPrice(cash ?? 0).replaceAll('Rs.', '').trim(),
+                            align: pw.TextAlign.right,
                           ),
                         ],
                       ),
                     if ((cheques ?? dataProvider.chequeList).isNotEmpty)
                       ...(cheques ?? dataProvider.chequeList).map((m) {
+                        final amountStr =
+                            formatPrice(m.chequeAmount).replaceAll('Rs.', '').trim();
                         return pw.TableRow(
                           children: [
-                            pwcell('Cheque', align: pw.TextAlign.left),
-                            pwcell(m.chequeNumber, align: pw.TextAlign.left),
-                            pwcell(
-                              formatPrice(m.chequeAmount).replaceAll('Rs.', ''),
-                              align: pw.TextAlign.end,
+                            _bodyCellSmall('Cheque', align: pw.TextAlign.left),
+                            _bodyCellSmall(
+                              m.chequeNumber,
+                              align: pw.TextAlign.left,
                             ),
+                            _bodyCellSmall(amountStr, align: pw.TextAlign.right),
                           ],
                         );
                       }),
@@ -466,8 +471,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
                   children: [
                     _totalRow(
                       'Total:',
-                      formatPrice(totalPaymentForPrint()),
-                      fontSize: 22.0,
+                      formatPrice(totalPaymentForPrint())
                     ),
                   ],
                 ),
@@ -517,37 +521,36 @@ class PrintInvoiceViewNew extends StatelessWidget {
                 ),
                 pw.SizedBox(height: 2.0),
                 pw.Table(
+                  border: pw.TableBorder.all(width: 0.8, color: PdfColors.black),
+                  columnWidths: const {
+                    0: pw.FlexColumnWidth(1.6),
+                    1: pw.FlexColumnWidth(1.4),
+                    2: pw.FlexColumnWidth(1.2),
+                  },
                   children: [
                     pw.TableRow(
-                      decoration: const pw.BoxDecoration(),
+                      decoration: const pw.BoxDecoration(color: PdfColors.grey300),
                       children: [
-                        pwtitleCell('Date', align: pw.TextAlign.left),
-                        pwtitleCell('Invoice No:'),
-                        pwtitleCell(
-                          'Payment',
-                          align: pw.TextAlign.right,
-                          mainAxisAlignment: pw.MainAxisAlignment.end,
-                        ),
+                        _headerCellSmall('Date', align: pw.TextAlign.left),
+                        _headerCellSmall('Invoice No:', align: pw.TextAlign.center),
+                        _headerCellSmall('Payment', align: pw.TextAlign.right),
                       ],
                     ),
                     ...prevList.map((dp) {
+                      final dateStr =
+                          dp.issuedInvoice.routeCard?.date?.toString().split(' ')[0] ??
+                              'No Date';
+                      final amountStr = formatPrice(dp.paymentAmount)
+                          .replaceAll('Rs.', '')
+                          .trim();
                       return pw.TableRow(
                         children: [
-                          pwcell(
-                            dp.issuedInvoice.routeCard?.date
-                                    ?.toString()
-                                    .split(' ')[0] ??
-                                'No Date',
-                            align: pw.TextAlign.left,
-                          ),
-                          pwcell(
+                          _bodyCellSmall(dateStr, align: pw.TextAlign.left),
+                          _bodyCellSmall(
                             dp.issuedInvoice.invoiceNo.toString(),
                             align: pw.TextAlign.left,
                           ),
-                          pwcell(
-                            formatPrice(dp.paymentAmount).replaceAll('Rs.', ''),
-                            align: pw.TextAlign.end,
-                          ),
+                          _bodyCellSmall(amountStr, align: pw.TextAlign.right),
                         ],
                       );
                     }),
@@ -661,5 +664,33 @@ pw.TableRow _totalRow(
         ),
       ),
     ],
+  );
+}
+
+pw.Widget _headerCellSmall(
+  String text, {
+  pw.TextAlign align = pw.TextAlign.center,
+}) {
+  return pw.Container(
+    padding: const pw.EdgeInsets.all(4),
+    child: pw.Text(
+      text,
+      textAlign: align,
+      style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+    ),
+  );
+}
+
+pw.Widget _bodyCellSmall(
+  String text, {
+  pw.TextAlign align = pw.TextAlign.center,
+}) {
+  return pw.Container(
+    padding: const pw.EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+    child: pw.Text(
+      text,
+      textAlign: align,
+      style: const pw.TextStyle(fontSize: 10),
+    ),
   );
 }

@@ -21,6 +21,7 @@ class CustomerModel {
   final double? depositBalance;
   final int? status;
   final Vat? vat;
+  final int? isProForma;
 
   CustomerModel({
     this.customerId,
@@ -43,6 +44,7 @@ class CustomerModel {
     this.depositBalance,
     this.status,
     this.vat,
+    this.isProForma,
   });
 
   factory CustomerModel.fromJson(Map<dynamic, dynamic> json) => CustomerModel(
@@ -71,6 +73,7 @@ class CustomerModel {
             : json["depositBalance"],
         status: json["status"],
         vat: json["vat"] != null ? Vat.fromJson(Map<String, dynamic>.from(json["vat"])) : null,
+        isProForma: json["isProForma"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -95,5 +98,6 @@ class CustomerModel {
         "depositBalance": depositBalance,
         "status": status,
         "vat": vat?.toJson(),
+        "isProForma": isProForma,
       };
 }

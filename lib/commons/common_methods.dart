@@ -159,6 +159,25 @@ waiting(
 String date(DateTime date, {String? format}) =>
     DateFormat(format ?? 'dd MMM yyyy').format(date);
 
+/// Generate Tax Invoice No in required format:
+/// `YYMMM_{appCode}_{(invoiceCountBase + 1)}`
+///
+/// Example: `26APR_ENTR_1`
+String generateInvoiceNumber({
+  required DateTime referenceDate,
+  required int invoiceCountBase,
+  String appCode = CompanyConstants.taxInvoiceAppCode,
+  String locale = 'en_US',
+}) {
+  final yy = (referenceDate.year % 100).toString().padLeft(2, '0');
+  final mmm = DateFormat('MMM', locale)
+      .format(referenceDate)
+      .substring(0, 3)
+      .toUpperCase();
+  // Use `${appCode}` to avoid `$appCode_` being parsed as a different variable.
+  return '$yy${mmm}_${appCode}_${invoiceCountBase + 1}';
+}
+
 Image image(
   String image, {
   double? size,
