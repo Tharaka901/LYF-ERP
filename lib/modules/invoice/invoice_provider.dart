@@ -31,7 +31,7 @@ class InvoiceProvider extends ChangeNotifier {
       int invoiceCount = await invoiceService
           .invoiceCount(dataProvider.currentRouteCard!.routeCardId!);
       int invoiceCountLocalDb = hiveDBProvider.invoiceBox?.length ?? 0;
-      if (dataProvider.selectedCustomer?.isProForma == 0) {
+      if (dataProvider.selectedCustomer?.customerVat == "0") {
         invoiceNu =
             '${dataProvider.currentRouteCard!.routeCardNo}/${invoiceCount + invoiceCountLocalDb + 1}';
       } else {

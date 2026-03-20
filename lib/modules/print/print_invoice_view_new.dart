@@ -6,6 +6,7 @@ import 'package:gsr/models/added_item.dart';
 import 'package:gsr/models/cheque/cheque.dart';
 import 'package:gsr/models/invoice/invoice_model.dart';
 import 'package:gsr/models/issued_invoice_paid_model/issued_invoice_paid.dart';
+import 'package:gsr/modules/print/print_invoice_view_model.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -14,11 +15,6 @@ import 'package:provider/provider.dart';
 import '../../commons/common_methods.dart';
 import '../../providers/data_provider.dart';
 
-/// New VAT invoice layout based on `VAT Invoice Format 2026.04.01.pdf`.
-///
-/// Note: this is a visual template implementation using the current app data
-/// (invoice, items, cheques, totals). If you want it to match the PDF 1:1,
-/// share an annotated screenshot and I’ll tune column widths/font sizes.
 class PrintInvoiceViewNew extends StatelessWidget {
   final String invoiceNo;
   final String rn;
@@ -49,15 +45,19 @@ class PrintInvoiceViewNew extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = PrintInvoiceViewModel();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Print Invoice (New)'),
+        title: const Text('Print Invoice'),
       ),
       body: PdfPreview(
         onPrinted: (context) async {
-          // Keep behaviour parity with the old widget.
-          if ((isBillingFrom ?? false) && (onSaveData != null)) {
+          if ((isBillingFrom ?? false) & (onSaveData != null)) {
             await onSaveData!();
+          }
+          if (type != 'previous') {
+            if (!context.mounted) return;
+            viewModel.onPrinted(context, isBillingFrom ?? false);
           }
         },
         build: (format) => _generatePdf(format, context),
@@ -85,6 +85,11 @@ class PrintInvoiceViewNew extends StatelessWidget {
     final supplierVatNo =
         CompanyConstants.vatNumber.replaceAll('Our Vat No - ', '').trim();
     final customer = issuedInvoice?.customer ?? dataProvider.selectedCustomer;
+    final invoiceHeaderText = (customer?.isProForma == 1)
+        ? 'PROFORMA INVOICE'
+        : (customer?.customerVat != "0")
+            ? 'TAX INVOICE'
+            : 'INVOICE';
 
     final invoiceDate = formatInvoiceDate();
     final itemLines = items ?? dataProvider.itemList;
@@ -128,9 +133,9 @@ class PrintInvoiceViewNew extends StatelessWidget {
                 children: [
                   pw.Center(
                     child: pw.Text(
-                      'TAX INVOICE',
+                      invoiceHeaderText,
                       style: pw.TextStyle(
-                        fontSize: 16,
+                        fontSize: 22,
                         fontWeight: pw.FontWeight.bold,
                       ),
                     ),
@@ -142,14 +147,14 @@ class PrintInvoiceViewNew extends StatelessWidget {
                       pw.Text(
                         'Invoice Date :${invoiceDate.isEmpty ? 'MM/DD/YYYY' : invoiceDate}',
                         style: pw.TextStyle(
-                          fontSize: 11,
+                          fontSize: 21,
                           fontWeight: pw.FontWeight.bold,
                         ),
                       ),
                       pw.Text(
                         'Tax Invoice No :$invoiceNo',
                         style: pw.TextStyle(
-                          fontSize: 12,
+                          fontSize: 22,
                           fontWeight: pw.FontWeight.bold,
                           color: PdfColors.red,
                         ),
@@ -179,18 +184,18 @@ class PrintInvoiceViewNew extends StatelessWidget {
                         children: [
                           pw.Text('VAT No :$supplierVatNo',
                               style: pw.TextStyle(
-                                  fontSize: 10,
+                                  fontSize: 18,
                                   fontWeight: pw.FontWeight.bold)),
                           pw.Text('Name :$supplierName',
-                              style: const pw.TextStyle(fontSize: 10)),
+                              style: const pw.TextStyle(fontSize: 18)),
                           pw.Text(supplierDistributors,
-                              style: const pw.TextStyle(fontSize: 10)),
+                              style: const pw.TextStyle(fontSize: 18)),
                           pw.SizedBox(height: 2),
                           pw.Text('Address :$supplierAddress',
-                              style: const pw.TextStyle(fontSize: 10)),
+                              style: const pw.TextStyle(fontSize: 18)),
                           pw.SizedBox(height: 2),
                           pw.Text('Phone :$supplierPhone',
-                              style: const pw.TextStyle(fontSize: 10)),
+                              style: const pw.TextStyle(fontSize: 18)),
                         ],
                       ),
                     ),
@@ -202,16 +207,16 @@ class PrintInvoiceViewNew extends StatelessWidget {
                         children: [
                           pw.Text('VAT No :${dash(customer?.customerVat)}',
                               style: pw.TextStyle(
-                                  fontSize: 10,
+                                  fontSize: 18,
                                   fontWeight: pw.FontWeight.bold)),
                           pw.Text('Name :${dash(customer?.businessName)}',
-                              style: const pw.TextStyle(fontSize: 10)),
+                              style: const pw.TextStyle(fontSize: 18)),
                           pw.SizedBox(height: 2),
                           pw.Text('Address :${dash(customer?.address)}',
-                              style: const pw.TextStyle(fontSize: 10)),
+                              style: const pw.TextStyle(fontSize: 18)),
                           pw.SizedBox(height: 2),
                           pw.Text('Phone :${dash(customer?.contactNumber)}',
-                              style: const pw.TextStyle(fontSize: 10)),
+                              style: const pw.TextStyle(fontSize: 18)),
                         ],
                       ),
                     ),
@@ -239,28 +244,28 @@ class PrintInvoiceViewNew extends StatelessWidget {
                       alignment: pw.Alignment.center,
                       child: pw.Text('Items',
                           style: pw.TextStyle(
-                              fontSize: 12, fontWeight: pw.FontWeight.bold)),
+                              fontSize: 18, fontWeight: pw.FontWeight.bold)),
                     ),
                     pw.Container(
                       padding: const pw.EdgeInsets.symmetric(vertical: 4),
                       alignment: pw.Alignment.center,
                       child: pw.Text('Qty',
                           style: pw.TextStyle(
-                              fontSize: 12, fontWeight: pw.FontWeight.bold)),
+                              fontSize: 18, fontWeight: pw.FontWeight.bold)),
                     ),
                     pw.Container(
                       padding: const pw.EdgeInsets.symmetric(vertical: 4),
                       alignment: pw.Alignment.center,
                       child: pw.Text('Unit Price',
                           style: pw.TextStyle(
-                              fontSize: 12, fontWeight: pw.FontWeight.bold)),
+                              fontSize: 18, fontWeight: pw.FontWeight.bold)),
                     ),
                     pw.Container(
                       padding: const pw.EdgeInsets.symmetric(vertical: 4),
                       alignment: pw.Alignment.center,
                       child: pw.Text('Amount Excluding VAT',
                           style: pw.TextStyle(
-                              fontSize: 12, fontWeight: pw.FontWeight.bold)),
+                              fontSize: 18, fontWeight: pw.FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -275,26 +280,26 @@ class PrintInvoiceViewNew extends StatelessWidget {
                             vertical: 4, horizontal: 2),
                         alignment: pw.Alignment.centerLeft,
                         child: pw.Text(invoiceItem.item.itemName,
-                            style: const pw.TextStyle(fontSize: 11)),
+                            style: const pw.TextStyle(fontSize: 18)),
                       ),
                       pw.Container(
                         padding: const pw.EdgeInsets.symmetric(vertical: 4),
                         alignment: pw.Alignment.center,
                         child: pw.Text(num(qty).toString(),
-                            style: const pw.TextStyle(fontSize: 10)),
+                            style: const pw.TextStyle(fontSize: 18)),
                       ),
                       pw.Container(
                         padding: const pw.EdgeInsets.symmetric(vertical: 4),
                         alignment: pw.Alignment.center,
                         child: pw.Text(formatNumberNoRs(unitPrice),
-                            style: const pw.TextStyle(fontSize: 10)),
+                            style: const pw.TextStyle(fontSize: 18)),
                       ),
                       pw.Container(
                         padding: const pw.EdgeInsets.symmetric(
                             vertical: 4, horizontal: 2),
                         alignment: pw.Alignment.centerRight,
                         child: pw.Text(formatNumberNoRs(amountExVat),
-                            style: const pw.TextStyle(fontSize: 10)),
+                            style: const pw.TextStyle(fontSize: 18)),
                       ),
                     ],
                   );
@@ -303,7 +308,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
             ),
 
             // ===== Totals bordered block (2 columns) =====
-            pw.SizedBox(height: 2),
+            pw.SizedBox(height: 10),
             pw.Table(
               border: pw.TableBorder.all(width: 0.8, color: PdfColors.black),
               columnWidths: {
@@ -349,11 +354,13 @@ class PrintInvoiceViewNew extends StatelessWidget {
                 },
                 children: [
                   pw.TableRow(
-                    decoration: const pw.BoxDecoration(color: PdfColors.grey300),
+                    decoration:
+                        const pw.BoxDecoration(color: PdfColors.grey300),
                     children: [
                       _headerCellSmall('#', align: pw.TextAlign.left),
                       _headerCellSmall('Date', align: pw.TextAlign.center),
-                      _headerCellSmall('Invoice No:', align: pw.TextAlign.center),
+                      _headerCellSmall('Invoice No:',
+                          align: pw.TextAlign.center),
                       _headerCellSmall(
                         'Payment',
                         align: pw.TextAlign.right,
@@ -361,16 +368,19 @@ class PrintInvoiceViewNew extends StatelessWidget {
                     ],
                   ),
                   ...dataProvider.issuedDepositePaidList.map((dp) {
-                    final idx = dataProvider.issuedDepositePaidList.indexOf(dp) + 1;
+                    final idx =
+                        dataProvider.issuedDepositePaidList.indexOf(dp) + 1;
                     final dateStr = date(
                       dp.issuedDeposite.routeCard?.date ?? DateTime.now(),
                       format: 'dd-MM-yyyy',
                     );
-                    final amountStr =
-                        formatPrice(dp.paymentAmount).replaceAll('Rs.', '').trim();
+                    final amountStr = formatPrice(dp.paymentAmount)
+                        .replaceAll('Rs.', '')
+                        .trim();
                     return pw.TableRow(
                       children: [
-                        _bodyCellSmall(idx.toString(), align: pw.TextAlign.left),
+                        _bodyCellSmall(idx.toString(),
+                            align: pw.TextAlign.left),
                         _bodyCellSmall(dateStr, align: pw.TextAlign.center),
                         _bodyCellSmall(
                           dp.issuedDeposite.receiptNo ?? '-',
@@ -409,14 +419,15 @@ class PrintInvoiceViewNew extends StatelessWidget {
                   pw.Text(
                     'Recipt No : $rn',
                     textAlign: pw.TextAlign.start,
-                    style: const pw.TextStyle(fontSize: 15.0),
+                    style: const pw.TextStyle(fontSize: 18.0),
                   ),
                 ],
               ),
-              pw.SizedBox(height: 2.0),
+              pw.SizedBox(height: 10.0),
               if ((dataProvider.getTotalChequeAmount() + (cash ?? 0)) != 0)
                 pw.Table(
-                  border: pw.TableBorder.all(width: 0.8, color: PdfColors.black),
+                  border:
+                      pw.TableBorder.all(width: 0.8, color: PdfColors.black),
                   columnWidths: const {
                     0: pw.FlexColumnWidth(1.1),
                     1: pw.FlexColumnWidth(1.2),
@@ -424,10 +435,12 @@ class PrintInvoiceViewNew extends StatelessWidget {
                   },
                   children: [
                     pw.TableRow(
-                      decoration: const pw.BoxDecoration(color: PdfColors.grey300),
+                      decoration:
+                          const pw.BoxDecoration(color: PdfColors.grey300),
                       children: [
                         _headerCellSmall('Method', align: pw.TextAlign.left),
-                        _headerCellSmall('Cheque No', align: pw.TextAlign.center),
+                        _headerCellSmall('Cheque No',
+                            align: pw.TextAlign.center),
                         _headerCellSmall(
                           'Amount',
                           align: pw.TextAlign.right,
@@ -447,8 +460,9 @@ class PrintInvoiceViewNew extends StatelessWidget {
                       ),
                     if ((cheques ?? dataProvider.chequeList).isNotEmpty)
                       ...(cheques ?? dataProvider.chequeList).map((m) {
-                        final amountStr =
-                            formatPrice(m.chequeAmount).replaceAll('Rs.', '').trim();
+                        final amountStr = formatPrice(m.chequeAmount)
+                            .replaceAll('Rs.', '')
+                            .trim();
                         return pw.TableRow(
                           children: [
                             _bodyCellSmall('Cheque', align: pw.TextAlign.left),
@@ -456,7 +470,8 @@ class PrintInvoiceViewNew extends StatelessWidget {
                               m.chequeNumber,
                               align: pw.TextAlign.left,
                             ),
-                            _bodyCellSmall(amountStr, align: pw.TextAlign.right),
+                            _bodyCellSmall(amountStr,
+                                align: pw.TextAlign.right),
                           ],
                         );
                       }),
@@ -469,10 +484,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
                     1: pw.FlexColumnWidth(1),
                   },
                   children: [
-                    _totalRow(
-                      'Total:',
-                      formatPrice(totalPaymentForPrint())
-                    ),
+                    _totalRow('Total:', formatPrice(totalPaymentForPrint())),
                   ],
                 ),
             ],
@@ -521,7 +533,8 @@ class PrintInvoiceViewNew extends StatelessWidget {
                 ),
                 pw.SizedBox(height: 2.0),
                 pw.Table(
-                  border: pw.TableBorder.all(width: 0.8, color: PdfColors.black),
+                  border:
+                      pw.TableBorder.all(width: 0.8, color: PdfColors.black),
                   columnWidths: const {
                     0: pw.FlexColumnWidth(1.6),
                     1: pw.FlexColumnWidth(1.4),
@@ -529,17 +542,20 @@ class PrintInvoiceViewNew extends StatelessWidget {
                   },
                   children: [
                     pw.TableRow(
-                      decoration: const pw.BoxDecoration(color: PdfColors.grey300),
+                      decoration:
+                          const pw.BoxDecoration(color: PdfColors.grey300),
                       children: [
                         _headerCellSmall('Date', align: pw.TextAlign.left),
-                        _headerCellSmall('Invoice No:', align: pw.TextAlign.center),
+                        _headerCellSmall('Invoice No:',
+                            align: pw.TextAlign.center),
                         _headerCellSmall('Payment', align: pw.TextAlign.right),
                       ],
                     ),
                     ...prevList.map((dp) {
-                      final dateStr =
-                          dp.issuedInvoice.routeCard?.date?.toString().split(' ')[0] ??
-                              'No Date';
+                      final dateStr = dp.issuedInvoice.routeCard?.date
+                              ?.toString()
+                              .split(' ')[0] ??
+                          'No Date';
                       final amountStr = formatPrice(dp.paymentAmount)
                           .replaceAll('Rs.', '')
                           .trim();
@@ -589,46 +605,58 @@ class PrintInvoiceViewNew extends StatelessWidget {
 
             // ===== Footer signature lines =====
             pw.SizedBox(height: 10),
-            pw.Row(
-              children: [
-                pw.Expanded(
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Container(
-                        alignment: pw.Alignment.centerLeft,
-                        child: pw.Text(
-                          '..........................................................',
-                          style: const pw.TextStyle(fontSize: 10),
-                        ),
-                      ),
-                      pw.SizedBox(height: 2),
-                      pw.Text('Prepare by',
-                          style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold, fontSize: 12)),
-                    ],
-                  ),
-                ),
-                pw.Expanded(
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.end,
-                    children: [
-                      pw.Container(
-                        alignment: pw.Alignment.centerRight,
-                        child: pw.Text(
-                          '..........................................................',
-                          style: const pw.TextStyle(fontSize: 10),
-                        ),
-                      ),
-                      pw.SizedBox(height: 2),
-                      pw.Text('Customer Signature',
-                          style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold, fontSize: 12)),
-                    ],
-                  ),
-                ),
-              ],
+            pw.Divider(thickness: 0.5),
+            pwtitleCell(
+              'Billing By: ${dataProvider.currentEmployee?.firstName}',
+              color: const PdfColor.fromInt(0xFF000000),
             ),
+            pwtitleCell(
+              'Billing Date & Time: ${date(DateTime.now(), format: 'dd.MM.yyyy hh:mm a')}',
+              color: const PdfColor.fromInt(0xFF000000),
+            ),
+            pw.SizedBox(height: 2),
+            MessageConstants.signatureNotRequired,
+            pw.SizedBox(height: 5)
+            // pw.Row(
+            //   children: [
+            //     pw.Expanded(
+            //       child: pw.Column(
+            //         crossAxisAlignment: pw.CrossAxisAlignment.start,
+            //         children: [
+            //           pw.Container(
+            //             alignment: pw.Alignment.centerLeft,
+            //             child: pw.Text(
+            //               '..........................................................',
+            //               style: const pw.TextStyle(fontSize: 10),
+            //             ),
+            //           ),
+            //           pw.SizedBox(height: 2),
+            //           pw.Text('Prepare by',
+            //               style: pw.TextStyle(
+            //                   fontWeight: pw.FontWeight.bold, fontSize: 12)),
+            //         ],
+            //       ),
+            //     ),
+            //     pw.Expanded(
+            //       child: pw.Column(
+            //         crossAxisAlignment: pw.CrossAxisAlignment.end,
+            //         children: [
+            //           pw.Container(
+            //             alignment: pw.Alignment.centerRight,
+            //             child: pw.Text(
+            //               '..........................................................',
+            //               style: const pw.TextStyle(fontSize: 10),
+            //             ),
+            //           ),
+            //           pw.SizedBox(height: 2),
+            //           pw.Text('Customer Signature',
+            //               style: pw.TextStyle(
+            //                   fontWeight: pw.FontWeight.bold, fontSize: 12)),
+            //         ],
+            //       ),
+            //     ),
+            //   ],
+            // ),
           ];
         },
       ),
@@ -641,8 +669,8 @@ class PrintInvoiceViewNew extends StatelessWidget {
 pw.TableRow _totalRow(
   String label,
   String value, {
-  double fontSize = 12.0,
-  double valueFontSize = 12.0,
+  double fontSize = 22.0,
+  double valueFontSize = 22.0,
 }) {
   return pw.TableRow(
     children: [
@@ -676,7 +704,7 @@ pw.Widget _headerCellSmall(
     child: pw.Text(
       text,
       textAlign: align,
-      style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+      style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold),
     ),
   );
 }
@@ -690,7 +718,7 @@ pw.Widget _bodyCellSmall(
     child: pw.Text(
       text,
       textAlign: align,
-      style: const pw.TextStyle(fontSize: 10),
+      style: const pw.TextStyle(fontSize: 20),
     ),
   );
 }
