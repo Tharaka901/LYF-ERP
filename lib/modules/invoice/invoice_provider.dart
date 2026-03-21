@@ -28,15 +28,16 @@ class InvoiceProvider extends ChangeNotifier {
     final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     if (hiveDBProvider.isInternetConnected) {
-      int invoiceCount = await invoiceService
-          .invoiceCount(dataProvider.currentRouteCard!.routeCardId!);
+      int invoiceCount = await invoiceService.invoiceCount(
+          dataProvider.currentRouteCard!.routeCardId!,
+          isProForma: dataProvider.selectedCustomer?.customerVat != "0");
       int invoiceCountLocalDb = hiveDBProvider.invoiceBox?.length ?? 0;
       if (dataProvider.selectedCustomer?.customerVat == "0") {
         invoiceNu =
             '${dataProvider.currentRouteCard!.routeCardNo}/${invoiceCount + invoiceCountLocalDb + 1}';
       } else {
         invoiceNu = generateInvoiceNumber(
-            referenceDate: DateTime.now(),
+            referenceDate: dataProvider.currentRouteCard!.date!,
             invoiceCountBase: invoiceCount + invoiceCountLocalDb);
       }
 

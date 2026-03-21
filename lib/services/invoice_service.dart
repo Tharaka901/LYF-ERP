@@ -150,14 +150,14 @@ class InvoiceService {
     }
   }
 
-   Future<int> invoiceCount(int routeCardId) async {
-    final response =
-        await respo('invoice/count-by-routecard?id=$routeCardId');
+  Future<int> invoiceCount(int routeCardId, {bool isProForma = false}) async {
+    final response = await respo(
+        'invoice/count-by-routecard?id=$routeCardId&is_profoma=$isProForma');
     final int count = response.data;
     return count;
   }
 
-   Future<List<InvoiceModel>> getCreditInvoices(BuildContext context,
+  Future<List<InvoiceModel>> getCreditInvoices(BuildContext context,
       {int? cId, String? type, int? invoiceId}) async {
     String url =
         'invoice/get?customerId=${cId ?? context.read<DataProvider>().selectedCustomer!.customerId}';
@@ -176,7 +176,7 @@ class InvoiceService {
         .toList();
   }
 
-   Future<Respo> createInvoice(dynamic request) async {
+  Future<Respo> createInvoice(dynamic request) async {
     try {
       //! Create invoice
       final invoiceResponse = await respo(

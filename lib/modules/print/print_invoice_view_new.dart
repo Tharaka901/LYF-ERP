@@ -145,18 +145,17 @@ class PrintInvoiceViewNew extends StatelessWidget {
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     children: [
                       pw.Text(
-                        'Invoice Date :${invoiceDate.isEmpty ? 'MM/DD/YYYY' : invoiceDate}',
+                        'Date :${invoiceDate.isEmpty ? 'MM/DD/YYYY' : invoiceDate}',
                         style: pw.TextStyle(
                           fontSize: 21,
                           fontWeight: pw.FontWeight.bold,
                         ),
                       ),
                       pw.Text(
-                        'Tax Invoice No :$invoiceNo',
+                        'In No :$invoiceNo',
                         style: pw.TextStyle(
                           fontSize: 22,
                           fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.red,
                         ),
                       ),
                     ],
