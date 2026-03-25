@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/added_item.dart';
 import 'package:gsr/models/payment_data/payment_data_model.dart';
+import 'package:gsr/modules/print/print_invoice_view_new.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/providers/hive_db_provider.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +22,8 @@ class ViewIssuedInvoiceScreen extends StatefulWidget {
   const ViewIssuedInvoiceScreen({super.key, required this.issuedInvoice});
 
   @override
-  State<ViewIssuedInvoiceScreen> createState() => _ViewIssuedInvoiceScreenState();
+  State<ViewIssuedInvoiceScreen> createState() =>
+      _ViewIssuedInvoiceScreenState();
 }
 
 class _ViewIssuedInvoiceScreenState extends State<ViewIssuedInvoiceScreen> {
@@ -152,20 +154,20 @@ class _ViewIssuedInvoiceScreenState extends State<ViewIssuedInvoiceScreen> {
           IconButton(
               onPressed: () {
                 final payments = widget.issuedInvoice.payments ?? [];
-                final cash = payments
-                        .where((p) => p.paymentMethod == 1)
-                        .isNotEmpty
-                    ? payments
-                        .where((p) => p.paymentMethod == 1)
-                        .toList()
-                        .first
-                        .amount ?? 0.0
-                    : 0.0;
+                final cash =
+                    payments.where((p) => p.paymentMethod == 1).isNotEmpty
+                        ? payments
+                                .where((p) => p.paymentMethod == 1)
+                                .toList()
+                                .first
+                                .amount ??
+                            0.0
+                        : 0.0;
                 final invoiceItems = issuedInvoice.invoiceItems ?? [];
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PrintInvoiceView(
+                    builder: (context) => PrintInvoiceViewNew(
                       invoiceNo: issuedInvoice.invoiceNo,
                       rn: payments.isNotEmpty
                           ? payments[0].receiptNo ?? ''
@@ -590,7 +592,8 @@ class _ViewIssuedInvoiceScreenState extends State<ViewIssuedInvoiceScreen> {
                               Row(
                                 children: [
                                   text('Receipt No:'),
-                                  text((issuedInvoice.payments ?? [])[0].receiptNo ??
+                                  text((issuedInvoice.payments ?? [])[0]
+                                          .receiptNo ??
                                       ''),
                                 ],
                               ),
@@ -683,9 +686,11 @@ class _ViewIssuedInvoiceScreenState extends State<ViewIssuedInvoiceScreen> {
                                     align: TextAlign.end,
                                   ),
                                   const Spacer(),
-                                  if ((issuedInvoice.previousPayments ?? []).isNotEmpty)
+                                  if ((issuedInvoice.previousPayments ?? [])
+                                      .isNotEmpty)
                                     text(
-                                      formatPrice((issuedInvoice.amount ?? 0.0) +
+                                      formatPrice((issuedInvoice.amount ??
+                                              0.0) +
                                           (issuedInvoice.previousPayments ?? [])
                                               .map((e) => e.value ?? 0.0)
                                               .toList()
@@ -694,10 +699,12 @@ class _ViewIssuedInvoiceScreenState extends State<ViewIssuedInvoiceScreen> {
                                           _totalPayment()),
                                       align: TextAlign.end,
                                     ),
-                                  if ((issuedInvoice.previousPayments ?? []).isEmpty)
+                                  if ((issuedInvoice.previousPayments ?? [])
+                                      .isEmpty)
                                     text(
-                                      formatPrice((issuedInvoice.amount ?? 0.0) -
-                                          _totalPayment()),
+                                      formatPrice(
+                                          (issuedInvoice.amount ?? 0.0) -
+                                              _totalPayment()),
                                       align: TextAlign.end,
                                     ),
                                 ],

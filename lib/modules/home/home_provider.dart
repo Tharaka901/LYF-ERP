@@ -196,14 +196,28 @@ class HomeProvider extends ChangeNotifier {
           print('routeCardSoldItems: ${routeCardSoldItems.length}');
         }
         //!Get invoice count and save to local DB
-        int invoiceCount = await invoiceService
-            .invoiceCount(pendingRouteCards[0].routeCardId!);
-        int invoiceCountLocalDb = hiveDBProvider.invoiceBox!.length;
+        final allLocalInvoices = hiveDBProvider.invoiceBox!.values.toList();
+        final localEntrCount = allLocalInvoices
+            .where((inv) => inv.invoiceNo.contains('ENTR'))
+            .length;
+        final localNonEntrCount = allLocalInvoices
+            .where((inv) => !inv.invoiceNo.contains('ENTR'))
+            .length;
+
+        final nonEntrServerCount = await invoiceService
+            .invoiceCount(pendingRouteCards[0].routeCardId!, isProForma: false);
+        final entrServerCount = await invoiceService
+            .invoiceCount(pendingRouteCards[0].routeCardId!, isProForma: true);
+
         await hiveDBProvider.dataBox!.put(
-            'invoiceCount', (invoiceCount + invoiceCountLocalDb).toString());
+            'invoiceCount', (nonEntrServerCount + localNonEntrCount).toString());
+        await hiveDBProvider.dataBox!.put(
+            'invoiceCountEntr', (entrServerCount + localEntrCount).toString());
         if (kDebugMode) {
-          print('invoiceCount: $invoiceCount');
-          print('invoiceCountLocalDb: $invoiceCountLocalDb');
+          print('invoiceCount (non-ENTR): $nonEntrServerCount');
+          print('invoiceCountLocalDb (non-ENTR): $localNonEntrCount');
+          print('invoiceCount (ENTR): $entrServerCount');
+          print('invoiceCountLocalDb (ENTR): $localEntrCount');
         }
         //!Get receipt count and save to local DB
         int receiptCount = await paymentService

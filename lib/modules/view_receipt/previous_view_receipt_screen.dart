@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
+import 'package:gsr/modules/print/print_invoice_view_new.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/providers/payment_provider.dart';
 import 'package:gsr/widgets/confirm_for_save_and_print.dart';
@@ -598,7 +599,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => PrintInvoiceView(
+                                builder: (context) => PrintInvoiceViewNew(
                                   invoiceNo: '0',
                                   rn: dataProvider.isManualReceipt
                                       ? _usernameController.text
