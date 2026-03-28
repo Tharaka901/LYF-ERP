@@ -229,7 +229,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
             pw.Table(
               border: pw.TableBorder.all(width: 0.8, color: PdfColors.black),
               columnWidths: {
-                0: const pw.FlexColumnWidth(2.7),
+                0: const pw.FlexColumnWidth(2.3),
                 1: const pw.FlexColumnWidth(0.7),
                 2: const pw.FlexColumnWidth(1.0),
                 3: const pw.FlexColumnWidth(2.0),
@@ -311,7 +311,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
             pw.Table(
               border: pw.TableBorder.all(width: 0.8, color: PdfColors.black),
               columnWidths: {
-                0: const pw.FlexColumnWidth(1.5),
+                0: const pw.FlexColumnWidth(2.0),
                 1: const pw.FlexColumnWidth(1),
               },
               children: [
@@ -423,13 +423,14 @@ class PrintInvoiceViewNew extends StatelessWidget {
                 ],
               ),
               pw.SizedBox(height: 10.0),
-              if ((dataProvider.getTotalChequeAmount() + (cash ?? 0)) != 0)
+              if ((dataProvider.getTotalChequeAmount() + (cash ?? 0)) != 0 ||
+                  (cheques ?? dataProvider.chequeList).isNotEmpty)
                 pw.Table(
                   border:
                       pw.TableBorder.all(width: 0.8, color: PdfColors.black),
                   columnWidths: const {
-                    0: pw.FlexColumnWidth(1.1),
-                    1: pw.FlexColumnWidth(1.2),
+                    0: pw.FlexColumnWidth(1.0),
+                    1: pw.FlexColumnWidth(1.0),
                     2: pw.FlexColumnWidth(1.0),
                   },
                   children: [
