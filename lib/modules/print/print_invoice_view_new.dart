@@ -84,14 +84,16 @@ class PrintInvoiceViewNew extends StatelessWidget {
     // Values / labels
     final supplierVatNo =
         CompanyConstants.vatNumber.replaceAll('Our Vat No - ', '').trim();
-    final supplierVatDisplay =
-        (supplierVatNo.isEmpty || supplierVatNo == '0') ? 'Not Eligible' : supplierVatNo;
+    final supplierVatDisplay = (supplierVatNo.isEmpty || supplierVatNo == '0')
+        ? 'Not Eligible'
+        : supplierVatNo;
     final customer = issuedInvoice?.customer ?? dataProvider.selectedCustomer;
-    final invoiceHeaderText = (customer?.isProForma == 1)
-        ? 'PROFORMA INVOICE'
-        : (customer?.customerVat != "0")
-            ? 'TAX INVOICE'
-            : 'INVOICE';
+    final customerVat = (customer?.customerVat?.isEmpty ?? false) ||
+            (customer?.customerVat == "0")
+        ? 'Not Eligible'
+        : customer?.customerVat;
+    final invoiceHeaderText =
+        (customer?.isProForma == 1) ? 'PROFORMA INVOICE' : 'TAX INVOICE';
 
     final invoiceDate = formatInvoiceDate();
     final itemLines = items ?? dataProvider.itemList;
@@ -209,7 +211,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
                       child: pw.Column(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Text('VAT No :${dash(customer?.customerVat)}',
+                          pw.Text('VAT No :${dash(customerVat)}',
                               style: pw.TextStyle(
                                   fontSize: 18,
                                   fontWeight: pw.FontWeight.bold)),
