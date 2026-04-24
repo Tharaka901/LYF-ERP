@@ -92,11 +92,15 @@ class PrintInvoiceViewNew extends StatelessWidget {
             (customer?.customerVat == "0")
         ? 'Not Eligible'
         : customer?.customerVat;
-    final invoiceHeaderText =
-        (customer?.isProForma == 1) ? 'PROFORMA INVOICE' : 'TAX INVOICE';
-
     final invoiceDate = formatInvoiceDate();
     final itemLines = items ?? dataProvider.itemList;
+
+    final hasNewItem = itemLines.any((e) => e.item.itemTypeId == 2);
+    final invoiceHeaderText = hasNewItem
+        ? 'TRANSFER NOTE'
+        : (customer?.isProForma == 1)
+            ? 'PROFORMA INVOICE'
+            : 'TAX INVOICE';
     final totalValueOfSupply =
         issuedInvoice?.subTotal ?? dataProvider.getTotalAmount();
     final vatAmount = issuedInvoice?.vat ?? dataProvider.vat;
@@ -174,17 +178,24 @@ class PrintInvoiceViewNew extends StatelessWidget {
               border: pw.TableBorder.all(width: 0.8, color: PdfColors.black),
               columnWidths: {
                 0: const pw.FlexColumnWidth(1),
-                1: const pw.FlexColumnWidth(1),
               },
               children: [
+                // Supplier row
                 pw.TableRow(
                   children: [
-                    // Supplier cell
                     pw.Container(
                       padding: const pw.EdgeInsets.all(4),
                       child: pw.Column(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
+                          pw.Text(
+                            'Supplier',
+                            style: pw.TextStyle(
+                              fontSize: 20,
+                              fontWeight: pw.FontWeight.bold,
+                            ),
+                          ),
+                          pw.SizedBox(height: 2),
                           pw.Text(
                             'VAT No :$supplierVatDisplay',
                             style: pw.TextStyle(
@@ -205,12 +216,24 @@ class PrintInvoiceViewNew extends StatelessWidget {
                         ],
                       ),
                     ),
-                    // Customer cell
+                  ],
+                ),
+                // Customer row
+                pw.TableRow(
+                  children: [
                     pw.Container(
                       padding: const pw.EdgeInsets.all(4),
                       child: pw.Column(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
+                          pw.Text(
+                            'Customer',
+                            style: pw.TextStyle(
+                              fontSize: 20,
+                              fontWeight: pw.FontWeight.bold,
+                            ),
+                          ),
+                          pw.SizedBox(height: 2),
                           pw.Text('VAT No :${dash(customerVat)}',
                               style: pw.TextStyle(
                                   fontSize: 18,

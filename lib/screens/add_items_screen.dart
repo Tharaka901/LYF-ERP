@@ -3,13 +3,11 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/added_item.dart';
-import 'package:gsr/models/item.dart';
 import 'package:gsr/modules/return_cylinder/screens/return_note_screen.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/providers/items_provider.dart';
 import 'package:gsr/modules/leak_cylinders/leak_note_screen.dart';
 import 'package:gsr/modules/loan_cylinder/loan_note_screen.dart';
-import 'package:gsr/modules/return_cylinder/return_note_screen.dart';
 import 'package:gsr/modules/invoice/invoice_view.dart';
 import 'package:gsr/widgets/add_items.dart';
 import 'package:gsr/widgets/cards/add_item_card.dart';
@@ -18,6 +16,7 @@ import 'package:gsr/widgets/option_card.dart';
 import 'package:provider/provider.dart';
 
 import '../models/item/item_model.dart';
+import '../models/route_card_item/route_card_item_model.dart';
 import '../widgets/buttons/text_toogle.dart';
 
 class AddItemsScreen extends StatefulWidget {
@@ -284,21 +283,58 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
       ),
       body: widget.type == 'Default'
           ? SafeArea(
-              child: Consumer<ItemsProvider>(builder: (context, ip, _) {
+              child: Consumer2<ItemsProvider, DataProvider>(
+                  builder: (context, ip, dp, _) {
+                final basicItemIds = ip.basicItems
+                    .map((e) => (e as RouteCardItemModel).item?.id)
+                    .whereType<int>()
+                    .toSet();
+                final newItemIds = ip.newItems
+                    .map((e) => (e as RouteCardItemModel).item?.id)
+                    .whereType<int>()
+                    .toSet();
+
+                final hasBasicItemsAdded =
+                    dp.itemList.any((e) => basicItemIds.contains(e.item.id));
+                final hasNewItemsAdded =
+                    dp.itemList.any((e) => newItemIds.contains(e.item.id));
+
                 return ip.isLoadingItems
                     ? const Center(child: CircularProgressIndicator())
                     : ListView(shrinkWrap: true, children: [
                         //! Basic items list
                         const SizedBox(height: 10),
-                        ...ip.basicItems.map((e) => AddItemCard(e)),
+                        IgnorePointer(
+                          ignoring: hasNewItemsAdded,
+                          child: Opacity(
+                            opacity: hasNewItemsAdded ? 0.4 : 1.0,
+                            child: Column(
+                              children: ip.basicItems
+                                  .map((e) => AddItemCard(e))
+                                  .toList(),
+                            ),
+                          ),
+                        ),
 
                         //! New item section
-                        ToogleTextButton(
-                          label: 'New items',
-                          onChanged: ip.onNewItemSwitchPressed,
+                        IgnorePointer(
+                          ignoring: hasBasicItemsAdded,
+                          child: Opacity(
+                            opacity: hasBasicItemsAdded ? 0.4 : 1.0,
+                            child: Column(
+                              children: [
+                                ToogleTextButton(
+                                  label: 'New items',
+                                  onChanged: ip.onNewItemSwitchPressed,
+                                ),
+                                if (ip.isViewNewItems)
+                                  ...ip.newItems
+                                      .map((e) => AddItemCard(e))
+                                      .toList(),
+                              ],
+                            ),
+                          ),
                         ),
-                        if (ip.isViewNewItems)
-                          ...ip.newItems.map((e) => AddItemCard(e)),
 
                         //! Other item section
                         ToogleTextButton(

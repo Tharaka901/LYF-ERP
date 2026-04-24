@@ -67,17 +67,16 @@ class _CounterWidgetState extends State<CounterWidget> {
 
   void decreaseCount(DataProvider dataProvider) {
     if (count > 0) {
-      List<AddedItem> copyList = List.from(dataProvider.itemList);
-      copyList.forEach((item) {
-        if (item.item.id == widget.routecardItem.item?.id) {
-          if (item.quantity != 1) {
-            item.quantity -= 1;
-          } else {
-            dataProvider.itemList.removeWhere(
-                (item) => item.item.id == widget.routecardItem.item?.id);
-          }
+      final matchingItems = dataProvider.itemList
+          .where((item) => item.item.id == widget.routecardItem.item?.id)
+          .toList();
+      for (final item in matchingItems) {
+        if (item.quantity > 1) {
+          dataProvider.modifyItem(item, item.quantity - 1);
+        } else {
+          dataProvider.removeItem(item);
         }
-      });
+      }
       setState(() {
         count--;
         _textEditingController.text = count.toString();
