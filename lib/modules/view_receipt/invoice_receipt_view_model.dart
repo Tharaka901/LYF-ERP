@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gsr/models/payment_data/payment_data_model.dart';
 import 'package:gsr/modules/invoice/invoice_provider.dart';
@@ -56,81 +57,90 @@ class InvoiceReceiptViewModel {
     String? receiptNo,
     bool? isDirectPrevious = true,
   }) async {
-    waiting(context, body: 'Sending...');
-    final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    final paymentprovider =
-        Provider.of<PaymentProvider>(context, listen: false);
-    final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
-    final invoiceProvider =
-        Provider.of<InvoiceProvider>(context, listen: false);
-    PaymentDataModel paymentDataModel = PaymentDataModel(
-      selectedCustomer: dataProvider.selectedCustomer!,
-      issuedInvoicePaidList: dataProvider.issuedInvoicePaidList,
-      issuedDepositePaidList: dataProvider.issuedDepositePaidList,
-      currentRouteCard: dataProvider.currentRouteCard!,
-      balance: balance,
-      receiptNo: receiptNo ?? paymentprovider.receiptNumber!,
-      cash: cash,
-      currentEmployee: dataProvider.currentEmployee!,
-      chequeList: dataProvider.chequeList,
-      selectedVoucher: dataProvider.selectedVoucher,
-      invoiceId: invoiceProvider.invoiceRes?.data['invoice']['invoiceId'] ?? 0,
-      totalPayment: dataProvider.getTotalChequeAmount() +
-          cash +
-          (dataProvider.selectedVoucher != null
-              ? dataProvider.selectedVoucher!.value
-              : 0.0),
-      isDirectPrevoius: isDirectPrevious,
-    );
-    if (hiveDBProvider.isInternetConnected) {
-      if (dataProvider.issuedInvoicePaidList.isNotEmpty && isDirectPrevious!) {
-        await paymentService.payWithCreditInvoice(
-          context: context,
-          paymentDataModel: paymentDataModel,
-        );
-        //! only credit invoice payment
-      } else if (!isDirectPrevious!) {
-        await invoiceProvider.getInvoiceNu(context);
-        paymentDataModel.invoiceNo = invoiceProvider.invoiceNu;
-        await paymentService.sendCreditPayment(context, paymentDataModel);
+    try {
+      waiting(context, body: 'Sending...');
+      final dataProvider = Provider.of<DataProvider>(context, listen: false);
+      final paymentprovider =
+          Provider.of<PaymentProvider>(context, listen: false);
+      final hiveDBProvider =
+          Provider.of<HiveDBProvider>(context, listen: false);
+      final invoiceProvider =
+          Provider.of<InvoiceProvider>(context, listen: false);
+      PaymentDataModel paymentDataModel = PaymentDataModel(
+        selectedCustomer: dataProvider.selectedCustomer!,
+        issuedInvoicePaidList: dataProvider.issuedInvoicePaidList,
+        issuedDepositePaidList: dataProvider.issuedDepositePaidList,
+        currentRouteCard: dataProvider.currentRouteCard!,
+        balance: balance,
+        receiptNo: receiptNo ?? paymentprovider.receiptNumber!,
+        cash: cash,
+        currentEmployee: dataProvider.currentEmployee!,
+        chequeList: dataProvider.chequeList,
+        selectedVoucher: dataProvider.selectedVoucher,
+        invoiceId:
+            invoiceProvider.invoiceRes?.data['invoice']['invoiceId'] ?? 0,
+        totalPayment: dataProvider.getTotalChequeAmount() +
+            cash +
+            (dataProvider.selectedVoucher != null
+                ? dataProvider.selectedVoucher!.value
+                : 0.0),
+        isDirectPrevoius: isDirectPrevious,
+      );
+      if (hiveDBProvider.isInternetConnected) {
+        if (dataProvider.issuedInvoicePaidList.isNotEmpty &&
+            isDirectPrevious!) {
+          await paymentService.payWithCreditInvoice(
+            context: context,
+            paymentDataModel: paymentDataModel,
+          );
+          //! only credit invoice payment
+        } else if (!isDirectPrevious!) {
+          await invoiceProvider.getInvoiceNu(context);
+          paymentDataModel.invoiceNo = invoiceProvider.invoiceNu;
+          await paymentService.sendCreditPayment(context, paymentDataModel);
+        } else {
+          await paymentService.pay(
+            context: context,
+            paymentDataModel: paymentDataModel,
+            isOnlySave: isOnlySave,
+          );
+        }
+        dataProvider.itemList.clear();
+        dataProvider.issuedDepositePaidList.clear();
+        dataProvider.issuedInvoicePaidList.clear();
       } else {
-        await paymentService.pay(
-          context: context,
-          paymentDataModel: paymentDataModel,
-          isOnlySave: isOnlySave,
-        );
+        //! Save payment data in local DB
+        if (!isDirectPrevious!) {
+          //! only credit invoice payment
+          await invoiceProvider.getInvoiceNu(context);
+          paymentDataModel.invoiceNo = invoiceProvider.invoiceNu;
+          await invoiceProvider.createInvoiceDB(
+            context,
+            invoiceProvider.invoiceNu,
+            paymentDataModel: paymentDataModel,
+            onlyPayment: true,
+          );
+        }
+        final paymentKey =
+            invoiceProvider.invoiceNu ?? paymentDataModel.invoiceNo ?? '';
+        if (paymentKey.toString().trim().isNotEmpty) {
+          await hiveDBProvider.paymentsBox!
+              .put(paymentKey.toString().trim(), paymentDataModel);
+        }
+        //!Update receipt count
+        int receiptCount =
+            int.parse(hiveDBProvider.dataBox!.get('receiptCount') ?? '0');
+        await hiveDBProvider.dataBox!
+            .put('receiptCount', (receiptCount + 1).toString());
+        dataProvider.itemList.clear();
+        dataProvider.issuedDepositePaidList.clear();
+        dataProvider.issuedInvoicePaidList.clear();
       }
-      dataProvider.itemList.clear();
-      dataProvider.issuedDepositePaidList.clear();
-      dataProvider.issuedInvoicePaidList.clear();
-    } else {
-      //! Save payment data in local DB
-      if (!isDirectPrevious!) {
-        //! only credit invoice payment
-        await invoiceProvider.getInvoiceNu(context);
-        paymentDataModel.invoiceNo = invoiceProvider.invoiceNu;
-        await invoiceProvider.createInvoiceDB(
-          context,
-          invoiceProvider.invoiceNu,
-          paymentDataModel: paymentDataModel,
-          onlyPayment: true,
-        );
+    } catch (e) {
+      toast(e.toString());
+      if (kDebugMode) {
+        print('Error paying: $e');
       }
-      final paymentKey = invoiceProvider.invoiceNu ??
-          paymentDataModel.invoiceNo ??
-          '';
-      if (paymentKey.toString().trim().isNotEmpty) {
-        await hiveDBProvider.paymentsBox!
-            .put(paymentKey.toString().trim(), paymentDataModel);
-      }
-      //!Update receipt count
-      int receiptCount =
-          int.parse(hiveDBProvider.dataBox!.get('receiptCount') ?? '0');
-      await hiveDBProvider.dataBox!
-          .put('receiptCount', (receiptCount + 1).toString());
-      dataProvider.itemList.clear();
-      dataProvider.issuedDepositePaidList.clear();
-      dataProvider.issuedInvoicePaidList.clear();
     }
   }
 }

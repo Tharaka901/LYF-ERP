@@ -125,6 +125,7 @@ class InvoiceProvider extends ChangeNotifier {
         );
       }
     } catch (e) {
+      toast(e.toString());
       if (kDebugMode) {
         print('Error creating invoice: $e');
       }

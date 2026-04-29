@@ -33,36 +33,40 @@ Future<Respo> respo(
   Map<String, dynamic>? data,
   Method method = Method.get,
 }) async {
-  final response = method == Method.post
-      ? await Dio().post(
-          '$baseUrl/$endPoint',
-          data: data,
-          options: Options(
-            validateStatus: (_) => true,
-            contentType: Headers.jsonContentType,
-            responseType: ResponseType.json,
-          ),
-        )
-      : method == Method.get
-          ? await Dio().get(
-              '$baseUrl/$endPoint',
-              queryParameters: data,
-              options: Options(
-                validateStatus: (_) => true,
-                contentType: Headers.jsonContentType,
-                responseType: ResponseType.json,
-              ),
-            )
-          : await Dio().put(
-              '$baseUrl/$endPoint',
-              data: data,
-              options: Options(
-                validateStatus: (_) => true,
-                contentType: Headers.jsonContentType,
-                responseType: ResponseType.json,
-              ),
-            );
-  return Respo.fromJson(response.data);
+  try {
+    final response = method == Method.post
+        ? await Dio().post(
+            '$baseUrl/$endPoint',
+            data: data,
+            options: Options(
+              validateStatus: (_) => true,
+              contentType: Headers.jsonContentType,
+              responseType: ResponseType.json,
+            ),
+          )
+        : method == Method.get
+            ? await Dio().get(
+                '$baseUrl/$endPoint',
+                queryParameters: data,
+                options: Options(
+                  validateStatus: (_) => true,
+                  contentType: Headers.jsonContentType,
+                  responseType: ResponseType.json,
+                ),
+              )
+            : await Dio().put(
+                '$baseUrl/$endPoint',
+                data: data,
+                options: Options(
+                  validateStatus: (_) => true,
+                  contentType: Headers.jsonContentType,
+                  responseType: ResponseType.json,
+                ),
+              );
+    return Respo.fromJson(response.data);
+  } catch (e) {
+    throw Exception(e);
+  }
 }
 
 enum Method { get, post, put }
