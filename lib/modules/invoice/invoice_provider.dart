@@ -43,7 +43,7 @@ class InvoiceProvider extends ChangeNotifier {
       );
 
       if (!isEntrInvoice) {
-        final base = serverCount + localNonEntrCount;
+        final base = serverCount + localNonEntrCount - 1;
         invoiceNu =
             '${dataProvider.currentRouteCard!.routeCardNo}/${base + 1}';
         await hiveDBProvider.dataBox!.put(_invoiceCountKeyNonEntr, base.toString());
@@ -76,7 +76,7 @@ class InvoiceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> createInvoiceDB(
+  Future<String?> createInvoiceDB(
     BuildContext context,
     String? invoiceNo, {
     bool? onlyPayment = false,
@@ -84,7 +84,7 @@ class InvoiceProvider extends ChangeNotifier {
   }) async {
     iscreateReceipt = false;
     // Ensure the context is mounted when used after an async gap
-    if (!context.mounted) return;
+    if (!context.mounted) return null;
     try {
       final hiveDBProvider =
           Provider.of<HiveDBProvider>(context, listen: false);
@@ -96,6 +96,10 @@ class InvoiceProvider extends ChangeNotifier {
         final invoiceRequest = invoiceViewModel.setInvoiceCreateRequest(context,
             invoiceNu: invoiceNo);
         invoiceRes = await invoiceService.createInvoice(invoiceRequest);
+        print('invoiceRes: ${invoiceRes?.error}');
+        if (invoiceRes?.error != null) {
+          return invoiceRes!.error;
+        }
         //! Update local DB invoice number
         final isEntrInvoice = (invoiceNu ?? '').contains('ENTR') ||
             dataProvider.selectedCustomer?.customerVat != "0";

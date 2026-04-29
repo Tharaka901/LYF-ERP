@@ -1,5 +1,6 @@
 import 'package:badges/badges.dart' as b;
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gsr/commons/common_consts.dart';
@@ -65,6 +66,9 @@ Future<Respo> respo(
               );
     return Respo.fromJson(response.data);
   } catch (e) {
+    if (kDebugMode) {
+      print('Error respo: $e');
+    }
     throw Exception(e);
   }
 }

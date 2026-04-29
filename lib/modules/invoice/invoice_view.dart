@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/modules/invoice/invoice_provider.dart';
@@ -49,41 +50,60 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
         title: const Text('Invoice'),
       ),
       floatingActionButton: Consumer<InvoiceProvider>(
-        builder: ((context, ip, child) => (ip.invoiceNu == null && !(isManual ?? false))
-            ? const CircularProgressIndicator()
-            : FloatingActionButton(
-                onPressed: () async {
-                  if (isManual ?? false) {
-                    if (formKey.currentState!.validate()) {
-                      waiting(context, body: 'Sending...');
-                      await invoiceProvider.createInvoiceDB(
-                          context, invoiceNoController.text.trim());
-                      if (context.mounted) {
-                        pop(context);
-                        Navigator.pushNamed(context, AddPaymentScreen.routeId,
-                            arguments: {
-                              'invoiceRes': invoiceProvider.invoiceRes,
-                              'isManual': isManual
-                            });
+        builder: ((context, ip, child) =>
+            (ip.invoiceNu == null && !(isManual ?? false))
+                ? const CircularProgressIndicator()
+                : FloatingActionButton(
+                    onPressed: () async {
+                      if (isManual ?? false) {
+                        if (formKey.currentState!.validate()) {
+                          try {
+                            waiting(context, body: 'Sending...');
+                            final error = await invoiceProvider.createInvoiceDB(
+                                context, invoiceNoController.text.trim());
+                            if (error != null) {
+                              pop(context);
+                              toast(error, toastState: TS.error);
+                              return;
+                            }
+                            if (context.mounted) {
+                              pop(context);
+                              Navigator.pushNamed(
+                                  context, AddPaymentScreen.routeId,
+                                  arguments: {
+                                    'invoiceRes': invoiceProvider.invoiceRes,
+                                    'isManual': isManual
+                                  });
+                            }
+                          } catch (e) {
+                            toast(e.toString());
+                            if (kDebugMode) {
+                              print('Error creating invoice: $e');
+                            }
+                          }
+                        }
+                      } else {
+                        waiting(context, body: 'Sending...');
+                        final error = await invoiceProvider.createInvoiceDB(context, null);
+                        if (error != null) {
+                          pop(context);
+                          toast(error, toastState: TS.error);
+                          return;
+                        }
+                        if (context.mounted) {
+                          pop(context);
+                          Navigator.pushNamed(context, AddPaymentScreen.routeId,
+                              arguments: {
+                                'invoiceRes': invoiceProvider.invoiceRes
+                              });
+                        }
                       }
-                    }
-                  } else {
-                    waiting(context, body: 'Sending...');
-                    await invoiceProvider.createInvoiceDB(context, null);
-                    if (context.mounted) {
-                      pop(context);
-                      Navigator.pushNamed(context, AddPaymentScreen.routeId,
-                          arguments: {
-                            'invoiceRes': invoiceProvider.invoiceRes
-                          });
-                    }
-                  }
-                },
-                child: const Icon(
-                  Icons.arrow_forward,
-                  size: 40,
-                ),
-              )),
+                    },
+                    child: const Icon(
+                      Icons.arrow_forward,
+                      size: 40,
+                    ),
+                  )),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -215,7 +235,8 @@ class _ViewInvoiceScreenState extends State<ViewInvoiceScreen> {
                     Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Text(
-                        date(dataProvider.currentRouteCard!.date!, format: 'dd.MM.yyyy'),
+                        date(dataProvider.currentRouteCard!.date!,
+                            format: 'dd.MM.yyyy'),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 16.0,
