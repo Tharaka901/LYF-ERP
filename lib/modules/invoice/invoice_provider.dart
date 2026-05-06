@@ -43,7 +43,7 @@ class InvoiceProvider extends ChangeNotifier {
       );
 
       if (!isEntrInvoice) {
-        final base = serverCount + localNonEntrCount - 1;
+        final base = serverCount + localNonEntrCount;
         invoiceNu =
             '${dataProvider.currentRouteCard!.routeCardNo}/${base + 1}';
         await hiveDBProvider.dataBox!.put(_invoiceCountKeyNonEntr, base.toString());
@@ -96,7 +96,6 @@ class InvoiceProvider extends ChangeNotifier {
         final invoiceRequest = invoiceViewModel.setInvoiceCreateRequest(context,
             invoiceNu: invoiceNo);
         invoiceRes = await invoiceService.createInvoice(invoiceRequest);
-        print('invoiceRes: ${invoiceRes?.error}');
         if (invoiceRes?.error != null) {
           return invoiceRes!.error;
         }
