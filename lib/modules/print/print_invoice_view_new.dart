@@ -76,7 +76,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
     }
 
     String formatInvoiceDate() {
-      final d = issuedInvoice?.createdAt ?? dataProvider.currentRouteCard?.date;
+      final d = issuedInvoice?.routeCard?.date ?? dataProvider.currentRouteCard?.date;
       if (d == null) return '';
       return '${d.month.toString().padLeft(2, '0')}/${d.day.toString().padLeft(2, '0')}/${d.year}';
     }
@@ -292,7 +292,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
                     pw.Container(
                       padding: const pw.EdgeInsets.symmetric(vertical: 4),
                       alignment: pw.Alignment.center,
-                      child: pw.Text('Amount Excluding VAT',
+                      child: pw.Text('Amount',
                           style: pw.TextStyle(
                               fontSize: 18, fontWeight: pw.FontWeight.bold)),
                     ),
@@ -350,7 +350,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
                 _totalRow('VAT 18%', formatNumberNoRs(vatAmount)),
                 _totalRow('Nun VAT Items', formatNumberNoRs(nonVatItemsAmount)),
                 _totalRow(
-                  'Total consideration (Including VAT)',
+                  'Total',
                   formatNumberNoRs(grandTotal),
                 ),
               ],
