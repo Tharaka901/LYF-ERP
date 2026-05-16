@@ -100,7 +100,9 @@ class PrintInvoiceViewNew extends StatelessWidget {
         ? 'TRANSFER NOTE'
         : (customer?.isProForma == 1)
             ? 'PROFORMA INVOICE'
-            : 'TAX INVOICE';
+            : (customerVat == 'Not Eligible')
+                ? 'INVOICE'
+                : 'TAX INVOICE';           
     final totalValueOfSupply =
         issuedInvoice?.subTotal ?? dataProvider.getTotalAmount();
     final vatAmount = issuedInvoice?.vat ?? dataProvider.vat;
