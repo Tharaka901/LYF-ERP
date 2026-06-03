@@ -102,7 +102,10 @@ class PrintInvoiceViewNew extends StatelessWidget {
             ? 'PROFORMA INVOICE'
             : (customerVat == 'Not Eligible')
                 ? 'INVOICE'
-                : 'TAX INVOICE';           
+                : 'TAX INVOICE';
+    final isTransferNote = invoiceHeaderText == 'TRANSFER NOTE';
+    final vatPercent =
+        double.tryParse(customer?.vat?.vatAmount ?? '18') ?? 18;
     final totalValueOfSupply =
         issuedInvoice?.subTotal ?? dataProvider.getTotalAmount();
     final vatAmount = issuedInvoice?.vat ?? dataProvider.vat;
@@ -302,8 +305,15 @@ class PrintInvoiceViewNew extends StatelessWidget {
                 ),
                 ...itemLines.map((invoiceItem) {
                   final qty = invoiceItem.quantity;
-                  final unitPrice = invoiceItem.item.salePrice;
-                  final amountExVat = qty * unitPrice;
+                  final baseUnitPrice =
+                      invoiceItem.item.hasSpecialPrice?.itemPrice ??
+                          invoiceItem.item.salePrice;
+                  final nonVatPerUnit = invoiceItem.item.nonVatAmount ?? 0;
+                  final vatPerUnit = (baseUnitPrice / 100) * vatPercent;
+                  final unitPrice = isTransferNote
+                      ? baseUnitPrice + vatPerUnit + nonVatPerUnit
+                      : baseUnitPrice;
+                  final lineAmount = qty * unitPrice;
                   return pw.TableRow(
                     children: [
                       pw.Container(
@@ -329,7 +339,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
                         padding: const pw.EdgeInsets.symmetric(
                             vertical: 4, horizontal: 2),
                         alignment: pw.Alignment.centerRight,
-                        child: pw.Text(formatNumberNoRs(amountExVat),
+                        child: pw.Text(formatNumberNoRs(lineAmount),
                             style: const pw.TextStyle(fontSize: 18)),
                       ),
                     ],
@@ -347,10 +357,13 @@ class PrintInvoiceViewNew extends StatelessWidget {
                 1: const pw.FlexColumnWidth(1),
               },
               children: [
-                _totalRow('Total Value of Supply',
-                    formatNumberNoRs(totalValueOfSupply)),
-                _totalRow('VAT 18%', formatNumberNoRs(vatAmount)),
-                _totalRow('Nun VAT Items', formatNumberNoRs(nonVatItemsAmount)),
+                if (!isTransferNote) ...[
+                  _totalRow('Total Value of Supply',
+                      formatNumberNoRs(totalValueOfSupply)),
+                  _totalRow('VAT 18%', formatNumberNoRs(vatAmount)),
+                  _totalRow('Nun VAT Items',
+                      formatNumberNoRs(nonVatItemsAmount)),
+                ],
                 _totalRow(
                   'Total',
                   formatNumberNoRs(grandTotal),
