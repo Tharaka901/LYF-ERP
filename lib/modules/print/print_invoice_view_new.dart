@@ -97,13 +97,13 @@ class PrintInvoiceViewNew extends StatelessWidget {
 
     final hasNewItem = itemLines.any((e) => e.item.itemTypeId == 2);
     final invoiceHeaderText = hasNewItem
-        ? 'TRANSFER NOTE'
+        ? 'DELIVERY NOTE'
         : (customer?.isProForma == 1)
             ? 'PROFORMA INVOICE'
             : (customerVat == 'Not Eligible')
                 ? 'INVOICE'
                 : 'TAX INVOICE';
-    final isTransferNote = invoiceHeaderText == 'TRANSFER NOTE';
+    final isDeliveryNote = invoiceHeaderText == 'DELIVERY NOTE';
     final vatPercent =
         double.tryParse(customer?.vat?.vatAmount ?? '18') ?? 18;
     final totalValueOfSupply =
@@ -310,7 +310,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
                           invoiceItem.item.salePrice;
                   final nonVatPerUnit = invoiceItem.item.nonVatAmount ?? 0;
                   final vatPerUnit = (baseUnitPrice / 100) * vatPercent;
-                  final unitPrice = isTransferNote
+                  final unitPrice = isDeliveryNote
                       ? baseUnitPrice + vatPerUnit + nonVatPerUnit
                       : baseUnitPrice;
                   final lineAmount = qty * unitPrice;
@@ -357,7 +357,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
                 1: const pw.FlexColumnWidth(1),
               },
               children: [
-                if (!isTransferNote) ...[
+                if (!isDeliveryNote) ...[
                   _totalRow('Total Value of Supply',
                       formatNumberNoRs(totalValueOfSupply)),
                   _totalRow('VAT 18%', formatNumberNoRs(vatAmount)),
@@ -660,7 +660,12 @@ class PrintInvoiceViewNew extends StatelessWidget {
               color: const PdfColor.fromInt(0xFF000000),
             ),
             pw.SizedBox(height: 2),
-            MessageConstants.signatureNotRequired,
+            invoiceHeaderText == 'DELIVERY NOTE'
+                ? pw.Text(
+                    'Use for payment only.',
+                    style: pw.TextStyle(fontSize: 20),
+                  )
+                : MessageConstants.signatureNotRequired,
             pw.SizedBox(height: 5)
             // pw.Row(
             //   children: [

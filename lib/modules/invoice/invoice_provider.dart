@@ -25,10 +25,13 @@ class InvoiceProvider extends ChangeNotifier {
   bool iscreateReceipt = false; //! Create receipt and save other data to DB
   static const _invoiceCountKeyNonEntr = 'invoiceCount';
   static const _invoiceCountKeyEntr = 'invoiceCountEntr';
+  static const _invoiceCountKeyDeliveryNote = 'invoiceCountDeliveryNote';
 
   Future<void> getInvoiceNu(BuildContext context) async {
     final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
+    final isDeliveryNote =
+        dataProvider.itemList.any((e) => e.item.itemTypeId == 2);
     if (hiveDBProvider.isInternetConnected) {
       final isEntrInvoice = dataProvider.selectedCustomer?.customerVat != "0";
       final allLocal = hiveDBProvider.invoiceBox?.values.toList() ?? [];
@@ -36,33 +39,49 @@ class InvoiceProvider extends ChangeNotifier {
           allLocal.where((inv) => inv.invoiceNo.contains('ENTR')).length;
       final localNonEntrCount =
           allLocal.where((inv) => !inv.invoiceNo.contains('ENTR')).length;
-
+      final localDeliveryNoteCount =
+          allLocal.where((inv) => inv.invoiceNo.startsWith('DN')).length;
       final serverCount = await invoiceService.invoiceCount(
         dataProvider.currentRouteCard!.routeCardId!,
-        isProForma: isEntrInvoice,
+        isProForma: isEntrInvoice && !isDeliveryNote,
+        isDeliveryNote: isDeliveryNote,
       );
 
-      if (!isEntrInvoice) {
+      if (!isEntrInvoice && !isDeliveryNote) {
         final base = serverCount + localNonEntrCount;
+        invoiceNu = '${dataProvider.currentRouteCard!.routeCardNo}/${base + 1}';
+        await hiveDBProvider.dataBox!
+            .put(_invoiceCountKeyNonEntr, base.toString());
+      } else if (isDeliveryNote) {
+        final base = serverCount + localDeliveryNoteCount;
         invoiceNu =
-            '${dataProvider.currentRouteCard!.routeCardNo}/${base + 1}';
-        await hiveDBProvider.dataBox!.put(_invoiceCountKeyNonEntr, base.toString());
+            'DN/${dataProvider.currentRouteCard!.routeCardNo}/${base + 1}'.replaceAll('/RCN', '');
+        await hiveDBProvider.dataBox!
+            .put(_invoiceCountKeyDeliveryNote, base.toString());
       } else {
         final base = serverCount + localEntrCount;
         invoiceNu = generateInvoiceNumber(
           referenceDate: dataProvider.currentRouteCard!.date!,
           invoiceCountBase: base,
         );
-        await hiveDBProvider.dataBox!.put(_invoiceCountKeyEntr, base.toString());
+        await hiveDBProvider.dataBox!
+            .put(_invoiceCountKeyEntr, base.toString());
       }
     } else {
       final isEntrInvoice = dataProvider.selectedCustomer?.customerVat != "0";
-      final key = isEntrInvoice ? _invoiceCountKeyEntr : _invoiceCountKeyNonEntr;
-      final base =
-          int.tryParse(hiveDBProvider.dataBox!.get(key) ?? '0') ?? 0;
+      final isDeliveryNote =
+          dataProvider.itemList.any((e) => e.item.itemTypeId == 2);
+      final key = isDeliveryNote
+          ? _invoiceCountKeyDeliveryNote
+          : isEntrInvoice
+              ? _invoiceCountKeyEntr
+              : _invoiceCountKeyNonEntr;
+      final base = int.tryParse(hiveDBProvider.dataBox!.get(key) ?? '0') ?? 0;
       if (!isEntrInvoice) {
+        invoiceNu = '${dataProvider.currentRouteCard!.routeCardNo}/${base + 1}';
+      } else if (isDeliveryNote) {
         invoiceNu =
-            '${dataProvider.currentRouteCard!.routeCardNo}/${base + 1}';
+            'DN/${dataProvider.currentRouteCard!.routeCardNo}/${base + 1}';
       } else {
         invoiceNu = generateInvoiceNumber(
           referenceDate: dataProvider.currentRouteCard!.date!,
@@ -102,12 +121,20 @@ class InvoiceProvider extends ChangeNotifier {
         //! Update local DB invoice number
         final isEntrInvoice = (invoiceNu ?? '').contains('ENTR') ||
             dataProvider.selectedCustomer?.customerVat != "0";
+        final isDeliveryNote =
+            dataProvider.itemList.any((e) => e.item.itemTypeId == 2);
         final serverCount = await invoiceService.invoiceCount(
           dataProvider.currentRouteCard!.routeCardId!,
-          isProForma: isEntrInvoice,
+          isProForma: isEntrInvoice && !isDeliveryNote,
+          isDeliveryNote: isDeliveryNote,
         );
-        final key = isEntrInvoice ? _invoiceCountKeyEntr : _invoiceCountKeyNonEntr;
-        final localCount = int.tryParse(hiveDBProvider.dataBox!.get(key) ?? '0') ?? 0;
+        final key = isDeliveryNote
+            ? _invoiceCountKeyDeliveryNote
+            : isEntrInvoice
+                ? _invoiceCountKeyEntr
+                : _invoiceCountKeyNonEntr;
+        final localCount =
+            int.tryParse(hiveDBProvider.dataBox!.get(key) ?? '0') ?? 0;
         final maxCount = serverCount > localCount ? serverCount : localCount;
         await hiveDBProvider.dataBox!.put(key, maxCount.toString());
       } else {
@@ -119,7 +146,13 @@ class InvoiceProvider extends ChangeNotifier {
         //! Update local DB invoice number
         final isEntrInvoice = (invoiceNo ?? invoiceNu ?? '').contains('ENTR') ||
             dataProvider.selectedCustomer?.customerVat != "0";
-        final key = isEntrInvoice ? _invoiceCountKeyEntr : _invoiceCountKeyNonEntr;
+        final isDeliveryNote =
+            dataProvider.itemList.any((e) => e.item.itemTypeId == 2);
+        final key = isDeliveryNote
+            ? _invoiceCountKeyDeliveryNote
+            : isEntrInvoice
+                ? _invoiceCountKeyEntr
+                : _invoiceCountKeyNonEntr;
         int invoiceCount =
             int.tryParse(hiveDBProvider.dataBox!.get(key) ?? '0') ?? 0;
         await hiveDBProvider.dataBox!.put(

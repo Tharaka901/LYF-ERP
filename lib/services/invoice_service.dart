@@ -150,9 +150,9 @@ class InvoiceService {
     }
   }
 
-  Future<int> invoiceCount(int routeCardId, {bool isProForma = false}) async {
+  Future<int> invoiceCount(int routeCardId, {bool isProForma = false, bool isDeliveryNote = false}) async {
     final response = await respo(
-        'invoice/count-by-routecard?id=$routeCardId&is_profoma=$isProForma');
+        'invoice/count-by-routecard?id=$routeCardId&is_profoma=$isProForma&isDeliveryNote=$isDeliveryNote');
     final int count = response.data;
     return count;
   }
