@@ -563,9 +563,8 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                               return;
                             }
 
-                            Future<void> onSaveData() async {
-                              waiting(context, body: 'Sending...');
-                              await invoiceReceiptViewModel.pay(
+                            Future<bool> onSaveData() async {
+                              final saved = await invoiceReceiptViewModel.pay(
                                 context: context,
                                 cash: cash,
                                 isDirectPrevious: false,
@@ -574,26 +573,7 @@ class _PreviousViewReceiptScreenState extends State<PreviousViewReceiptScreen> {
                                     ? _usernameController.text
                                     : null,
                               );
-                              // await sendCreditPayment(
-                              //     context,
-                              //     dataProvider.getTotalChequeAmount() +
-                              //         cash +
-                              //         (dataProvider.selectedVoucher != null
-                              //             ? dataProvider.selectedVoucher!.value
-                              //             : 0.0),
-                              //     cash,
-                              //     false,
-                              //     0,
-                              //     receiptNo: dataProvider.isManualReceipt
-                              //         ? _usernameController.text
-                              //         : null);
-
-                              dataProvider.issuedDepositePaidList.clear();
-                              dataProvider.chequeList.clear();
-                              dataProvider.issuedInvoicePaidList.clear();
-                              dataProvider.itemList.clear();
-                              Navigator.popUntil(context,
-                                  ModalRoute.withName(PreviousScreen.routeId));
+                              return saved;
                             }
 
                             Navigator.push(

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gsr/commons/common_consts.dart';
 import 'package:gsr/commons/common_methods.dart';
 import 'package:gsr/models/balance.dart';
+import 'package:gsr/models/added_item.dart';
+import 'package:gsr/models/cheque/cheque.dart';
+import 'package:gsr/models/issued_invoice_paid_model/issued_invoice_paid.dart';
 import 'package:gsr/modules/print/print_invoice_view_new.dart';
 import 'package:gsr/providers/data_provider.dart';
 import 'package:gsr/modules/print/print_invoice_view.dart';
@@ -30,6 +33,88 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
   PaymentProvider? paymentProvider;
   final TextEditingController receiptNoController = TextEditingController();
   final formKey = GlobalKey<FormState>();
+  String? _savedInvoiceNo;
+  bool _isPaymentSaved = false;
+  List<AddedItem>? _printItems;
+  List<ChequeModel>? _printCheques;
+  List<IssuedInvoicePaidModel>? _printInvoicePaidList;
+  List<IssuedDepositePaidModel>? _printDepositePaidList;
+
+  String? _invoiceNoForPrint(InvoiceProvider invoiceProvider) {
+    return invoiceProvider.invoiceNu ?? _savedInvoiceNo;
+  }
+
+  void _cachePrintData(DataProvider dataProvider) {
+    _printItems ??= List<AddedItem>.from(dataProvider.itemList);
+    _printCheques ??= List<ChequeModel>.from(dataProvider.chequeList);
+    _printInvoicePaidList ??=
+        List<IssuedInvoicePaidModel>.from(dataProvider.issuedInvoicePaidList);
+    _printDepositePaidList ??=
+        List<IssuedDepositePaidModel>.from(dataProvider.issuedDepositePaidList);
+  }
+
+  Future<bool> _saveBeforePrint({
+    required InvoiceReceiptViewModel invoiceReceiptViewModel,
+    required InvoiceProvider invoiceProvider,
+    required ItemsProvider itemProvider,
+    required BuildContext context,
+    required double cash,
+    required double balance,
+    String? receiptNo,
+  }) async {
+    if (_isPaymentSaved) return true;
+
+    final invoiceNoBeforeSave = invoiceProvider.invoiceNu;
+    final saved = await invoiceReceiptViewModel.pay(
+      context: context,
+      cash: cash,
+      balance: balance,
+      receiptNo: receiptNo,
+    );
+    if (saved) {
+      _isPaymentSaved = true;
+      _savedInvoiceNo = invoiceNoBeforeSave ?? _savedInvoiceNo;
+      itemProvider.clearData();
+      if (mounted) setState(() {});
+    }
+    return saved;
+  }
+
+  void _openPrintInvoice({
+    required BuildContext context,
+    required InvoiceProvider invoiceProvider,
+    required DataProvider dataProvider,
+    required String rn,
+    required double cash,
+    required double balance,
+    required Future<bool> Function() onSaveData,
+  }) {
+    _cachePrintData(dataProvider);
+
+    final invoiceNo = _invoiceNoForPrint(invoiceProvider);
+    if (invoiceNo == null || invoiceNo.isEmpty) {
+      toast('Invoice number not available', toastState: TS.error);
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PrintInvoiceViewNew(
+          invoiceNo: invoiceNo,
+          rn: rn,
+          cash: cash,
+          balance: balance,
+          items: _printItems,
+          cheques: _printCheques,
+          issuedInvoicePaidList: _printInvoicePaidList,
+          issuedDepositePaidList: _printDepositePaidList,
+          isBillingFrom: true,
+          onSaveData: onSaveData,
+        ),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -199,7 +284,9 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(5.0),
                                   child: Text(
-                                    invoiceProvider.invoiceNu ?? '',
+                                    invoiceProvider.invoiceNu ??
+                                        _savedInvoiceNo ??
+                                        '',
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(fontSize: 18.0),
                                   ),
@@ -1026,9 +1113,43 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                     pop(context);
                                     if (isManual) {
                                       if (formKey.currentState!.validate()) {
-                                        Future<void> onSaveData() async {
-                                          waiting(context, body: 'Sending...');
-                                          await invoiceReceiptViewModel.pay(
+                                        Future<bool> onSaveData() => _saveBeforePrint(
+                                              invoiceReceiptViewModel:
+                                                  invoiceReceiptViewModel,
+                                              invoiceProvider: invoiceProvider,
+                                              itemProvider: itemProvider,
+                                              context: context,
+                                              cash: cash,
+                                              balance: currentBalance -
+                                                  (dataProvider
+                                                          .issuedInvoicePaidList
+                                                          .map((e) =>
+                                                              e.paymentAmount)
+                                                          .toList())
+                                                      .reduce(
+                                                          (value, element) =>
+                                                              value + element),
+                                              receiptNo: receiptNoController
+                                                  .text
+                                                  .trim(),
+                                            );
+
+                                        _openPrintInvoice(
+                                          context: context,
+                                          invoiceProvider: invoiceProvider,
+                                          dataProvider: dataProvider,
+                                          rn: receiptNoController.text.trim(),
+                                          cash: cash,
+                                          balance: currentBalance,
+                                          onSaveData: onSaveData,
+                                        );
+                                      }
+                                    } else {
+                                      Future<bool> onSaveData() => _saveBeforePrint(
+                                            invoiceReceiptViewModel:
+                                                invoiceReceiptViewModel,
+                                            invoiceProvider: invoiceProvider,
+                                            itemProvider: itemProvider,
                                             context: context,
                                             cash: cash,
                                             balance: currentBalance -
@@ -1039,70 +1160,23 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                                         .toList())
                                                     .reduce((value, element) =>
                                                         value + element),
-                                            receiptNo:
-                                                receiptNoController.text.trim(),
                                           );
-                                          itemProvider.clearData();
-                                        }
 
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                PrintInvoiceViewNew(
-                                              invoiceNo:
-                                                  invoiceProvider.invoiceNu!,
-                                              rn: receiptNoController.text
-                                                  .trim(),
-                                              cash: cash,
-                                              balance: currentBalance,
-                                              isBillingFrom: true,
-                                              onSaveData: onSaveData,
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    } else {
-                                      Future<void> onSaveData() async {
-                                        waiting(context, body: 'Sending...');
-                                        await invoiceReceiptViewModel.pay(
-                                          context: context,
-                                          cash: cash,
-                                          balance: currentBalance -
-                                              (dataProvider
-                                                      .issuedInvoicePaidList
-                                                      .map((e) =>
-                                                          e.paymentAmount)
-                                                      .toList())
-                                                  .reduce((value, element) =>
-                                                      value + element),
-                                        );
-                                        itemProvider.clearData();
-                                      }
-
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              PrintInvoiceViewNew(
-                                            invoiceNo:
-                                                invoiceProvider.invoiceNu!,
-                                            rn: paymentProvider
-                                                    ?.receiptNumber ??
-                                                '',
-                                            cash: cash,
-                                            balance: currentBalance -
-                                                (dataProvider
-                                                        .issuedInvoicePaidList
-                                                        .map((e) =>
-                                                            e.paymentAmount)
-                                                        .toList())
-                                                    .reduce((value, element) =>
-                                                        value + element),
-                                            isBillingFrom: true,
-                                            onSaveData: onSaveData,
-                                          ),
-                                        ),
+                                      _openPrintInvoice(
+                                        context: context,
+                                        invoiceProvider: invoiceProvider,
+                                        dataProvider: dataProvider,
+                                        rn: paymentProvider?.receiptNumber ??
+                                            '',
+                                        cash: cash,
+                                        balance: currentBalance -
+                                            (dataProvider
+                                                    .issuedInvoicePaidList
+                                                    .map((e) => e.paymentAmount)
+                                                    .toList())
+                                                .reduce((value, element) =>
+                                                    value + element),
+                                        onSaveData: onSaveData,
                                       );
                                     }
                                   },
@@ -1182,64 +1256,49 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                   onSaveAndPrint: () async {
                                     pop(context);
                                     if (isManual) {
-                                      Future<void> onSaveData() async {
-                                        await invoiceReceiptViewModel.pay(
-                                          context: context,
-                                          cash: cash,
-                                          balance: currentBalance,
-                                          receiptNo:
-                                              receiptNoController.text.trim(),
-                                        );
-                                        itemProvider.clearData();
-                                      }
+                                      Future<bool> onSaveData() => _saveBeforePrint(
+                                            invoiceReceiptViewModel:
+                                                invoiceReceiptViewModel,
+                                            invoiceProvider: invoiceProvider,
+                                            itemProvider: itemProvider,
+                                            context: context,
+                                            cash: cash,
+                                            balance: currentBalance,
+                                            receiptNo:
+                                                receiptNoController.text.trim(),
+                                          );
 
                                       if (formKey.currentState!.validate()) {
-                                        //pop(context);
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                PrintInvoiceViewNew(
-                                              invoiceNo:
-                                                  invoiceProvider.invoiceNu!,
-                                              rn: receiptNoController.text
-                                                  .trim(),
-                                              cash: cash,
-                                              balance: currentBalance,
-                                              isBillingFrom: true,
-                                              onSaveData: onSaveData,
-                                            ),
-                                          ),
+                                        _openPrintInvoice(
+                                          context: context,
+                                          invoiceProvider: invoiceProvider,
+                                          dataProvider: dataProvider,
+                                          rn: receiptNoController.text.trim(),
+                                          cash: cash,
+                                          balance: currentBalance,
+                                          onSaveData: onSaveData,
                                         );
                                       }
                                     } else {
-                                      Future<void> onSaveData() async {
-                                        waiting(context, body: 'Sending...');
-                                        await invoiceReceiptViewModel.pay(
-                                          context: context,
-                                          cash: cash,
-                                          balance: currentBalance,
-                                        );
-                                        itemProvider.clearData();
-                                      }
-
-                                      //pop(context);
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              PrintInvoiceViewNew(
-                                            invoiceNo:
-                                                invoiceProvider.invoiceNu!,
-                                            rn: paymentProvider
-                                                    ?.receiptNumber ??
-                                                '',
+                                      Future<bool> onSaveData() => _saveBeforePrint(
+                                            invoiceReceiptViewModel:
+                                                invoiceReceiptViewModel,
+                                            invoiceProvider: invoiceProvider,
+                                            itemProvider: itemProvider,
+                                            context: context,
                                             cash: cash,
                                             balance: currentBalance,
-                                            isBillingFrom: true,
-                                            onSaveData: onSaveData,
-                                          ),
-                                        ),
+                                          );
+
+                                      _openPrintInvoice(
+                                        context: context,
+                                        invoiceProvider: invoiceProvider,
+                                        dataProvider: dataProvider,
+                                        rn: paymentProvider?.receiptNumber ??
+                                            '',
+                                        cash: cash,
+                                        balance: currentBalance,
+                                        onSaveData: onSaveData,
                                       );
                                     }
                                   },

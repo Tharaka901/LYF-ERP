@@ -14,8 +14,90 @@ import 'package:provider/provider.dart';
 
 import '../../commons/common_methods.dart';
 import '../../providers/data_provider.dart';
+import '../previous_customer_select/previous_screen.dart';
 
-class PrintInvoiceViewNew extends StatelessWidget {
+class _PrintInvoiceSnapshot {
+  final List<AddedItem> items;
+  final List<ChequeModel> cheques;
+  final List<IssuedInvoicePaidModel> issuedInvoicePaidList;
+  final List<IssuedDepositePaidModel> issuedDepositePaidList;
+  final double subTotal;
+  final double vat;
+  final double nonVatItemTotal;
+  final double grandTotal;
+  final double totalChequeAmount;
+  final double totalDepositePaymentAmount;
+
+  const _PrintInvoiceSnapshot({
+    required this.items,
+    required this.cheques,
+    required this.issuedInvoicePaidList,
+    required this.issuedDepositePaidList,
+    required this.subTotal,
+    required this.vat,
+    required this.nonVatItemTotal,
+    required this.grandTotal,
+    required this.totalChequeAmount,
+    required this.totalDepositePaymentAmount,
+  });
+
+  factory _PrintInvoiceSnapshot.fromDataProvider(
+    DataProvider dataProvider, {
+    List<AddedItem>? itemsOverride,
+    List<ChequeModel>? chequesOverride,
+    List<IssuedInvoicePaidModel>? issuedInvoicePaidListOverride,
+    List<IssuedDepositePaidModel>? issuedDepositePaidListOverride,
+  }) {
+    final items = List<AddedItem>.from(itemsOverride ?? dataProvider.itemList);
+    final cheques =
+        List<ChequeModel>.from(chequesOverride ?? dataProvider.chequeList);
+    final issuedInvoicePaidList = List<IssuedInvoicePaidModel>.from(
+      issuedInvoicePaidListOverride ?? dataProvider.issuedInvoicePaidList,
+    );
+    final issuedDepositePaidList = List<IssuedDepositePaidModel>.from(
+      issuedDepositePaidListOverride ?? dataProvider.issuedDepositePaidList,
+    );
+    final subTotal = items.fold<double>(0.0, (total, addedItem) {
+      final price = addedItem.item.hasSpecialPrice?.itemPrice ??
+          addedItem.item.salePrice;
+      return total + (price * addedItem.quantity);
+    });
+    final vatPercent = double.tryParse(
+          dataProvider.selectedCustomer?.vat?.vatAmount ?? '0',
+        ) ??
+        0;
+    final vat =
+        double.parse(((subTotal / 100) * vatPercent).toStringAsFixed(2));
+    final nonVatItemTotal = items.fold<double>(
+      0,
+      (sum, e) => sum + (e.item.nonVatAmount ?? 0) * e.quantity,
+    );
+    final grandTotal = double.parse(
+      (subTotal + vat + nonVatItemTotal).toStringAsFixed(2),
+    );
+    final totalChequeAmount =
+        cheques.fold<double>(0, (sum, c) => sum + c.chequeAmount);
+    final totalDepositePaymentAmount = issuedDepositePaidList.fold<double>(
+      0,
+      (sum, d) => sum + d.paymentAmount,
+    );
+
+    return _PrintInvoiceSnapshot(
+      items: items,
+      cheques: cheques,
+      issuedInvoicePaidList: issuedInvoicePaidList,
+      issuedDepositePaidList: issuedDepositePaidList,
+      subTotal: subTotal,
+      vat: vat,
+      nonVatItemTotal: nonVatItemTotal,
+      grandTotal: grandTotal,
+      totalChequeAmount: totalChequeAmount,
+      totalDepositePaymentAmount: totalDepositePaymentAmount,
+    );
+  }
+}
+
+class PrintInvoiceViewNew extends StatefulWidget {
   final String invoiceNo;
   final String rn;
   final double? cash;
@@ -24,8 +106,10 @@ class PrintInvoiceViewNew extends StatelessWidget {
   final List<AddedItem>? items;
   final List<ChequeModel>? cheques;
   final List<IssuedInvoicePaidModel>? previousPayments;
+  final List<IssuedInvoicePaidModel>? issuedInvoicePaidList;
+  final List<IssuedDepositePaidModel>? issuedDepositePaidList;
   final bool? isBillingFrom;
-  final Future<void> Function()? onSaveData;
+  final Future<bool> Function()? onSaveData;
   final String? type;
 
   const PrintInvoiceViewNew({
@@ -38,30 +122,91 @@ class PrintInvoiceViewNew extends StatelessWidget {
     this.items,
     this.cheques,
     this.previousPayments,
+    this.issuedInvoicePaidList,
+    this.issuedDepositePaidList,
     this.isBillingFrom,
     this.onSaveData,
     this.type,
   });
 
   @override
+  State<PrintInvoiceViewNew> createState() => _PrintInvoiceViewNewState();
+}
+
+class _PrintInvoiceViewNewState extends State<PrintInvoiceViewNew> {
+  final _viewModel = PrintInvoiceViewModel();
+  _PrintInvoiceSnapshot? _snapshot;
+  bool _isSaving = false;
+  bool _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if ((widget.isBillingFrom ?? false) && widget.onSaveData != null) {
+      _isSaving = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _saveBeforePrint());
+    } else {
+      _ready = true;
+    }
+  }
+
+  Future<void> _saveBeforePrint() async {
+    final dataProvider = Provider.of<DataProvider>(context, listen: false);
+    _snapshot = _PrintInvoiceSnapshot.fromDataProvider(
+      dataProvider,
+      itemsOverride: widget.items,
+      chequesOverride: widget.cheques,
+      issuedInvoicePaidListOverride: widget.issuedInvoicePaidList,
+      issuedDepositePaidListOverride: widget.issuedDepositePaidList,
+    );
+
+    final saved = await widget.onSaveData!();
+    if (!mounted) return;
+
+    if (!saved) {
+      Navigator.pop(context);
+      return;
+    }
+
+    setState(() {
+      _isSaving = false;
+      _ready = true;
+    });
+  }
+
+  Future<void> _onPrinted(BuildContext context) async {
+    if (widget.type == 'previous') {
+      final dataProvider = Provider.of<DataProvider>(context, listen: false);
+      dataProvider.issuedDepositePaidList.clear();
+      dataProvider.chequeList.clear();
+      dataProvider.issuedInvoicePaidList.clear();
+      dataProvider.itemList.clear();
+      if (!context.mounted) return;
+      Navigator.popUntil(
+        context,
+        ModalRoute.withName(PreviousScreen.routeId),
+      );
+      return;
+    }
+
+    if (!context.mounted) return;
+    _viewModel.onPrinted(context, widget.isBillingFrom ?? false);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final viewModel = PrintInvoiceViewModel();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Print Invoice'),
       ),
-      body: PdfPreview(
-        onPrinted: (context) async {
-          if ((isBillingFrom ?? false) & (onSaveData != null)) {
-            await onSaveData!();
-          }
-          if (type != 'previous') {
-            if (!context.mounted) return;
-            viewModel.onPrinted(context, isBillingFrom ?? false);
-          }
-        },
-        build: (format) => _generatePdf(format, context),
-      ),
+      body: _isSaving || !_ready
+          ? const Center(child: CircularProgressIndicator())
+          : PdfPreview(
+              onPrinted: (context) async {
+                await _onPrinted(context);
+              },
+              build: (format) => _generatePdf(format, context),
+            ),
     );
   }
 
@@ -69,6 +214,18 @@ class PrintInvoiceViewNew extends StatelessWidget {
       PdfPageFormat format, BuildContext context) async {
     final pdf = pw.Document(version: PdfVersion.pdf_1_5, compress: true);
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
+    final snapshot = _snapshot;
+    final itemLines = widget.items ?? snapshot?.items ?? dataProvider.itemList;
+    final chequesForPrint =
+        widget.cheques ?? snapshot?.cheques ?? dataProvider.chequeList;
+    final depositePaidList = snapshot?.issuedDepositePaidList ??
+        dataProvider.issuedDepositePaidList;
+    final invoicePaidList = snapshot?.issuedInvoicePaidList ??
+        dataProvider.issuedInvoicePaidList;
+    final totalChequeAmount =
+        snapshot?.totalChequeAmount ?? dataProvider.getTotalChequeAmount();
+    final totalDepositePaymentAmount = snapshot?.totalDepositePaymentAmount ??
+        dataProvider.getTotalDepositePaymentAmount();
 
     String formatNumberNoRs(double v) {
       final s = formatPrice(v).replaceAll('Rs.', '').trim();
@@ -76,7 +233,8 @@ class PrintInvoiceViewNew extends StatelessWidget {
     }
 
     String formatInvoiceDate() {
-      final d = issuedInvoice?.routeCard?.date ?? dataProvider.currentRouteCard?.date;
+      final d = widget.issuedInvoice?.routeCard?.date ??
+          dataProvider.currentRouteCard?.date;
       if (d == null) return '';
       return '${d.month.toString().padLeft(2, '0')}/${d.day.toString().padLeft(2, '0')}/${d.year}';
     }
@@ -87,13 +245,13 @@ class PrintInvoiceViewNew extends StatelessWidget {
     final supplierVatDisplay = (supplierVatNo.isEmpty || supplierVatNo == '0')
         ? 'Not Eligible'
         : supplierVatNo;
-    final customer = issuedInvoice?.customer ?? dataProvider.selectedCustomer;
+    final customer =
+        widget.issuedInvoice?.customer ?? dataProvider.selectedCustomer;
     final customerVat = (customer?.customerVat?.isEmpty ?? false) ||
             (customer?.customerVat == "0")
         ? 'Not Eligible'
         : customer?.customerVat;
     final invoiceDate = formatInvoiceDate();
-    final itemLines = items ?? dataProvider.itemList;
 
     final hasNewItem = itemLines.any((e) => e.item.itemTypeId == 2);
     final invoiceHeaderText = hasNewItem
@@ -106,20 +264,24 @@ class PrintInvoiceViewNew extends StatelessWidget {
     final isDeliveryNote = invoiceHeaderText == 'DELIVERY NOTE';
     final vatPercent =
         double.tryParse(customer?.vat?.vatAmount ?? '18') ?? 18;
-    final totalValueOfSupply =
-        issuedInvoice?.subTotal ?? dataProvider.getTotalAmount();
-    final vatAmount = issuedInvoice?.vat ?? dataProvider.vat;
-    final nonVatItemsAmount =
-        issuedInvoice?.nonVatItemTotal ?? dataProvider.nonVatItemTotal;
-    final grandTotal = issuedInvoice?.amount ??
+    final totalValueOfSupply = widget.issuedInvoice?.subTotal ??
+        snapshot?.subTotal ??
+        dataProvider.getTotalAmount();
+    final vatAmount =
+        widget.issuedInvoice?.vat ?? snapshot?.vat ?? dataProvider.vat;
+    final nonVatItemsAmount = widget.issuedInvoice?.nonVatItemTotal ??
+        snapshot?.nonVatItemTotal ??
+        dataProvider.nonVatItemTotal;
+    final grandTotal = widget.issuedInvoice?.amount ??
+        snapshot?.grandTotal ??
         (dataProvider.getTotalAmount() + nonVatItemsAmount + vatAmount);
 
     double totalPaymentForPrint() {
-      if ((issuedInvoice?.payments ?? []).isNotEmpty) {
-        return (issuedInvoice!.payments ?? [])
+      if ((widget.issuedInvoice?.payments ?? []).isNotEmpty) {
+        return (widget.issuedInvoice!.payments ?? [])
             .fold<double>(0.0, (sum, p) => sum + (p.amount ?? 0.0));
       }
-      return dataProvider.getTotalChequeAmount() + (cash ?? 0.0);
+      return totalChequeAmount + (widget.cash ?? 0.0);
     }
 
     // Template-specific supplier strings (match the screenshot wording/format).
@@ -165,7 +327,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
                         ),
                       ),
                       pw.Text(
-                        'In No :$invoiceNo',
+                        'In No :${widget.invoiceNo}',
                         style: pw.TextStyle(
                           fontSize: 22,
                           fontWeight: pw.FontWeight.bold,
@@ -372,7 +534,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
             ),
 
             // ===== Over payment settlement (Previous Deposite Payments) =====
-            if (dataProvider.issuedDepositePaidList.isNotEmpty) ...[
+            if (depositePaidList.isNotEmpty) ...[
               pw.SizedBox(height: 5.0),
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.start,
@@ -411,9 +573,8 @@ class PrintInvoiceViewNew extends StatelessWidget {
                       ),
                     ],
                   ),
-                  ...dataProvider.issuedDepositePaidList.map((dp) {
-                    final idx =
-                        dataProvider.issuedDepositePaidList.indexOf(dp) + 1;
+                  ...depositePaidList.map((dp) {
+                    final idx = depositePaidList.indexOf(dp) + 1;
                     final dateStr = date(
                       dp.issuedDeposite.routeCard?.date ?? DateTime.now(),
                       format: 'dd-MM-yyyy',
@@ -445,7 +606,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
                 children: [
                   _totalRow(
                     'Total Previous Deposite Payment',
-                    formatPrice(dataProvider.getTotalDepositePaymentAmount()),
+                    formatPrice(totalDepositePaymentAmount),
                     fontSize: 22.0,
                   ),
                 ],
@@ -454,22 +615,22 @@ class PrintInvoiceViewNew extends StatelessWidget {
             ],
 
             // ===== Payment section =====
-            if ((issuedInvoice?.payments?.isNotEmpty ?? false) ||
-                (dataProvider.getTotalChequeAmount() + (cash ?? 0)) != 0) ...[
+            if ((widget.issuedInvoice?.payments?.isNotEmpty ?? false) ||
+                (totalChequeAmount + (widget.cash ?? 0)) != 0) ...[
               pw.Divider(thickness: 0.5),
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.start,
                 children: [
                   pw.Text(
-                    'Recipt No : $rn',
+                    'Recipt No : ${widget.rn}',
                     textAlign: pw.TextAlign.start,
                     style: const pw.TextStyle(fontSize: 18.0),
                   ),
                 ],
               ),
               pw.SizedBox(height: 10.0),
-              if ((dataProvider.getTotalChequeAmount() + (cash ?? 0)) != 0 ||
-                  (cheques ?? dataProvider.chequeList).isNotEmpty)
+              if ((totalChequeAmount + (widget.cash ?? 0)) != 0 ||
+                  chequesForPrint.isNotEmpty)
                 pw.Table(
                   border:
                       pw.TableBorder.all(width: 0.8, color: PdfColors.black),
@@ -492,19 +653,21 @@ class PrintInvoiceViewNew extends StatelessWidget {
                         ),
                       ],
                     ),
-                    if (cash != null && cash != 0)
+                    if (widget.cash != null && widget.cash != 0)
                       pw.TableRow(
                         children: [
                           _bodyCellSmall('Cash', align: pw.TextAlign.left),
                           _bodyCellSmall('-', align: pw.TextAlign.left),
                           _bodyCellSmall(
-                            formatPrice(cash ?? 0).replaceAll('Rs.', '').trim(),
+                            formatPrice(widget.cash ?? 0)
+                                .replaceAll('Rs.', '')
+                                .trim(),
                             align: pw.TextAlign.right,
                           ),
                         ],
                       ),
-                    if ((cheques ?? dataProvider.chequeList).isNotEmpty)
-                      ...(cheques ?? dataProvider.chequeList).map((m) {
+                    if (chequesForPrint.isNotEmpty)
+                      ...chequesForPrint.map((m) {
                         final amountStr = formatPrice(m.chequeAmount)
                             .replaceAll('Rs.', '')
                             .trim();
@@ -522,7 +685,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
                       }),
                   ],
                 ),
-              if ((dataProvider.getTotalChequeAmount() + (cash ?? 0)) != 0)
+              if ((totalChequeAmount + (widget.cash ?? 0)) != 0)
                 pw.Table(
                   columnWidths: const {
                     0: pw.FlexColumnWidth(1),
@@ -535,7 +698,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
             ],
 
             // ===== Over payment or credit =====
-            if (balance != 0)
+            if (widget.balance != 0)
               pw.Table(
                 border: pw.TableBorder.all(width: 0.8, color: PdfColors.black),
                 columnWidths: const {
@@ -544,17 +707,19 @@ class PrintInvoiceViewNew extends StatelessWidget {
                 },
                 children: [
                   _totalRow(
-                    balance > 0 ? 'Over Payment' : 'Credit',
-                    formatPrice(balance > 0 ? balance : -1 * balance),
+                    widget.balance > 0 ? 'Over Payment' : 'Credit',
+                    formatPrice(widget.balance > 0
+                        ? widget.balance
+                        : -1 * widget.balance),
                   ),
                 ],
               ),
 
             // ===== Previous payments (Credit bills) =====
             ...(() {
-              final prevList = issuedInvoice != null
-                  ? (previousPayments ?? [])
-                  : dataProvider.issuedInvoicePaidList;
+              final prevList = widget.issuedInvoice != null
+                  ? (widget.previousPayments ?? [])
+                  : invoicePaidList;
               if (prevList.isEmpty) return <pw.Widget>[];
 
               final prevTotal = prevList
@@ -631,7 +796,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (balance > 0)
+                if (widget.balance > 0)
                   pw.Table(
                     columnWidths: const {
                       0: pw.FlexColumnWidth(1),
@@ -640,7 +805,7 @@ class PrintInvoiceViewNew extends StatelessWidget {
                     children: [
                       _totalRow(
                         'Balance:',
-                        formatPrice(balance),
+                        formatPrice(widget.balance),
                         fontSize: 22.0,
                       ),
                     ],

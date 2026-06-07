@@ -49,7 +49,7 @@ class InvoiceReceiptViewModel {
     }
   }
 
-  Future<void> pay({
+  Future<bool> pay({
     required BuildContext context,
     required double balance,
     required double cash,
@@ -136,11 +136,15 @@ class InvoiceReceiptViewModel {
         dataProvider.issuedDepositePaidList.clear();
         dataProvider.issuedInvoicePaidList.clear();
       }
+      if (context.mounted) pop(context);
+      return true;
     } catch (e) {
+      if (context.mounted) pop(context);
       toast(e.toString());
       if (kDebugMode) {
         print('Error paying: $e');
       }
+      return false;
     }
   }
 }
