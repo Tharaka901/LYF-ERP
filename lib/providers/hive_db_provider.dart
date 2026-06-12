@@ -75,7 +75,7 @@ class HiveDBProvider extends ChangeNotifier {
       if (kDebugMode) {
         print(status);
       }
-      isInternetConnected = status == InternetConnectionStatus.connected;
+      // isInternetConnected = status == InternetConnectionStatus.connected;
     });
   }
 }
