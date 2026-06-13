@@ -39,12 +39,12 @@ class InvoiceProvider extends ChangeNotifier {
         isProForma: false,
         isDeliveryNote: false,
       );
-      final base =
-          int.tryParse(hiveDBProvider.dataBox!.get(_invoiceCountKeyReceipt) ?? '0') ?? 0;
+      // final base =
+      //     int.tryParse(hiveDBProvider.dataBox!.get(_invoiceCountKeyReceipt) ?? '0') ?? 0;
       invoiceNu =
-          'RCN/${dataProvider.currentRouteCard!.routeCardId}/${base + serverCount + 1}';
-      await hiveDBProvider.dataBox!
-          .put(_invoiceCountKeyReceipt, (base + 1).toString());
+          'RCN/${dataProvider.currentRouteCard!.routeCardId}/${  serverCount + 1}';
+      // await hiveDBProvider.dataBox!
+      //     .put(_invoiceCountKeyReceipt, (base + 1).toString());
       if (context.mounted) setCurrentInvoice(context);
       notifyListeners();
       return;
