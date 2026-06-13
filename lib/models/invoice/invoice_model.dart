@@ -18,6 +18,7 @@ class InvoiceModel {
   final int? customerId;
   final double? creditValue;
   final int? employeeId;
+  final int? rep;
   final int? status;
   CustomerModel? customer;
   final EmployeeModel? employee;
@@ -38,6 +39,7 @@ class InvoiceModel {
     this.customerId,
     this.creditValue,
     this.employeeId,
+    this.rep,
     this.status,
     this.customer,
     required this.invoiceNo,
@@ -71,6 +73,9 @@ class InvoiceModel {
                 ? double.parse(json["creditValue"])
                 : json["creditValue"],
         employeeId: json["employeeId"],
+        rep: json["rep"] is String
+            ? int.tryParse(json["rep"])
+            : json["rep"] as int?,
         status: json["status"],
         createdAt: json["createdAt"] is String
             ? DateTime.parse(json["createdAt"])
@@ -121,6 +126,7 @@ class InvoiceModel {
         "customerId": customerId,
         "creditValue": creditValue,
         "employeeId": employeeId,
+        "rep": rep,
         "status": status,
         "customer": customer?.toJson(),
         "invoiceItems": invoiceItems,
@@ -138,6 +144,7 @@ class InvoiceModel {
         "customerId": customerId,
         "creditValue": creditValue,
         "employeeId": employeeId,
+        "rep": rep,
         "status": status,
         "customer": customer?.toJson(),
         "items": invoiceItems?.map((x) => x.toJson()).toList(),

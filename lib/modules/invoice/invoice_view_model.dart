@@ -42,6 +42,7 @@ class InvoiceViewModel {
       customerId: selectedCustomer.customerId,
       creditValue: double.parse((dataProvider.grandTotal).toStringAsFixed(2)),
       employeeId: dataProvider.currentEmployee!.employeeId,
+      rep: selectedCustomer.employeeId,
       status: 1,
       invoiceItems: setInvoiceItems(context),
       createdAt: _getSriLankaDateTime(),

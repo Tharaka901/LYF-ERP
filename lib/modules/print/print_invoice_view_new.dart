@@ -422,116 +422,118 @@ class _PrintInvoiceViewNewState extends State<PrintInvoiceViewNew> {
             ),
 
             // ===== Items table =====
-            pw.SizedBox(height: 4),
-            pw.Table(
-              border: pw.TableBorder.all(width: 0.8, color: PdfColors.black),
-              columnWidths: {
-                0: const pw.FlexColumnWidth(2.3),
-                1: const pw.FlexColumnWidth(0.7),
-                2: const pw.FlexColumnWidth(1.0),
-                3: const pw.FlexColumnWidth(2.0),
-              },
-              children: [
-                // Header row
-                pw.TableRow(
-                  children: [
-                    pw.Container(
-                      padding: const pw.EdgeInsets.symmetric(vertical: 4),
-                      alignment: pw.Alignment.center,
-                      child: pw.Text('Items',
-                          style: pw.TextStyle(
-                              fontSize: 18, fontWeight: pw.FontWeight.bold)),
-                    ),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.symmetric(vertical: 4),
-                      alignment: pw.Alignment.center,
-                      child: pw.Text('Qty',
-                          style: pw.TextStyle(
-                              fontSize: 18, fontWeight: pw.FontWeight.bold)),
-                    ),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.symmetric(vertical: 4),
-                      alignment: pw.Alignment.center,
-                      child: pw.Text('Unit Price',
-                          style: pw.TextStyle(
-                              fontSize: 18, fontWeight: pw.FontWeight.bold)),
-                    ),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.symmetric(vertical: 4),
-                      alignment: pw.Alignment.center,
-                      child: pw.Text('Amount',
-                          style: pw.TextStyle(
-                              fontSize: 18, fontWeight: pw.FontWeight.bold)),
-                    ),
-                  ],
-                ),
-                ...itemLines.map((invoiceItem) {
-                  final qty = invoiceItem.quantity;
-                  final baseUnitPrice =
-                      invoiceItem.item.hasSpecialPrice?.itemPrice ??
-                          invoiceItem.item.salePrice;
-                  final nonVatPerUnit = invoiceItem.item.nonVatAmount ?? 0;
-                  final vatPerUnit = (baseUnitPrice / 100) * vatPercent;
-                  final unitPrice = isDeliveryNote
-                      ? baseUnitPrice + vatPerUnit + nonVatPerUnit
-                      : baseUnitPrice;
-                  final lineAmount = qty * unitPrice;
-                  return pw.TableRow(
+            if (itemLines.isNotEmpty) ...[
+              pw.SizedBox(height: 4),
+              pw.Table(
+                border: pw.TableBorder.all(width: 0.8, color: PdfColors.black),
+                columnWidths: {
+                  0: const pw.FlexColumnWidth(2.3),
+                  1: const pw.FlexColumnWidth(0.7),
+                  2: const pw.FlexColumnWidth(1.0),
+                  3: const pw.FlexColumnWidth(2.0),
+                },
+                children: [
+                  // Header row
+                  pw.TableRow(
                     children: [
                       pw.Container(
-                        padding: const pw.EdgeInsets.symmetric(
-                            vertical: 4, horizontal: 2),
-                        alignment: pw.Alignment.centerLeft,
-                        child: pw.Text(invoiceItem.item.itemName,
-                            style: const pw.TextStyle(fontSize: 18)),
+                        padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                        alignment: pw.Alignment.center,
+                        child: pw.Text('Items',
+                            style: pw.TextStyle(
+                                fontSize: 18, fontWeight: pw.FontWeight.bold)),
                       ),
                       pw.Container(
                         padding: const pw.EdgeInsets.symmetric(vertical: 4),
                         alignment: pw.Alignment.center,
-                        child: pw.Text(num(qty).toString(),
-                            style: const pw.TextStyle(fontSize: 18)),
+                        child: pw.Text('Qty',
+                            style: pw.TextStyle(
+                                fontSize: 18, fontWeight: pw.FontWeight.bold)),
                       ),
                       pw.Container(
                         padding: const pw.EdgeInsets.symmetric(vertical: 4),
                         alignment: pw.Alignment.center,
-                        child: pw.Text(formatNumberNoRs(unitPrice),
-                            style: const pw.TextStyle(fontSize: 18)),
+                        child: pw.Text('Unit Price',
+                            style: pw.TextStyle(
+                                fontSize: 18, fontWeight: pw.FontWeight.bold)),
                       ),
                       pw.Container(
-                        padding: const pw.EdgeInsets.symmetric(
-                            vertical: 4, horizontal: 2),
-                        alignment: pw.Alignment.centerRight,
-                        child: pw.Text(formatNumberNoRs(lineAmount),
-                            style: const pw.TextStyle(fontSize: 18)),
+                        padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                        alignment: pw.Alignment.center,
+                        child: pw.Text('Amount',
+                            style: pw.TextStyle(
+                                fontSize: 18, fontWeight: pw.FontWeight.bold)),
                       ),
                     ],
-                  );
-                }),
-              ],
-            ),
-
-            // ===== Totals bordered block (2 columns) =====
-            pw.SizedBox(height: 10),
-            pw.Table(
-              border: pw.TableBorder.all(width: 0.8, color: PdfColors.black),
-              columnWidths: {
-                0: const pw.FlexColumnWidth(2.0),
-                1: const pw.FlexColumnWidth(1),
-              },
-              children: [
-                if (!isDeliveryNote) ...[
-                  _totalRow('Total Value of Supply',
-                      formatNumberNoRs(totalValueOfSupply)),
-                  _totalRow('VAT 18%', formatNumberNoRs(vatAmount)),
-                  _totalRow('Nun VAT Items',
-                      formatNumberNoRs(nonVatItemsAmount)),
+                  ),
+                  ...itemLines.map((invoiceItem) {
+                    final qty = invoiceItem.quantity;
+                    final baseUnitPrice =
+                        invoiceItem.item.hasSpecialPrice?.itemPrice ??
+                            invoiceItem.item.salePrice;
+                    final nonVatPerUnit = invoiceItem.item.nonVatAmount ?? 0;
+                    final vatPerUnit = (baseUnitPrice / 100) * vatPercent;
+                    final unitPrice = isDeliveryNote
+                        ? baseUnitPrice + vatPerUnit + nonVatPerUnit
+                        : baseUnitPrice;
+                    final lineAmount = qty * unitPrice;
+                    return pw.TableRow(
+                      children: [
+                        pw.Container(
+                          padding: const pw.EdgeInsets.symmetric(
+                              vertical: 4, horizontal: 2),
+                          alignment: pw.Alignment.centerLeft,
+                          child: pw.Text(invoiceItem.item.itemName,
+                              style: const pw.TextStyle(fontSize: 18)),
+                        ),
+                        pw.Container(
+                          padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                          alignment: pw.Alignment.center,
+                          child: pw.Text(num(qty).toString(),
+                              style: const pw.TextStyle(fontSize: 18)),
+                        ),
+                        pw.Container(
+                          padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                          alignment: pw.Alignment.center,
+                          child: pw.Text(formatNumberNoRs(unitPrice),
+                              style: const pw.TextStyle(fontSize: 18)),
+                        ),
+                        pw.Container(
+                          padding: const pw.EdgeInsets.symmetric(
+                              vertical: 4, horizontal: 2),
+                          alignment: pw.Alignment.centerRight,
+                          child: pw.Text(formatNumberNoRs(lineAmount),
+                              style: const pw.TextStyle(fontSize: 18)),
+                        ),
+                      ],
+                    );
+                  }),
                 ],
-                _totalRow(
-                  'Total',
-                  formatNumberNoRs(grandTotal),
-                ),
-              ],
-            ),
+              ),
+
+              // ===== Totals bordered block (2 columns) =====
+              pw.SizedBox(height: 10),
+              pw.Table(
+                border: pw.TableBorder.all(width: 0.8, color: PdfColors.black),
+                columnWidths: {
+                  0: const pw.FlexColumnWidth(2.0),
+                  1: const pw.FlexColumnWidth(1),
+                },
+                children: [
+                  if (!isDeliveryNote) ...[
+                    _totalRow('Total Value of Supply',
+                        formatNumberNoRs(totalValueOfSupply)),
+                    _totalRow('VAT 18%', formatNumberNoRs(vatAmount)),
+                    _totalRow('Nun VAT Items',
+                        formatNumberNoRs(nonVatItemsAmount)),
+                  ],
+                  _totalRow(
+                    'Total',
+                    formatNumberNoRs(grandTotal),
+                  ),
+                ],
+              ),
+            ],
 
             // ===== Over payment settlement (Previous Deposite Payments) =====
             if (depositePaidList.isNotEmpty) ...[
