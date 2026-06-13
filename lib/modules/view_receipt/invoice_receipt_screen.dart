@@ -1067,8 +1067,7 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                     pop(context);
                                     if (isManual) {
                                       if (formKey.currentState!.validate()) {
-                                        waiting(context, body: 'Sending...');
-                                        await invoiceReceiptViewModel.pay(
+                                        final saved = await invoiceReceiptViewModel.pay(
                                           context: context,
                                           cash: cash,
                                           balance: currentBalance -
@@ -1083,15 +1082,16 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                               receiptNoController.text.trim(),
                                           isOnlySave: true,
                                         );
-                                        itemProvider.clearData();
-                                        Navigator.popUntil(
-                                            context,
-                                            ModalRoute.withName(
-                                                SelectCustomerView.routeId));
+                                        if (saved && context.mounted) {
+                                          itemProvider.clearData();
+                                          Navigator.popUntil(
+                                              context,
+                                              ModalRoute.withName(
+                                                  SelectCustomerView.routeId));
+                                        }
                                       }
                                     } else {
-                                      waiting(context, body: 'Sending...');
-                                      await invoiceReceiptViewModel.pay(
+                                      final saved = await invoiceReceiptViewModel.pay(
                                         context: context,
                                         cash: cash,
                                         balance: currentBalance -
@@ -1102,11 +1102,13 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                                     value + element),
                                         isOnlySave: true,
                                       );
-                                      itemProvider.clearData();
-                                      Navigator.popUntil(
-                                          context,
-                                          ModalRoute.withName(
-                                              SelectCustomerView.routeId));
+                                      if (saved && context.mounted) {
+                                        itemProvider.clearData();
+                                        Navigator.popUntil(
+                                            context,
+                                            ModalRoute.withName(
+                                                SelectCustomerView.routeId));
+                                      }
                                     }
                                   },
                                   onSaveAndPrint: () async {
@@ -1213,44 +1215,35 @@ class _InvoiceReceiptScreenState extends State<InvoiceReceiptScreen> {
                                     pop(context);
                                     if (isManual) {
                                       if (formKey.currentState!.validate()) {
-                                        waiting(context, body: 'Sending...');
-                                        await invoiceReceiptViewModel
-                                            .pay(
-                                              context: context,
-                                              cash: cash,
-                                              balance: currentBalance,
-                                              receiptNo: receiptNoController
-                                                  .text
-                                                  .trim(),
-                                              isOnlySave: true,
-                                            )
-                                            .then((value) => {
-                                                  pop(context),
-                                                  itemProvider.clearData(),
-                                                  Navigator.popUntil(
-                                                      context,
-                                                      ModalRoute.withName(
-                                                          SelectCustomerView
-                                                              .routeId))
-                                                });
+                                        final saved = await invoiceReceiptViewModel.pay(
+                                          context: context,
+                                          cash: cash,
+                                          balance: currentBalance,
+                                          receiptNo: receiptNoController.text.trim(),
+                                          isOnlySave: true,
+                                        );
+                                        if (saved && context.mounted) {
+                                          itemProvider.clearData();
+                                          Navigator.popUntil(
+                                              context,
+                                              ModalRoute.withName(
+                                                  SelectCustomerView.routeId));
+                                        }
                                       }
                                     } else {
-                                      await invoiceReceiptViewModel
-                                          .pay(
-                                            context: context,
-                                            cash: cash,
-                                            balance: currentBalance,
-                                            isOnlySave: true,
-                                          )
-                                          .then((value) => {
-                                                pop(context),
-                                                itemProvider.clearData(),
-                                                Navigator.popUntil(
-                                                    context,
-                                                    ModalRoute.withName(
-                                                        SelectCustomerView
-                                                            .routeId))
-                                              });
+                                      final saved = await invoiceReceiptViewModel.pay(
+                                        context: context,
+                                        cash: cash,
+                                        balance: currentBalance,
+                                        isOnlySave: true,
+                                      );
+                                      if (saved && context.mounted) {
+                                        itemProvider.clearData();
+                                        Navigator.popUntil(
+                                            context,
+                                            ModalRoute.withName(
+                                                SelectCustomerView.routeId));
+                                      }
                                     }
                                   },
                                   onSaveAndPrint: () async {
