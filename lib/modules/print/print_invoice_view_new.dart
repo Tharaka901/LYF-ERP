@@ -254,13 +254,15 @@ class _PrintInvoiceViewNewState extends State<PrintInvoiceViewNew> {
     final invoiceDate = formatInvoiceDate();
 
     final hasNewItem = itemLines.any((e) => e.item.itemTypeId == 2);
-    final invoiceHeaderText = hasNewItem
-        ? 'DELIVERY NOTE'
-        : (customer?.isProForma == 1)
-            ? 'PROFORMA INVOICE'
-            : (customerVat == 'Not Eligible')
-                ? 'INVOICE'
-                : 'TAX INVOICE';
+    final invoiceHeaderText = itemLines.isEmpty
+        ? 'RECEIPT'
+        : hasNewItem
+            ? 'DELIVERY NOTE'
+            : (customer?.isProForma == 1)
+                ? 'PROFORMA INVOICE'
+                : (customerVat == 'Not Eligible')
+                    ? 'INVOICE'
+                    : 'TAX INVOICE';
     final isDeliveryNote = invoiceHeaderText == 'DELIVERY NOTE';
     final vatPercent =
         double.tryParse(customer?.vat?.vatAmount ?? '18') ?? 18;
@@ -326,13 +328,14 @@ class _PrintInvoiceViewNewState extends State<PrintInvoiceViewNew> {
                           fontWeight: pw.FontWeight.bold,
                         ),
                       ),
-                      pw.Text(
-                        'In No :${widget.invoiceNo}',
-                        style: pw.TextStyle(
-                          fontSize: 22,
-                          fontWeight: pw.FontWeight.bold,
+                      if (itemLines.isNotEmpty)
+                        pw.Text(
+                          'In No :${widget.invoiceNo}',
+                          style: pw.TextStyle(
+                            fontSize: 22,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ],

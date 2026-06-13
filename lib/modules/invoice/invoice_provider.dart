@@ -26,10 +26,30 @@ class InvoiceProvider extends ChangeNotifier {
   static const _invoiceCountKeyNonEntr = 'invoiceCount';
   static const _invoiceCountKeyEntr = 'invoiceCountEntr';
   static const _invoiceCountKeyDeliveryNote = 'invoiceCountDeliveryNote';
+  static const _invoiceCountKeyReceipt = 'invoiceCountReceipt';
 
   Future<void> getInvoiceNu(BuildContext context) async {
     final hiveDBProvider = Provider.of<HiveDBProvider>(context, listen: false);
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
+
+    // Payment-only (no items) — use RCN/{routeCardId}/{count} format
+    if (dataProvider.itemList.isEmpty) {
+      final serverCount = await invoiceService.invoiceCount(
+        dataProvider.currentRouteCard!.routeCardId!,
+        isProForma: false,
+        isDeliveryNote: false,
+      );
+      final base =
+          int.tryParse(hiveDBProvider.dataBox!.get(_invoiceCountKeyReceipt) ?? '0') ?? 0;
+      invoiceNu =
+          'RCN/${dataProvider.currentRouteCard!.routeCardId}/${base + serverCount + 1}';
+      await hiveDBProvider.dataBox!
+          .put(_invoiceCountKeyReceipt, (base + 1).toString());
+      if (context.mounted) setCurrentInvoice(context);
+      notifyListeners();
+      return;
+    }
+
     final isDeliveryNote =
         dataProvider.itemList.any((e) => e.item.itemTypeId == 2);
     if (hiveDBProvider.isInternetConnected) {
