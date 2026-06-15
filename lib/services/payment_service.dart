@@ -119,23 +119,7 @@ class PaymentService {
         dataProvider.issuedDepositePaidList.clear();
       }
 
-      // //! Create invoice
-      await respo(
-        'invoice/update',
-        method: Method.put,
-        data: {
-          "invoiceId": paymentDataModel.invoiceId,
-          "status": 2,
-          "creditValue": 0
-        },
-      );
-      if (isOnlySave ?? false) {
-        dataProvider.itemList.clear();
-      }
-      //! Create receipt number
-
       final rn = paymentDataModel.receiptNo;
-
       final invoiceId = paymentDataModel.invoiceId;
 
       for (var invoice in paymentDataModel.issuedInvoicePaidList ?? []) {
@@ -220,6 +204,21 @@ class PaymentService {
         ).toJson(),
         method: Method.post,
       );
+
+      //! Update invoice — only after payment is successfully saved
+      await respo(
+        'invoice/update',
+        method: Method.put,
+        data: {
+          "invoiceId": paymentDataModel.invoiceId,
+          "status": 2,
+          "creditValue": 0
+        },
+      );
+      if (isOnlySave ?? false) {
+        dataProvider.itemList.clear();
+      }
+
       if (paymentDataModel.balance > 0) {
         await respo(
           'customers/update',
@@ -518,25 +517,21 @@ class PaymentService {
             method: Method.post,
             data: Payments(
               payments: [
-                if (paymentDataModel.cash > 0)
-                  PaymentModel(
-                    customerTypeId:
-                        paymentDataModel.selectedCustomer.customerTypeId,
-                    invoiceId: paymentDataModel.invoiceId,
-                    amount: paymentDataModel.selectedVoucher != null
-                        ? paymentDataModel.selectedVoucher!.value
-                        : 0.0,
-                    chequeNo: paymentDataModel.selectedVoucher?.code,
-                    receiptNo: rn,
-                    paymentMethod: 3,
-                    routecardId: paymentDataModel.currentRouteCard.routeCardId,
-                    routeId: paymentDataModel.currentRouteCard.routeId,
-                    customerId: paymentDataModel.selectedCustomer.customerId,
-                    priceLevelId:
-                        paymentDataModel.selectedCustomer.priceLevelId,
-                    employeeId: paymentDataModel.currentEmployee.employeeId,
-                    status: 1,
-                  ).toJson(),
+                PaymentModel(
+                  customerTypeId:
+                      paymentDataModel.selectedCustomer.customerTypeId,
+                  invoiceId: paymentDataModel.invoiceId,
+                  amount: paymentDataModel.selectedVoucher!.value,
+                  chequeNo: paymentDataModel.selectedVoucher?.code,
+                  receiptNo: rn,
+                  paymentMethod: 3,
+                  routecardId: paymentDataModel.currentRouteCard.routeCardId,
+                  routeId: paymentDataModel.currentRouteCard.routeId,
+                  customerId: paymentDataModel.selectedCustomer.customerId,
+                  priceLevelId: paymentDataModel.selectedCustomer.priceLevelId,
+                  employeeId: paymentDataModel.currentEmployee.employeeId,
+                  status: 1,
+                ).toJson(),
               ],
             ).toJson(),
           );
