@@ -84,85 +84,10 @@ class PaymentService {
   }) async {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     try {
-//! Update over payment
-      if (paymentDataModel.issuedDepositePaidList.isNotEmpty) {
-        await respo(
-          'over-payment/update',
-          method: Method.put,
-          data: {
-            "overPaymentsPayList": [
-              ...paymentDataModel.issuedDepositePaidList.map((e) => {
-                    "value": (e.depositeValue! - e.paymentAmount).toInt(),
-                    "customerId": paymentDataModel.selectedCustomer.customerId,
-                    "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
-                  })
-            ]
-          },
-        );
-      }
-
-      //! Update return cylinder invoice balance
-      for (var rci in paymentDataModel.issuedDepositePaidList) {
-        if (rci.issuedDeposite.status == 2) {
-          await respo('return-cylinder-invoice/update',
-              method: Method.put,
-              data: {
-                "invoiceNo": rci.issuedDeposite.receiptNo,
-                "balance": rci.issuedDeposite.value! - rci.paymentAmount,
-                "status":
-                    rci.issuedDeposite.value! - rci.paymentAmount == 0 ? 2 : 1
-              });
-        }
-      }
-
-      if (isOnlySave ?? false) {
-        dataProvider.issuedDepositePaidList.clear();
-      }
-
       final rn = paymentDataModel.receiptNo;
       final invoiceId = paymentDataModel.invoiceId;
 
-      for (var invoice in paymentDataModel.issuedInvoicePaidList ?? []) {
-        final creditAmount = invoice.creditAmount ?? invoice.paymentAmount;
-        final creditInvoiceId = invoice.chequeId ??
-            invoice.issuedInvoice.invoiceId ??
-            invoice.invoiceId;
-        if (creditInvoiceId == null) continue;
-        final data = {
-          "value": invoice.paymentAmount,
-          "paymentInvoiceId": invoiceId,
-          "routecardId": paymentDataModel.currentRouteCard.routeCardId,
-          "creditInvoiceId": creditInvoiceId,
-          "receiptNo": rn,
-          "status": invoice.chequeId != null ? 3 : 2,
-          "type": invoice.chequeId != null ? "return-cheque" : 'default'
-        };
-        await respo('credit-payment/create', method: Method.post, data: data);
-        if (creditAmount <= invoice.paymentAmount && invoice.chequeId == null) {
-          final issuedInvoiceId = invoice.issuedInvoice.invoiceId;
-          if (issuedInvoiceId != null) {
-            await respo('invoice/update', method: Method.put, data: {
-              "invoiceId": issuedInvoiceId,
-              "status": 2
-            });
-          }
-        }
-
-        if (invoice.chequeId != null) {
-          if (creditAmount <= invoice.paymentAmount) {
-            await respo('cheque/update',
-                method: Method.put,
-                data: {"id": invoice.chequeId, "isActive": 2, "balance": 0});
-          } else {
-            await respo('cheque/update', method: Method.put, data: {
-              "id": invoice.chequeId,
-              "balance": creditAmount - invoice.paymentAmount
-            });
-          }
-        }
-      }
-
-      //! Create payment
+      //! Create payment FIRST — any failure here leaves DB untouched
       final payWithCreditRes = await respo(
         'payment/create',
         data: Payments(
@@ -208,7 +133,82 @@ class PaymentService {
         throw Exception(payWithCreditRes.error ?? 'Payment failed');
       }
 
-      //! Update invoice — only after payment is successfully saved
+//! Update over payment
+      if (paymentDataModel.issuedDepositePaidList.isNotEmpty) {
+        await respo(
+          'over-payment/update',
+          method: Method.put,
+          data: {
+            "overPaymentsPayList": [
+              ...paymentDataModel.issuedDepositePaidList.map((e) => {
+                    "value": (e.depositeValue! - e.paymentAmount).toInt(),
+                    "customerId": paymentDataModel.selectedCustomer.customerId,
+                    "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
+                  })
+            ]
+          },
+        );
+      }
+
+      //! Update return cylinder invoice balance
+      for (var rci in paymentDataModel.issuedDepositePaidList) {
+        if (rci.issuedDeposite.status == 2) {
+          await respo('return-cylinder-invoice/update',
+              method: Method.put,
+              data: {
+                "invoiceNo": rci.issuedDeposite.receiptNo,
+                "balance": rci.issuedDeposite.value! - rci.paymentAmount,
+                "status":
+                    rci.issuedDeposite.value! - rci.paymentAmount == 0 ? 2 : 1
+              });
+        }
+      }
+
+      if (isOnlySave ?? false) {
+        dataProvider.issuedDepositePaidList.clear();
+      }
+
+      for (var invoice in paymentDataModel.issuedInvoicePaidList ?? []) {
+        final creditAmount = invoice.creditAmount ?? invoice.paymentAmount;
+        final creditInvoiceId = invoice.chequeId ??
+            invoice.issuedInvoice.invoiceId ??
+            invoice.invoiceId;
+        if (creditInvoiceId == null) continue;
+        final data = {
+          "value": invoice.paymentAmount,
+          "paymentInvoiceId": invoiceId,
+          "routecardId": paymentDataModel.currentRouteCard.routeCardId,
+          "creditInvoiceId": creditInvoiceId,
+          "receiptNo": rn,
+          "status": invoice.chequeId != null ? 3 : 2,
+          "type": invoice.chequeId != null ? "return-cheque" : 'default'
+        };
+        await respo('credit-payment/create', method: Method.post, data: data);
+        if (creditAmount <= invoice.paymentAmount && invoice.chequeId == null) {
+          final issuedInvoiceId = invoice.issuedInvoice.invoiceId;
+          if (issuedInvoiceId != null) {
+            await respo('invoice/update', method: Method.put, data: {
+              "invoiceId": issuedInvoiceId,
+              "status": 2
+            });
+          }
+        }
+
+        if (invoice.chequeId != null) {
+          if (creditAmount <= invoice.paymentAmount) {
+            await respo('cheque/update',
+                method: Method.put,
+                data: {"id": invoice.chequeId, "isActive": 2, "balance": 0});
+          } else {
+            await respo('cheque/update', method: Method.put, data: {
+              "id": invoice.chequeId,
+              "balance": creditAmount - invoice.paymentAmount
+            });
+          }
+        }
+      }
+
+      //! Update invoice
       await respo(
         'invoice/update',
         method: Method.put,
@@ -279,10 +279,12 @@ class PaymentService {
         );
       }
 
-      final invoiceProvider =
-          Provider.of<InvoiceProvider>(context, listen: false);
-      invoiceProvider.invoiceNu = null;
-      invoiceProvider.invoiceRes = null;
+      if (context.mounted) {
+        final invoiceProvider =
+            Provider.of<InvoiceProvider>(context, listen: false);
+        invoiceProvider.invoiceNu = null;
+        invoiceProvider.invoiceRes = null;
+      }
     } catch (e) {
       rethrow;
     }
@@ -296,7 +298,8 @@ class PaymentService {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     final selectedCustomer = paymentDataModel.selectedCustomer;
 
-    await respo('invoice/create-single', method: Method.post, data: {
+    final invoiceResponse =
+        await respo('invoice/create-single', method: Method.post, data: {
       "invoice": {
         "invoiceNo": paymentDataModel.invoiceNo,
         "routecardId": paymentDataModel.currentRouteCard.routeCardId,
@@ -309,151 +312,138 @@ class PaymentService {
         "nonVatItemTotal": 0,
         "status": !paymentDataModel.isDirectPrevoius! ? 3 : 4,
       },
-    }).then((invoiceResponse) async {
-      final invoiceId = invoiceResponse.data['invoiceId'] as int;
-      final rn = paymentDataModel.receiptNo;
-      if ((paymentDataModel.issuedInvoicePaidList ?? []).isNotEmpty) {
-        for (var invoice in paymentDataModel.issuedInvoicePaidList!) {
-          final data = {
-            "value": invoice.paymentAmount,
-            "paymentInvoiceId": invoiceId,
-            "routecardId": paymentDataModel.currentRouteCard.routeCardId,
-            "creditInvoiceId": invoice.chequeId ?? invoice.invoiceId,
-            "receiptNo": rn,
-            "status": invoice.chequeId != null ? 3 : 1,
-            "type": invoice.chequeId != null ? "return-cheque" : 'default'
-          };
-          await respo('credit-payment/create', method: Method.post, data: data);
-          if (invoice.creditAmount! <= invoice.paymentAmount &&
-              invoice.chequeId == null) {
-            await respo('invoice/update', method: Method.put, data: {
-              "invoiceId": invoice.issuedInvoice.invoiceId,
-              "status": 2
-            });
+    });
+    final invoiceId = invoiceResponse.data['invoiceId'] as int;
+    final rn = paymentDataModel.receiptNo;
+
+    //! Create payment FIRST — any failure here leaves DB untouched
+    final sendCreditPayRes = await respo('payment/create',
+        method: Method.post,
+        data: Payments(
+          payments: [
+            if (paymentDataModel.cash > 0)
+              PaymentModel(
+                customerTypeId: selectedCustomer.customerTypeId,
+                invoiceId: invoiceId,
+                amount: paymentDataModel.cash,
+                receiptNo: rn,
+                paymentMethod: 1,
+                chequeNo: null,
+                routecardId: paymentDataModel.currentRouteCard.routeCardId,
+                routeId: paymentDataModel.currentRouteCard.routeId,
+                customerId: selectedCustomer.customerId,
+                priceLevelId: selectedCustomer.priceLevelId,
+                employeeId: paymentDataModel.currentEmployee.employeeId,
+                status: 1,
+              ).toJson(),
+            ...paymentDataModel.chequeList.map(
+              (cheque) => PaymentModel(
+                customerTypeId: selectedCustomer.customerTypeId,
+                invoiceId: invoiceId,
+                amount: cheque.chequeAmount,
+                chequeNo: cheque.chequeNumber,
+                receiptNo: rn,
+                paymentMethod: 2,
+                routecardId: paymentDataModel.currentRouteCard.routeCardId,
+                routeId: paymentDataModel.currentRouteCard.routeId,
+                customerId: selectedCustomer.customerId,
+                priceLevelId: selectedCustomer.priceLevelId,
+                employeeId: paymentDataModel.currentEmployee.employeeId,
+                status: 1,
+              ).toJson(),
+            ),
+          ],
+        ).toJson());
+    if (!sendCreditPayRes.success || sendCreditPayRes.error != null) {
+      throw Exception(sendCreditPayRes.error ?? 'Payment failed');
+    }
+
+    if ((paymentDataModel.issuedInvoicePaidList ?? []).isNotEmpty) {
+      for (var invoice in paymentDataModel.issuedInvoicePaidList!) {
+        final data = {
+          "value": invoice.paymentAmount,
+          "paymentInvoiceId": invoiceId,
+          "routecardId": paymentDataModel.currentRouteCard.routeCardId,
+          "creditInvoiceId": invoice.chequeId ?? invoice.invoiceId,
+          "receiptNo": rn,
+          "status": invoice.chequeId != null ? 3 : 1,
+          "type": invoice.chequeId != null ? "return-cheque" : 'default'
+        };
+        await respo('credit-payment/create', method: Method.post, data: data);
+        if (invoice.creditAmount! <= invoice.paymentAmount &&
+            invoice.chequeId == null) {
+          await respo('invoice/update', method: Method.put, data: {
+            "invoiceId": invoice.issuedInvoice.invoiceId,
+            "status": 2
+          });
+        }
+        if (invoice.chequeId != null) {
+          if (invoice.creditAmount! <= invoice.paymentAmount) {
+            await respo('cheque/update',
+                method: Method.put,
+                data: {"id": invoice.chequeId, "isActive": 2, "balance": 0});
           } else {
-            // try {
-            //   if (kDebugMode) {
-            //     print(invoice.issuedInvoice.toJsonWithId());
-            //   }
-            //   await respo('invoice/update', method: Method.put, data: {
-            //     "invoiceId": invoice.issuedInvoice.invoiceId,
-            //     "creditValue": invoice.creditAmount! - invoice.paymentAmount
-            //   });
-            // } catch (e) {
-            //   if (kDebugMode) {
-            //     print(e);
-            //   }
-            // }
-          }
-          if (invoice.chequeId != null) {
-            if (invoice.creditAmount! <= invoice.paymentAmount) {
-              await respo('cheque/update',
-                  method: Method.put,
-                  data: {"id": invoice.chequeId, "isActive": 2, "balance": 0});
-            } else {
-              await respo('cheque/update', method: Method.put, data: {
-                "id": invoice.chequeId,
-                "balance": invoice.creditAmount! - invoice.paymentAmount
-              });
-            }
+            await respo('cheque/update', method: Method.put, data: {
+              "id": invoice.chequeId,
+              "balance": invoice.creditAmount! - invoice.paymentAmount
+            });
           }
         }
       }
+    }
 
-      final sendCreditPayRes = await respo('payment/create',
-          method: Method.post,
-          data: Payments(
-            payments: [
-              if (paymentDataModel.cash > 0)
-                PaymentModel(
-                  customerTypeId: selectedCustomer.customerTypeId,
-                  invoiceId: invoiceId,
-                  amount: paymentDataModel.cash,
-                  receiptNo: rn,
-                  paymentMethod: 1,
-                  chequeNo: null,
-                  routecardId: paymentDataModel.currentRouteCard.routeCardId,
-                  routeId: paymentDataModel.currentRouteCard.routeId,
-                  customerId: selectedCustomer.customerId,
-                  priceLevelId: selectedCustomer.priceLevelId,
-                  employeeId: paymentDataModel.currentEmployee.employeeId,
-                  status: 1,
-                ).toJson(),
-              ...paymentDataModel.chequeList.map(
-                (cheque) => PaymentModel(
-                  customerTypeId: selectedCustomer.customerTypeId,
-                  invoiceId: invoiceId,
-                  amount: cheque.chequeAmount,
-                  chequeNo: cheque.chequeNumber,
-                  receiptNo: rn,
-                  paymentMethod: 2,
-                  routecardId: paymentDataModel.currentRouteCard.routeCardId,
-                  routeId: paymentDataModel.currentRouteCard.routeId,
-                  customerId: selectedCustomer.customerId,
-                  priceLevelId: selectedCustomer.priceLevelId,
-                  employeeId: paymentDataModel.currentEmployee.employeeId,
-                  status: 1,
-                ).toJson(),
-              ),
-            ],
-          ).toJson());
-      if (!sendCreditPayRes.success || sendCreditPayRes.error != null) {
-        throw Exception(sendCreditPayRes.error ?? 'Payment failed');
-      }
-      if (paymentDataModel.totalPayment! >
-          (paymentDataModel.issuedInvoicePaidList!
-              .map((e) => e.paymentAmount)
-              .toList()
-              .reduce((value, element) => value + element))) {
-        await respo(
-          'customers/update',
-          method: Method.put,
-          data: {
-            "customerId": selectedCustomer.customerId,
-            "depositBalance": selectedCustomer.depositBalance! +
-                (paymentDataModel.totalPayment! -
-                    (paymentDataModel.issuedInvoicePaidList!
-                        .map((e) => e.paymentAmount)
-                        .toList()
-                        .reduce((value, element) => value + element))),
-          },
-        );
-        await respo(
-          'over-payment/create',
-          method: Method.post,
-          data: {
-            "value": (paymentDataModel.totalPayment! -
-                (paymentDataModel.issuedInvoicePaidList!
-                    .map((e) => e.paymentAmount)
-                    .toList()
-                    .reduce((value, element) => value + element))),
-            "status": 1,
-            "paymentInvoiceId": invoiceId,
-            "routecardId": paymentDataModel.currentRouteCard.routeCardId,
-            "receiptNo": rn,
-            "customerId": selectedCustomer.customerId
-          },
-        );
-      }
-      //});
-      dataProvider.chequeList.clear();
-      //! Update over payment
-      if (paymentDataModel.issuedDepositePaidList.isNotEmpty) {
-        await respo(
-          'over-payment/update',
-          method: Method.put,
-          data: {
-            "overPaymentsPayList": [
-              ...paymentDataModel.issuedDepositePaidList.map((e) => {
-                    "value": (e.depositeValue! - e.paymentAmount).toInt(),
-                    "customerId": paymentDataModel.selectedCustomer.customerId,
-                    "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
-                  })
-            ]
-          },
-        );
-      }
-    });
+    if (paymentDataModel.totalPayment! >
+        (paymentDataModel.issuedInvoicePaidList!
+            .map((e) => e.paymentAmount)
+            .toList()
+            .reduce((value, element) => value + element))) {
+      await respo(
+        'customers/update',
+        method: Method.put,
+        data: {
+          "customerId": selectedCustomer.customerId,
+          "depositBalance": selectedCustomer.depositBalance! +
+              (paymentDataModel.totalPayment! -
+                  (paymentDataModel.issuedInvoicePaidList!
+                      .map((e) => e.paymentAmount)
+                      .toList()
+                      .reduce((value, element) => value + element))),
+        },
+      );
+      await respo(
+        'over-payment/create',
+        method: Method.post,
+        data: {
+          "value": (paymentDataModel.totalPayment! -
+              (paymentDataModel.issuedInvoicePaidList!
+                  .map((e) => e.paymentAmount)
+                  .toList()
+                  .reduce((value, element) => value + element))),
+          "status": 1,
+          "paymentInvoiceId": invoiceId,
+          "routecardId": paymentDataModel.currentRouteCard.routeCardId,
+          "receiptNo": rn,
+          "customerId": selectedCustomer.customerId
+        },
+      );
+    }
+    dataProvider.chequeList.clear();
+    //! Update over payment
+    if (paymentDataModel.issuedDepositePaidList.isNotEmpty) {
+      await respo(
+        'over-payment/update',
+        method: Method.put,
+        data: {
+          "overPaymentsPayList": [
+            ...paymentDataModel.issuedDepositePaidList.map((e) => {
+                  "value": (e.depositeValue! - e.paymentAmount).toInt(),
+                  "customerId": paymentDataModel.selectedCustomer.customerId,
+                  "paymentInvoiceId": e.issuedDeposite.paymentInvoiceId
+                })
+          ]
+        },
+      );
+    }
     if (context.mounted) {
       final invoiceProvider =
           Provider.of<InvoiceProvider>(context, listen: false);
