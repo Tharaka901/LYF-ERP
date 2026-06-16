@@ -163,7 +163,7 @@ class PaymentService {
       }
 
       //! Create payment
-      await respo(
+      final payWithCreditRes = await respo(
         'payment/create',
         data: Payments(
           payments: [
@@ -204,6 +204,9 @@ class PaymentService {
         ).toJson(),
         method: Method.post,
       );
+      if (!payWithCreditRes.success || payWithCreditRes.error != null) {
+        throw Exception(payWithCreditRes.error ?? 'Payment failed');
+      }
 
       //! Update invoice — only after payment is successfully saved
       await respo(
@@ -357,7 +360,7 @@ class PaymentService {
         }
       }
 
-      await respo('payment/create',
+      final sendCreditPayRes = await respo('payment/create',
           method: Method.post,
           data: Payments(
             payments: [
@@ -394,6 +397,9 @@ class PaymentService {
               ),
             ],
           ).toJson());
+      if (!sendCreditPayRes.success || sendCreditPayRes.error != null) {
+        throw Exception(sendCreditPayRes.error ?? 'Payment failed');
+      }
       if (paymentDataModel.totalPayment! >
           (paymentDataModel.issuedInvoicePaidList!
               .map((e) => e.paymentAmount)
@@ -468,7 +474,7 @@ class PaymentService {
 
       if (paymentDataModel.totalPayment != 0.0) {
         //! Create payment
-        await respo(
+        final payRes = await respo(
           'payment/create',
           data: Payments(
             payments: [
@@ -509,6 +515,9 @@ class PaymentService {
           ).toJson(),
           method: Method.post,
         );
+        if (!payRes.success || payRes.error != null) {
+          throw Exception(payRes.error ?? 'Payment failed');
+        }
         dataProvider.chequeList.clear();
         //! Create voucher payment
         if (paymentDataModel.selectedVoucher != null) {
