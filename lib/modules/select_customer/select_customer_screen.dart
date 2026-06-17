@@ -249,8 +249,9 @@ class _SelectCustomerViewState extends State<SelectCustomerView> {
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const QRScanScreen(
+                                builder: (context) => QRScanScreen(
                                       screen: 'Billing',
+                                      type: widget.type,
                                     )));
                       },
                       icon: const Icon(
