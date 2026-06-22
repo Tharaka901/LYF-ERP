@@ -123,7 +123,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                           child: pw.Text(
                             'Item',
                             style: pw.TextStyle(
-                              fontSize: 12.0,
+                              fontSize: 14.0,
                               fontWeight: pw.FontWeight.bold,
                             ),
                           ),
@@ -133,7 +133,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                           child: pw.Text(
                             'Qty',
                             style: pw.TextStyle(
-                              fontSize: 12.0,
+                              fontSize: 14.0,
                               fontWeight: pw.FontWeight.bold,
                             ),
                             textAlign: pw.TextAlign.center,
@@ -144,7 +144,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                           child: pw.Text(
                             'Unit Price',
                             style: pw.TextStyle(
-                              fontSize: 12.0,
+                              fontSize: 14.0,
                               fontWeight: pw.FontWeight.bold,
                             ),
                             textAlign: pw.TextAlign.center,
@@ -155,7 +155,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                           child: pw.Text(
                             'Total',
                             style: pw.TextStyle(
-                              fontSize: 12.0,
+                              fontSize: 14.0,
                               fontWeight: pw.FontWeight.bold,
                             ),
                             textAlign: pw.TextAlign.center,
@@ -180,14 +180,14 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                               flex: 3,
                               child: pw.Text(
                                 item.itemName,
-                                style: const pw.TextStyle(fontSize: 12.0),
+                                style: const pw.TextStyle(fontSize: 14.0),
                               ),
                             ),
                             pw.Expanded(
                               flex: 1,
                               child: pw.Text(
                                 '${item.itemQty ?? 0}',
-                                style: const pw.TextStyle(fontSize: 12.0),
+                                style: const pw.TextStyle(fontSize: 14.0),
                                 textAlign: pw.TextAlign.center,
                               ),
                             ),
@@ -195,7 +195,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                               flex: 1,
                               child: pw.Text(
                                 price(item.salePrice),
-                                style: const pw.TextStyle(fontSize: 12.0),
+                                style: const pw.TextStyle(fontSize: 14.0),
                                 textAlign: pw.TextAlign.center,
                               ),
                             ),
@@ -203,7 +203,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                               flex: 1,
                               child: pw.Text(
                                 price((item.salePrice * (item.itemQty ?? 0))),
-                                style: const pw.TextStyle(fontSize: 12.0),
+                                style: const pw.TextStyle(fontSize: 14.0),
                                 textAlign: pw.TextAlign.center,
                               ),
                             ),
@@ -260,7 +260,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                             child: pw.Text(
                               'Invoice No',
                               style: pw.TextStyle(
-                                fontSize: 12.0,
+                                fontSize: 14.0,
                                 fontWeight: pw.FontWeight.bold,
                               ),
                             ),
@@ -270,7 +270,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                             child: pw.Text(
                               'Date',
                               style: pw.TextStyle(
-                                fontSize: 12.0,
+                                fontSize: 14.0,
                                 fontWeight: pw.FontWeight.bold,
                               ),
                               textAlign: pw.TextAlign.center,
@@ -281,7 +281,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                             child: pw.Text(
                               'Credit',
                               style: pw.TextStyle(
-                                fontSize: 12.0,
+                                fontSize: 14.0,
                                 fontWeight: pw.FontWeight.bold,
                               ),
                               textAlign: pw.TextAlign.center,
@@ -292,7 +292,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                             child: pw.Text(
                               'Payment',
                               style: pw.TextStyle(
-                                fontSize: 12.0,
+                                fontSize: 14.0,
                                 fontWeight: pw.FontWeight.bold,
                               ),
                               textAlign: pw.TextAlign.center,
@@ -317,7 +317,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                                 flex: 2,
                                 child: pw.Text(
                                   paidInvoice.issuedInvoice.invoiceNo,
-                                  style: const pw.TextStyle(fontSize: 12.0),
+                                  style: const pw.TextStyle(fontSize: 14.0),
                                 ),
                               ),
                               pw.Expanded(
@@ -327,7 +327,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                                           ?.toString()
                                           .split(' ')[0] ??
                                       '',
-                                  style: const pw.TextStyle(fontSize: 12.0),
+                                  style: const pw.TextStyle(fontSize: 14.0),
                                   textAlign: pw.TextAlign.center,
                                 ),
                               ),
@@ -335,7 +335,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                                 flex: 1,
                                 child: pw.Text(
                                   price(paidInvoice.creditAmount ?? 0),
-                                  style: const pw.TextStyle(fontSize: 12.0),
+                                  style: const pw.TextStyle(fontSize: 14.0),
                                   textAlign: pw.TextAlign.center,
                                 ),
                               ),
@@ -343,7 +343,7 @@ class ReturnCylinderPrintScreen extends StatelessWidget {
                                 flex: 1,
                                 child: pw.Text(
                                   price(paidInvoice.paymentAmount),
-                                  style: const pw.TextStyle(fontSize: 12.0),
+                                  style: const pw.TextStyle(fontSize: 14.0),
                                   textAlign: pw.TextAlign.center,
                                 ),
                               ),
