@@ -76,11 +76,13 @@ class _SelectPreviousInvoiceScreenState
               selectPreviousInvoiceViewModel: selectPreviousInvoiceViewModel,
             ),
             const SizedBox(height: 15),
-            Consumer<DataProvider>(
-              builder: (context, data, _) =>
-                  data.issuedInvoicePaidList.isNotEmpty
-                      ? _InvoicePaidTable()
-                      : dummy,
+            Expanded(
+              child: Consumer<DataProvider>(
+                builder: (context, data, _) =>
+                    data.issuedInvoicePaidList.isNotEmpty
+                        ? SingleChildScrollView(child: _InvoicePaidTable())
+                        : dummy,
+              ),
             ),
           ],
         ),
@@ -88,6 +90,7 @@ class _SelectPreviousInvoiceScreenState
     );
   }
 }
+
 
 // --- Extracted Widgets ---
 
